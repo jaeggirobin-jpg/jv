@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>JV Docs – Dokument</title>
+  <style>
+    /* Farben: #BF853B gold, #4B575D dunkel, #929A9D grau */
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #2a3135;
+      color: #fff;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    header {
+      background: #4B575D;
+      border-bottom: 2px solid #BF853B;
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: #fff;
+    }
+    header h1 .brand { color: #BF853B; font-weight: 700; }
+    header .customer {
+      font-size: 0.85rem;
+      color: #929A9D;
+    }
+    #viewer {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem 3rem;
+    }
+    .page-wrap {
+      margin: 0 auto 1.5rem;
+      background: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      position: relative;
+      display: block;
+      max-width: 100%;
+    }
+    .page-wrap canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      pointer-events: none;
+    }
+    #status {
+      text-align: center;
+      color: #929A9D;
+      padding: 2rem;
+      font-size: 0.95rem;
+    }
+    #status.error {
+      background: #4B575D;
+      border-left: 4px solid #BF853B;
+      color: #fff;
+      max-width: 600px;
+      margin: 3rem auto;
+      padding: 1.5rem 2rem;
+      text-align: left;
+      border-radius: 4px;
+    }
+    #status.error h2 {
+      margin: 0 0 0.8rem 0;
+      color: #BF853B;
+      font-size: 1.1rem;
+    }
+    #status button {
+      background: #BF853B;
+      color: #fff;
+      border: none;
+      padding: 0.55rem 1.2rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+    #status button:hover { background: #a8722e; }
+    footer {
+      text-align: center;
+      color: #929A9D;
+      font-size: 0.75rem;
+      padding: 1.5rem;
+      border-top: 1px solid #4B575D;
+    }
+    /* Druckversuche erschweren */
+    @media print {
+      html, body { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1><span class="brand">JV</span> Docs</h1>
+    <div class="customer" id="customerLabel"></div>
+  </header>
+
+  <div id="viewer">
+    <div id="status">Dokument wird geladen…</div>
+    <div id="pages"></div>
+  </div>
+
+  <footer>
+    © Jäggi Vollmer GmbH – Vertrauliches Dokument. Weitergabe untersagt.
+  </footer>
+
+  <!-- PDF.js 3.x von Mozilla CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    // Worker-URL setzen
+    if (window['pdfjsLib']) {
+      window['pdfjsLib'].GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    // --- Schutzmassnahmen gegen einfaches Abgreifen ---
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+    document.addEventListener('keydown', (e) => {
+      // Ctrl/Cmd + S (Speichern), Ctrl/Cmd + P (Drucken), Ctrl/Cmd + U (Quelltext)
+      const k = (e.key || '').toLowerCase();
+      if ((e.ctrlKey || e.metaKey) && (k === 's' || k === 'p' || k === 'u')) {
+        e.preventDefault();
+      }
+      // F12 / DevTools Hotkeys zumindest dezent erschweren
+      if (k === 'f12') e.preventDefault();
+    });
+    // Drag verhindern
+    document.addEventListener('dragstart', (e) => e.preventDefault());
+
+    const $ = (id) => document.getElementById(id);
+
+    function showStatus(html, isError) {
+      const el = $('status');
+      el.innerHTML = html;
+      el.className = isError ? 'error' : '';
+      el.style.display = 'block';
+    }
+
+    function hideStatus() {
+      $('status').style.display = 'none';
+    }
+
+    function getToken() {
+      const params = new URLSearchParams(location.search);
+      return params.get('t') || '';
+    }
+
+    // Wasserzeichen-Text: «Vertraulich – Kundenname» + Datum
+    function watermarkText(customerName) {
+      const d = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const date = `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+      return `« Vertraulich – ${customerName} »   ${date}`;
+    }
+
+    // Wasserzeichen über Canvas legen, diagonal, halbtransparent,
+    // mehrfach über die ganze Seite verteilt.
+    function drawWatermark(canvas, text) {
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.save();
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = '#BF853B';
+      const fontSize = Math.max(18, Math.round(w / 38));
+      ctx.font = `600 ${fontSize}px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Rasterabstände abhängig von der Seitenbreite
+      const stepX = Math.round(w / 2);
+      const stepY = Math.round(w / 3.5);
+
+      ctx.translate(w / 2, h / 2);
+      ctx.rotate(-Math.PI / 6); // ~ -30°
+
+      const cols = Math.ceil(w / stepX) + 2;
+      const rows = Math.ceil(h / stepY) + 2;
+
+      for (let r = -rows; r <= rows; r++) {
+        for (let c = -cols; c <= cols; c++) {
+          ctx.fillText(text, c * stepX, r * stepY);
+        }
+      }
+      ctx.restore();
+    }
+
+    async function renderPdf(signedUrl, customerName) {
+      const wmText = watermarkText(customerName);
+      const loadingTask = pdfjsLib.getDocument({
+        url: signedUrl,
+        // Verhindert, dass PDF.js versucht, Range-Requests via Browser-Cache zu nutzen
+        disableRange: false,
+        disableStream: false,
+      });
+
+      const pdf = await loadingTask.promise;
+      const pagesEl = $('pages');
+      pagesEl.innerHTML = '';
+
+      // Zielbreite (an Container angepasst)
+      const containerWidth = Math.min(1000, document.documentElement.clientWidth - 32);
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const baseViewport = page.getViewport({ scale: 1 });
+        const scale = containerWidth / baseViewport.width;
+        // Höhere Canvas-Auflösung für Retina, aber begrenzt
+        const outputScale = Math.min(window.devicePixelRatio || 1, 2);
+        const viewport = page.getViewport({ scale });
+
+        const wrap = document.createElement('div');
+        wrap.className = 'page-wrap';
+
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.floor(viewport.width * outputScale);
+        canvas.height = Math.floor(viewport.height * outputScale);
+        canvas.style.width = viewport.width + 'px';
+        canvas.style.height = viewport.height + 'px';
+
+        const ctx = canvas.getContext('2d');
+        const transform = outputScale !== 1
+          ? [outputScale, 0, 0, outputScale, 0, 0]
+          : null;
+
+        await page.render({
+          canvasContext: ctx,
+          viewport,
+          transform,
+        }).promise;
+
+        // Wasserzeichen überlagern, nachdem die Seite gerendert wurde
+        drawWatermark(canvas, wmText);
+
+        wrap.appendChild(canvas);
+        pagesEl.appendChild(wrap);
+      }
+    }
+
+    async function loadDocument() {
+      const token = getToken();
+      if (!token) {
+        showStatus(
+          '<h2>Kein Link angegeben</h2><p>Dieser Link scheint unvollständig zu sein. Bitte kontaktieren Sie Jäggi Vollmer.</p>',
+          true,
+        );
+        return;
+      }
+
+      showStatus('Dokument wird geladen…', false);
+
+      try {
+        const res = await fetch(`/.netlify/functions/get-pdf?t=${encodeURIComponent(token)}`, {
+          cache: 'no-store',
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 404) {
+          showStatus(
+            '<h2>Link nicht gefunden</h2><p>Der aufgerufene Link existiert nicht. Bitte kontaktieren Sie Jäggi Vollmer.</p>',
+            true,
+          );
+          return;
+        }
+        if (res.status === 403) {
+          showStatus(
+            '<h2>Zugang deaktiviert</h2><p>Dieser Link wurde deaktiviert. Bitte kontaktieren Sie Jäggi Vollmer.</p>',
+            true,
+          );
+          return;
+        }
+        if (!res.ok) {
+          throw new Error(data.error || 'HTTP ' + res.status);
+        }
+
+        $('customerLabel').textContent = data.customer_name || '';
+        hideStatus();
+        await renderPdf(data.signed_url, data.customer_name || 'Kunde');
+      } catch (e) {
+        showStatus(
+          `<h2>Fehler beim Laden</h2>
+           <p>${(e && e.message) ? e.message : 'Unbekannter Fehler'}</p>
+           <button id="retryBtn">Erneut versuchen</button>`,
+          true,
+        );
+        const rb = $('retryBtn');
+        if (rb) rb.addEventListener('click', loadDocument);
+      }
+    }
+
+    loadDocument();
+  </script>
+</body>
+</html>

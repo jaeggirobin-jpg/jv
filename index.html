@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>JV Docs – Admin</title>
+  <style>
+    /* Farben: #BF853B (gold), #4B575D (dunkel), #929A9D (grau) */
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f5f5f5;
+      color: #4B575D;
+    }
+    header {
+      background: #4B575D;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    header .brand { color: #BF853B; }
+    header button {
+      background: transparent;
+      border: 1px solid #929A9D;
+      color: #fff;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    header button:hover { background: #BF853B; border-color: #BF853B; }
+    main {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    .card {
+      background: #fff;
+      border-radius: 6px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .card h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1.05rem;
+      color: #4B575D;
+      border-bottom: 2px solid #BF853B;
+      padding-bottom: 0.5rem;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      margin: 0.75rem 0 0.25rem;
+      color: #4B575D;
+      font-weight: 500;
+    }
+    input[type="text"], input[type="password"], input[type="file"], textarea {
+      width: 100%;
+      padding: 0.55rem 0.7rem;
+      border: 1px solid #929A9D;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: #fff;
+      color: #4B575D;
+    }
+    textarea { min-height: 60px; resize: vertical; }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #BF853B;
+      box-shadow: 0 0 0 2px rgba(191,133,59,0.2);
+    }
+    button.primary {
+      background: #BF853B;
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-top: 1rem;
+    }
+    button.primary:hover { background: #a8722e; }
+    button.primary:disabled { background: #929A9D; cursor: not-allowed; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    th, td {
+      padding: 0.7rem 0.6rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e5e5;
+      vertical-align: middle;
+    }
+    th {
+      background: #f5f5f5;
+      color: #4B575D;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    tr:hover td { background: #fafafa; }
+    .status {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .status.active { background: #e6f4e6; color: #2d7a2d; }
+    .status.inactive { background: #f5e6e6; color: #963030; }
+    .actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .actions button {
+      border: 1px solid #929A9D;
+      background: #fff;
+      color: #4B575D;
+      padding: 0.3rem 0.6rem;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.78rem;
+    }
+    .actions button:hover { background: #4B575D; color: #fff; border-color: #4B575D; }
+    .actions button.danger:hover { background: #963030; border-color: #963030; }
+
+    #login {
+      max-width: 380px;
+      margin: 5rem auto;
+    }
+    .msg {
+      padding: 0.7rem 1rem;
+      border-radius: 4px;
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+    }
+    .msg.error { background: #f5e6e6; color: #963030; border-left: 3px solid #963030; }
+    .msg.success { background: #e6f4e6; color: #2d7a2d; border-left: 3px solid #2d7a2d; }
+    .msg.info { background: #eef2f5; color: #4B575D; border-left: 3px solid #929A9D; }
+    .muted { color: #929A9D; font-size: 0.8rem; }
+    .hidden { display: none !important; }
+    .token-short { font-family: monospace; font-size: 0.8rem; color: #929A9D; }
+  </style>
+</head>
+<body>
+
+  <!-- Login-Ansicht -->
+  <div id="login">
+    <div class="card">
+      <h2>JV Docs – Admin</h2>
+      <label for="pwd">Passwort</label>
+      <input type="password" id="pwd" autocomplete="current-password" />
+      <div id="loginMsg"></div>
+      <button class="primary" id="loginBtn">Anmelden</button>
+    </div>
+  </div>
+
+  <!-- Admin-Ansicht -->
+  <div id="app" class="hidden">
+    <header>
+      <h1><span class="brand">JV</span> Docs – Admin</h1>
+      <button id="logoutBtn">Abmelden</button>
+    </header>
+    <main>
+      <!-- Neuer Link -->
+      <div class="card">
+        <h2>Neuen Link erstellen</h2>
+        <label for="customerName">Kundenname *</label>
+        <input type="text" id="customerName" placeholder="z.B. Familie Muster" />
+
+        <label for="note">Notiz (optional)</label>
+        <textarea id="note" placeholder="z.B. Visualisierung Bad OG"></textarea>
+
+        <label for="pdfFile">PDF-Datei *</label>
+        <input type="file" id="pdfFile" accept="application/pdf" />
+
+        <div id="createMsg"></div>
+        <button class="primary" id="createBtn">Link erstellen</button>
+      </div>
+
+      <!-- Liste -->
+      <div class="card">
+        <h2>Alle Links</h2>
+        <div id="listMsg"></div>
+        <table id="linksTable">
+          <thead>
+            <tr>
+              <th>Kunde</th>
+              <th>Notiz</th>
+              <th>Erstellt</th>
+              <th>Letzter Aufruf</th>
+              <th>Aufrufe</th>
+              <th>Status</th>
+              <th>Aktionen</th>
+            </tr>
+          </thead>
+          <tbody id="linksBody">
+            <tr><td colspan="7" class="muted">Lade…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Einfacher Admin-Client. Passwort wird im sessionStorage gehalten
+    // und als Bearer-Token an alle Function-Calls mitgegeben.
+
+    const STORAGE_KEY = 'jv_admin_pwd';
+    const API = '/.netlify/functions';
+
+    const $ = (id) => document.getElementById(id);
+
+    function showMsg(elId, text, type) {
+      const el = $(elId);
+      el.innerHTML = text ? `<div class="msg ${type}">${text}</div>` : '';
+    }
+
+    function getPwd() {
+      return sessionStorage.getItem(STORAGE_KEY) || '';
+    }
+
+    function setPwd(p) {
+      sessionStorage.setItem(STORAGE_KEY, p);
+    }
+
+    function clearPwd() {
+      sessionStorage.removeItem(STORAGE_KEY);
+    }
+
+    async function apiCall(path, options = {}) {
+      const headers = Object.assign({}, options.headers || {}, {
+        'Authorization': 'Bearer ' + getPwd(),
+      });
+      if (options.body && !(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+      }
+      const res = await fetch(API + path, Object.assign({}, options, { headers }));
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const err = new Error(data.error || 'Fehler ' + res.status);
+        err.status = res.status;
+        throw err;
+      }
+      return data;
+    }
+
+    // Login-Flow: wir testen das Passwort über list-links
+    async function tryLogin(pwd) {
+      setPwd(pwd);
+      try {
+        await apiCall('/list-links');
+        return true;
+      } catch (e) {
+        if (e.status === 401) {
+          clearPwd();
+          return false;
+        }
+        // Andere Fehler (Netz, Server) bedeuten nicht «falsches Passwort»
+        return true;
+      }
+    }
+
+    function showApp() {
+      $('login').classList.add('hidden');
+      $('app').classList.remove('hidden');
+      loadLinks();
+    }
+
+    function showLogin() {
+      $('app').classList.add('hidden');
+      $('login').classList.remove('hidden');
+      $('pwd').focus();
+    }
+
+    // Datum schweizerisch formatieren
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleString('de-CH', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      });
+    }
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function buildShareUrl(token) {
+      return `${location.origin}/view.html?t=${token}`;
+    }
+
+    async function loadLinks() {
+      showMsg('listMsg', '', '');
+      try {
+        const data = await apiCall('/list-links');
+        renderLinks(data.links || []);
+      } catch (e) {
+        if (e.status === 401) { clearPwd(); showLogin(); return; }
+        showMsg('listMsg', 'Fehler beim Laden: ' + e.message, 'error');
+      }
+    }
+
+    function renderLinks(links) {
+      const body = $('linksBody');
+      if (!links.length) {
+        body.innerHTML = '<tr><td colspan="7" class="muted">Noch keine Links vorhanden.</td></tr>';
+        return;
+      }
+      body.innerHTML = links.map((l) => `
+        <tr data-id="${l.id}">
+          <td>
+            <strong>${escapeHtml(l.customer_name)}</strong><br>
+            <span class="token-short">${l.token.slice(0, 8)}…</span>
+          </td>
+          <td>${escapeHtml(l.note || '')}</td>
+          <td>${fmtDate(l.created_at)}</td>
+          <td>${fmtDate(l.last_viewed_at)}</td>
+          <td>${l.view_count || 0}</td>
+          <td>
+            <span class="status ${l.is_active ? 'active' : 'inactive'}">
+              ${l.is_active ? 'Aktiv' : 'Inaktiv'}
+            </span>
+          </td>
+          <td>
+            <div class="actions">
+              <button data-action="copy" data-token="${l.token}">Link kopieren</button>
+              <button data-action="toggle" data-id="${l.id}" data-active="${l.is_active ? '1' : '0'}">
+                ${l.is_active ? 'Deaktivieren' : 'Aktivieren'}
+              </button>
+              <button class="danger" data-action="delete" data-id="${l.id}" data-name="${escapeHtml(l.customer_name)}">Löschen</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Event-Delegation für die Tabellen-Buttons
+    $('linksBody').addEventListener('click', async (ev) => {
+      const btn = ev.target.closest('button[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+
+      if (action === 'copy') {
+        const url = buildShareUrl(btn.dataset.token);
+        try {
+          await navigator.clipboard.writeText(url);
+          showMsg('listMsg', 'Link in Zwischenablage kopiert.', 'success');
+        } catch (e) {
+          showMsg('listMsg', 'Kopieren fehlgeschlagen. Link: ' + url, 'info');
+        }
+        return;
+      }
+
+      if (action === 'toggle') {
+        const id = btn.dataset.id;
+        const currentlyActive = btn.dataset.active === '1';
+        btn.disabled = true;
+        try {
+          await apiCall('/toggle-link', {
+            method: 'POST',
+            body: JSON.stringify({ id, is_active: !currentlyActive }),
+          });
+          await loadLinks();
+        } catch (e) {
+          showMsg('listMsg', 'Fehler: ' + e.message, 'error');
+          btn.disabled = false;
+        }
+        return;
+      }
+
+      if (action === 'delete') {
+        const id = btn.dataset.id;
+        const name = btn.dataset.name;
+        if (!confirm(`Link für «${name}» wirklich löschen? Die Datei wird ebenfalls entfernt.`)) return;
+        btn.disabled = true;
+        try {
+          await apiCall('/delete-link', {
+            method: 'POST',
+            body: JSON.stringify({ id }),
+          });
+          await loadLinks();
+          showMsg('listMsg', 'Link gelöscht.', 'success');
+        } catch (e) {
+          showMsg('listMsg', 'Fehler: ' + e.message, 'error');
+          btn.disabled = false;
+        }
+      }
+    });
+
+    // Datei als Base64 einlesen
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result || '';
+          const comma = result.indexOf(',');
+          resolve(comma >= 0 ? result.slice(comma + 1) : result);
+        };
+        reader.onerror = () => reject(new Error('Datei konnte nicht gelesen werden'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Neuen Link erstellen
+    $('createBtn').addEventListener('click', async () => {
+      const customerName = $('customerName').value.trim();
+      const note = $('note').value.trim();
+      const file = $('pdfFile').files[0];
+
+      showMsg('createMsg', '', '');
+
+      if (!customerName) { showMsg('createMsg', 'Kundenname fehlt.', 'error'); return; }
+      if (!file) { showMsg('createMsg', 'Bitte eine PDF-Datei auswählen.', 'error'); return; }
+      if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+        showMsg('createMsg', 'Nur PDF-Dateien erlaubt.', 'error'); return;
+      }
+
+      const btn = $('createBtn');
+      btn.disabled = true;
+      btn.textContent = 'Lädt hoch…';
+
+      try {
+        const base64 = await fileToBase64(file);
+        const data = await apiCall('/create-link', {
+          method: 'POST',
+          body: JSON.stringify({
+            customer_name: customerName,
+            note,
+            file_name: file.name,
+            file_base64: base64,
+          }),
+        });
+        const shareUrl = buildShareUrl(data.link.token);
+        showMsg('createMsg',
+          `Link erstellt: <a href="${shareUrl}" target="_blank">${shareUrl}</a>`,
+          'success');
+        $('customerName').value = '';
+        $('note').value = '';
+        $('pdfFile').value = '';
+        await loadLinks();
+      } catch (e) {
+        showMsg('createMsg', 'Fehler: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Link erstellen';
+      }
+    });
+
+    // Login-Handler
+    $('loginBtn').addEventListener('click', async () => {
+      const pwd = $('pwd').value;
+      if (!pwd) return;
+      showMsg('loginMsg', 'Prüfe Passwort…', 'info');
+      const ok = await tryLogin(pwd);
+      if (ok) {
+        showMsg('loginMsg', '', '');
+        showApp();
+      } else {
+        showMsg('loginMsg', 'Passwort falsch.', 'error');
+      }
+    });
+
+    $('pwd').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') $('loginBtn').click();
+    });
+
+    $('logoutBtn').addEventListener('click', () => {
+      clearPwd();
+      showLogin();
+    });
+
+    // Initial: falls Passwort schon da, direkt versuchen
+    (async function init() {
+      if (getPwd()) {
+        const ok = await tryLogin(getPwd());
+        if (ok) { showApp(); return; }
+      }
+      showLogin();
+    })();
+  </script>
+</body>
+</html>

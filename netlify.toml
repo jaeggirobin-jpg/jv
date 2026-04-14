@@ -1,0 +1,24 @@
+[build]
+  functions = "netlify/functions"
+  publish = "."
+
+# Redirects: saubere URLs für die Functions
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Sicherheits-Header für den Kunden-Viewer
+[[headers]]
+  for = "/view.html"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
+    Cache-Control = "no-store"
+
+# PDFs sollen nie indexiert werden
+[[headers]]
+  for = "/*.pdf"
+  [headers.values]
+    X-Robots-Tag = "noindex"
