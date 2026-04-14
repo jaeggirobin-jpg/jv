@@ -54,6 +54,8 @@ exports.handler = async (event) => {
     return respond(400, { error: 'Ungültiges JSON' });
   }
 
+  // Hinweis: Das Feld heisst aus historischen Gründen weiterhin
+  // `customer_name`, enthält jetzt aber die Adresse des Bauobjekts.
   const customerName = (payload.customer_name || '').trim();
   const note = (payload.note || '').trim();
   const fileName = sanitizeFilename(payload.file_name);
@@ -61,7 +63,7 @@ exports.handler = async (event) => {
 
   // Input-Validierung
   if (!customerName) {
-    return respond(400, { error: 'Kundenname fehlt' });
+    return respond(400, { error: 'Adresse fehlt' });
   }
   if (!fileBase64) {
     return respond(400, { error: 'Datei fehlt' });

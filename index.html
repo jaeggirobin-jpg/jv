@@ -16,29 +16,50 @@
       color: #4B575D;
     }
     header {
-      background: #4B575D;
-      color: #fff;
+      background: #fff;
+      color: #4B575D;
       padding: 1rem 2rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      border-bottom: 3px solid #BF853B;
     }
-    header h1 {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
+    header .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
     }
-    header .brand { color: #BF853B; }
+    header .logo img {
+      height: 48px;
+      width: auto;
+      display: block;
+    }
+    header .logo .label {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #929A9D;
+      border-left: 1px solid #d0d0d0;
+      padding-left: 0.9rem;
+    }
     header button {
       background: transparent;
       border: 1px solid #929A9D;
-      color: #fff;
+      color: #4B575D;
       padding: 0.4rem 0.8rem;
       border-radius: 4px;
       cursor: pointer;
       font-size: 0.85rem;
     }
-    header button:hover { background: #BF853B; border-color: #BF853B; }
+    header button:hover { background: #BF853B; border-color: #BF853B; color: #fff; }
+    #login .login-logo {
+      text-align: center;
+      margin-bottom: 1.2rem;
+    }
+    #login .login-logo img {
+      max-width: 240px;
+      width: 80%;
+      height: auto;
+    }
     main {
       max-width: 1100px;
       margin: 2rem auto;
@@ -160,7 +181,10 @@
   <!-- Login-Ansicht -->
   <div id="login">
     <div class="card">
-      <h2>JV Docs – Admin</h2>
+      <div class="login-logo">
+        <img src="/logo.png" alt="Jäggi Vollmer" />
+      </div>
+      <h2>Dokumenten-Admin</h2>
       <label for="pwd">Passwort</label>
       <input type="password" id="pwd" autocomplete="current-password" />
       <div id="loginMsg"></div>
@@ -171,15 +195,18 @@
   <!-- Admin-Ansicht -->
   <div id="app" class="hidden">
     <header>
-      <h1><span class="brand">JV</span> Docs – Admin</h1>
+      <div class="logo">
+        <img src="/logo.png" alt="Jäggi Vollmer" />
+        <span class="label">Dokumenten-Admin</span>
+      </div>
       <button id="logoutBtn">Abmelden</button>
     </header>
     <main>
       <!-- Neuer Link -->
       <div class="card">
         <h2>Neuen Link erstellen</h2>
-        <label for="customerName">Kundenname *</label>
-        <input type="text" id="customerName" placeholder="z.B. Familie Muster" />
+        <label for="address">Adresse *</label>
+        <input type="text" id="address" placeholder="z.B. Musterstrasse 12, 4057 Basel" />
 
         <label for="note">Notiz (optional)</label>
         <textarea id="note" placeholder="z.B. Visualisierung Bad OG"></textarea>
@@ -198,7 +225,7 @@
         <table id="linksTable">
           <thead>
             <tr>
-              <th>Kunde</th>
+              <th>Adresse</th>
               <th>Notiz</th>
               <th>Erstellt</th>
               <th>Letzter Aufruf</th>
@@ -352,6 +379,8 @@
           </td>
         </tr>
       `).join('');
+      // Hinweis: Das DB-Feld heisst weiterhin `customer_name`,
+      // enthält aber neu die Adresse — kein Schema-Migrationsbedarf.
     }
 
     // Event-Delegation für die Tabellen-Buttons
@@ -423,13 +452,13 @@
 
     // Neuen Link erstellen
     $('createBtn').addEventListener('click', async () => {
-      const customerName = $('customerName').value.trim();
+      const address = $('address').value.trim();
       const note = $('note').value.trim();
       const file = $('pdfFile').files[0];
 
       showMsg('createMsg', '', '');
 
-      if (!customerName) { showMsg('createMsg', 'Kundenname fehlt.', 'error'); return; }
+      if (!address) { showMsg('createMsg', 'Adresse fehlt.', 'error'); return; }
       if (!file) { showMsg('createMsg', 'Bitte eine PDF-Datei auswählen.', 'error'); return; }
       if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
         showMsg('createMsg', 'Nur PDF-Dateien erlaubt.', 'error'); return;
@@ -441,10 +470,12 @@
 
       try {
         const base64 = await fileToBase64(file);
+        // Wir senden weiterhin `customer_name` an die Function,
+        // damit das DB-Schema unverändert bleibt; Inhalt ist die Adresse.
         const data = await apiCall('/create-link', {
           method: 'POST',
           body: JSON.stringify({
-            customer_name: customerName,
+            customer_name: address,
             note,
             file_name: file.name,
             file_base64: base64,
@@ -454,7 +485,7 @@
         showMsg('createMsg',
           `Link erstellt: <a href="${shareUrl}" target="_blank">${shareUrl}</a>`,
           'success');
-        $('customerName').value = '';
+        $('address').value = '';
         $('note').value = '';
         $('pdfFile').value = '';
         await loadLinks();
