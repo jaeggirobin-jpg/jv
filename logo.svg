@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" width="1200" height="360" role="img" aria-label="Jäggi Vollmer – Spenglerei | Sanitär | Planung">
+  <!--
+    JV-Logo — SVG-Annäherung an das Original.
+    Wenn ein pixelgenaues Logo gewünscht ist, einfach diese Datei
+    durch eine eigene SVG- oder PNG-Version ersetzen.
+  -->
+  <style>
+    .gold { fill: #BF853B; }
+    .grey { fill: #A8AEB0; }
+    .dark { fill: #4B575D; }
+    .name {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: 900;
+      font-size: 230px;
+      letter-spacing: -6px;
+    }
+    .sub {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: 500;
+      font-size: 70px;
+      letter-spacing: 0px;
+    }
+  </style>
+  <text x="0" y="225" class="name gold">Jäggi</text>
+  <text x="500" y="225" class="name grey">Vollmer</text>
+  <text x="6" y="320" class="sub dark">Spenglerei | Sanitär | Planung</text>
+</svg>

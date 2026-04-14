@@ -19,26 +19,21 @@
       user-select: none;
     }
     header {
-      background: #4B575D;
+      background: #fff;
       border-bottom: 2px solid #BF853B;
       padding: 0.8rem 1.5rem;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       position: sticky;
       top: 0;
       z-index: 10;
     }
-    header h1 {
-      margin: 0;
-      font-size: 1.05rem;
-      font-weight: 500;
-      color: #fff;
-    }
-    header h1 .brand { color: #BF853B; font-weight: 700; }
-    header .customer {
-      font-size: 0.85rem;
-      color: #929A9D;
+    header img.logo {
+      height: 44px;
+      width: auto;
+      display: block;
+      pointer-events: none;
     }
     #viewer {
       max-width: 1000px;
@@ -107,8 +102,7 @@
 <body>
 
   <header>
-    <h1><span class="brand">JV</span> Docs</h1>
-    <div class="customer" id="customerLabel"></div>
+    <img class="logo" src="/logo.svg" alt="Jäggi Vollmer" />
   </header>
 
   <div id="viewer">
@@ -161,49 +155,62 @@
       return params.get('t') || '';
     }
 
-    // Wasserzeichen-Text: «Vertraulich – Kundenname» + Datum
-    function watermarkText(customerName) {
-      const d = new Date();
-      const pad = (n) => String(n).padStart(2, '0');
-      const date = `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
-      return `« Vertraulich – ${customerName} »   ${date}`;
+    // Logo einmalig laden und für alle Seiten wiederverwenden
+    let logoImage = null;
+    function loadLogo() {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => { logoImage = img; resolve(img); };
+        img.onerror = () => { logoImage = null; resolve(null); };
+        img.src = '/logo.svg';
+      });
     }
 
-    // Wasserzeichen über Canvas legen, diagonal, halbtransparent,
-    // mehrfach über die ganze Seite verteilt.
-    function drawWatermark(canvas, text) {
+    // Wasserzeichen über Canvas legen: Logo, diagonal, halbtransparent,
+    // mehrfach über die ganze Seite gekachelt.
+    function drawWatermark(canvas) {
+      if (!logoImage || !logoImage.width) return;
       const ctx = canvas.getContext('2d');
       const w = canvas.width;
       const h = canvas.height;
 
-      ctx.save();
-      ctx.globalAlpha = 0.18;
-      ctx.fillStyle = '#BF853B';
-      const fontSize = Math.max(18, Math.round(w / 38));
-      ctx.font = `600 ${fontSize}px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      // Logo-Grösse relativ zur Seitenbreite
+      const logoW = w / 3.2;
+      const logoH = logoW * (logoImage.height / logoImage.width);
 
-      // Rasterabstände abhängig von der Seitenbreite
-      const stepX = Math.round(w / 2);
-      const stepY = Math.round(w / 3.5);
+      ctx.save();
+      ctx.globalAlpha = 0.13;
+
+      // Rasterabstände abhängig von der Logo-Grösse
+      const stepX = logoW * 1.5;
+      const stepY = logoH * 2.6;
 
       ctx.translate(w / 2, h / 2);
       ctx.rotate(-Math.PI / 6); // ~ -30°
 
-      const cols = Math.ceil(w / stepX) + 2;
-      const rows = Math.ceil(h / stepY) + 2;
+      // Genug Kacheln, damit auch die Ecken nach der Rotation gefüllt sind
+      const diag = Math.sqrt(w * w + h * h);
+      const cols = Math.ceil(diag / stepX) + 2;
+      const rows = Math.ceil(diag / stepY) + 2;
 
       for (let r = -rows; r <= rows; r++) {
         for (let c = -cols; c <= cols; c++) {
-          ctx.fillText(text, c * stepX, r * stepY);
+          ctx.drawImage(
+            logoImage,
+            c * stepX - logoW / 2,
+            r * stepY - logoH / 2,
+            logoW,
+            logoH,
+          );
         }
       }
       ctx.restore();
     }
 
-    async function renderPdf(signedUrl, customerName) {
-      const wmText = watermarkText(customerName);
+    async function renderPdf(signedUrl) {
+      // Logo für das Wasserzeichen vorab laden (parallel egal — wir warten)
+      await loadLogo();
+
       const loadingTask = pdfjsLib.getDocument({
         url: signedUrl,
         // Verhindert, dass PDF.js versucht, Range-Requests via Browser-Cache zu nutzen
@@ -246,8 +253,8 @@
           transform,
         }).promise;
 
-        // Wasserzeichen überlagern, nachdem die Seite gerendert wurde
-        drawWatermark(canvas, wmText);
+        // Wasserzeichen (Logo) überlagern, nachdem die Seite gerendert wurde
+        drawWatermark(canvas);
 
         wrap.appendChild(canvas);
         pagesEl.appendChild(wrap);
@@ -290,9 +297,8 @@
           throw new Error(data.error || 'HTTP ' + res.status);
         }
 
-        $('customerLabel').textContent = data.customer_name || '';
         hideStatus();
-        await renderPdf(data.signed_url, data.customer_name || 'Kunde');
+        await renderPdf(data.signed_url);
       } catch (e) {
         showStatus(
           `<h2>Fehler beim Laden</h2>
