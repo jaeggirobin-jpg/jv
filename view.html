@@ -17,6 +17,8 @@
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
+      -webkit-text-size-adjust: 100%;
+      overflow-x: hidden;
     }
     header {
       background: #fff;
@@ -96,6 +98,50 @@
     /* Druckversuche erschweren */
     @media print {
       html, body { display: none !important; }
+    }
+
+    /* ===========================================================
+       Responsive – Tablet (≤ 900 px)
+       =========================================================== */
+    @media (max-width: 900px) {
+      header { padding: 0.7rem 1rem; }
+      header img.logo { height: 38px; }
+      #viewer {
+        margin: 1.2rem auto;
+        padding: 0 0.6rem 2rem;
+      }
+      .page-wrap { margin-bottom: 1rem; }
+      footer { padding: 1rem; }
+    }
+
+    /* ===========================================================
+       Responsive – Handy (≤ 640 px)
+       =========================================================== */
+    @media (max-width: 640px) {
+      header { padding: 0.55rem 0.8rem; }
+      header img.logo { height: 32px; }
+      #viewer {
+        margin: 0.8rem auto;
+        padding: 0 0.4rem 1.5rem;
+      }
+      .page-wrap {
+        box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        margin-bottom: 0.7rem;
+      }
+      #status {
+        padding: 1.2rem;
+        font-size: 0.88rem;
+      }
+      #status.error {
+        margin: 1.5rem 0.6rem;
+        padding: 1.1rem 1.2rem;
+      }
+      #status.error h2 { font-size: 1rem; }
+      footer {
+        font-size: 0.7rem;
+        padding: 0.9rem 0.6rem;
+        line-height: 1.4;
+      }
     }
   </style>
 </head>
@@ -222,8 +268,14 @@
       const pagesEl = $('pages');
       pagesEl.innerHTML = '';
 
-      // Zielbreite (an Container angepasst)
-      const containerWidth = Math.min(1000, document.documentElement.clientWidth - 32);
+      // Zielbreite: exakt die Innenbreite des #viewer-Containers
+      // (berücksichtigt Padding unterschiedlicher Breakpoints automatisch).
+      const viewerEl = $('viewer');
+      const viewerStyles = getComputedStyle(viewerEl);
+      const paddingX =
+        parseFloat(viewerStyles.paddingLeft) +
+        parseFloat(viewerStyles.paddingRight);
+      const containerWidth = Math.min(1000, viewerEl.clientWidth - paddingX);
 
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         const page = await pdf.getPage(pageNum);
