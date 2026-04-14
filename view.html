@@ -102,7 +102,7 @@
 <body>
 
   <header>
-    <img class="logo" src="/logo.svg" alt="Jäggi Vollmer" />
+    <img class="logo" src="/logo.png" alt="Jäggi Vollmer" />
   </header>
 
   <div id="viewer">
@@ -162,7 +162,7 @@
         const img = new Image();
         img.onload = () => { logoImage = img; resolve(img); };
         img.onerror = () => { logoImage = null; resolve(null); };
-        img.src = '/logo.svg';
+        img.src = '/logo.png';
       });
     }
 
