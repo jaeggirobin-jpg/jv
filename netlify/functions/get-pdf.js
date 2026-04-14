@@ -40,6 +40,9 @@ exports.handler = async (event) => {
   );
 
   // Link in DB suchen
+  // Wichtig: customer_name wird zwar geladen (für Logging),
+  // aber NICHT an den Client zurückgegeben — der Kunde soll
+  // die Adresse im Viewer nicht sehen.
   const { data: link, error: dbError } = await supabase
     .from('doc_links')
     .select('id, token, customer_name, file_path, is_active, view_count')
@@ -79,6 +82,5 @@ exports.handler = async (event) => {
   return respond(200, {
     ok: true,
     signed_url: signed.signedUrl,
-    customer_name: link.customer_name,
   });
 };
