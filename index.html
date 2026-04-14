@@ -14,6 +14,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       background: #f5f5f5;
       color: #4B575D;
+      -webkit-text-size-adjust: 100%;
     }
     header {
       background: #fff;
@@ -174,6 +175,126 @@
     .muted { color: #929A9D; font-size: 0.8rem; }
     .hidden { display: none !important; }
     .token-short { font-family: monospace; font-size: 0.8rem; color: #929A9D; }
+
+    /* Container für die Tabelle, damit sie auf mittleren Screens
+       horizontal scrollen kann, ohne das Layout zu sprengen */
+    .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    /* ===========================================================
+       Responsive – Tablet (≤ 900 px)
+       =========================================================== */
+    @media (max-width: 900px) {
+      header { padding: 0.8rem 1rem; }
+      header .logo img { height: 40px; }
+      header .logo .label {
+        font-size: 0.8rem;
+        padding-left: 0.7rem;
+      }
+      main { margin: 1.25rem auto; padding: 0 1rem; }
+      .card { padding: 1.1rem; }
+      table { font-size: 0.82rem; }
+      th, td { padding: 0.55rem 0.45rem; }
+    }
+
+    /* ===========================================================
+       Responsive – Handy (≤ 640 px)
+       Tabelle wird zu gestapelten Karten, Header kompakter
+       =========================================================== */
+    @media (max-width: 640px) {
+      header {
+        padding: 0.7rem 0.9rem;
+      }
+      header .logo { gap: 0.6rem; }
+      header .logo img { height: 34px; }
+      header .logo .label {
+        /* Label auf kleinen Handys ausblenden — Logo spricht für sich */
+        display: none;
+      }
+      header button {
+        padding: 0.35rem 0.7rem;
+        font-size: 0.8rem;
+      }
+      main { margin: 0.9rem auto; padding: 0 0.75rem; }
+      .card { padding: 0.95rem; border-radius: 5px; }
+      .card h2 { font-size: 1rem; }
+      label { font-size: 0.82rem; }
+      input[type="text"], input[type="password"], input[type="file"], textarea {
+        font-size: 16px; /* verhindert iOS-Zoom beim Fokus */
+      }
+      button.primary {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+      }
+
+      /* Login-Ansicht auf Handy-Breite ausfüllen */
+      #login {
+        max-width: 100%;
+        margin: 2rem auto;
+        padding: 0 0.9rem;
+      }
+      #login .login-logo img { max-width: 220px; }
+
+      /* Tabelle → Karten-Layout.
+         Kopfzeile ausblenden, jede Zeile wird ein Block mit
+         Label (via data-label) + Wert pro Zelle. */
+      #linksTable thead { display: none; }
+      #linksTable, #linksTable tbody { display: block; width: 100%; }
+      #linksTable tr {
+        display: block;
+        width: 100%;
+        border: 1px solid #e5e5e5;
+        border-radius: 6px;
+        margin-bottom: 0.9rem;
+        padding: 0.35rem 0.85rem;
+        background: #fff;
+      }
+      #linksTable tr:hover td { background: transparent; }
+      #linksTable td {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 0.55rem 0;
+        border-bottom: 1px dashed #eee;
+        font-size: 0.9rem;
+        text-align: right;
+      }
+      #linksTable td:last-child { border-bottom: none; }
+      #linksTable td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: #929A9D;
+        flex-shrink: 0;
+        padding-top: 0.1rem;
+        text-align: left;
+      }
+      /* Aktionen links ausrichten und umbrechen lassen */
+      #linksTable td.actions-cell { flex-direction: column; align-items: stretch; text-align: left; }
+      #linksTable td.actions-cell::before { margin-bottom: 0.4rem; }
+      #linksTable td.actions-cell .actions { justify-content: flex-start; }
+      #linksTable td.actions-cell .actions button {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 0.45rem 0.6rem;
+        font-size: 0.82rem;
+      }
+      /* Mehrzeilige Zellen (Adresse mit Token) links ausrichten */
+      #linksTable td.cell-address { flex-direction: column; align-items: flex-start; text-align: left; }
+      #linksTable td.cell-address::before { margin-bottom: 0.25rem; }
+    }
+
+    /* ===========================================================
+       Responsive – sehr schmale Handys (≤ 380 px)
+       =========================================================== */
+    @media (max-width: 380px) {
+      header .logo img { height: 28px; }
+      .card { padding: 0.8rem; }
+      #linksTable td.actions-cell .actions { flex-direction: column; }
+    }
   </style>
 </head>
 <body>
@@ -222,22 +343,24 @@
       <div class="card">
         <h2>Alle Links</h2>
         <div id="listMsg"></div>
-        <table id="linksTable">
-          <thead>
-            <tr>
-              <th>Adresse</th>
-              <th>Notiz</th>
-              <th>Erstellt</th>
-              <th>Letzter Aufruf</th>
-              <th>Aufrufe</th>
-              <th>Status</th>
-              <th>Aktionen</th>
-            </tr>
-          </thead>
-          <tbody id="linksBody">
-            <tr><td colspan="7" class="muted">Lade…</td></tr>
-          </tbody>
-        </table>
+        <div class="table-wrap">
+          <table id="linksTable">
+            <thead>
+              <tr>
+                <th>Adresse</th>
+                <th>Notiz</th>
+                <th>Erstellt</th>
+                <th>Letzter Aufruf</th>
+                <th>Aufrufe</th>
+                <th>Status</th>
+                <th>Aktionen</th>
+              </tr>
+            </thead>
+            <tbody id="linksBody">
+              <tr><td colspan="7" class="muted">Lade…</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </main>
   </div>
@@ -353,22 +476,26 @@
         body.innerHTML = '<tr><td colspan="7" class="muted">Noch keine Links vorhanden.</td></tr>';
         return;
       }
+      // data-label wird in der Mobile-Darstellung (Card-Layout) als
+      // Label vor jedem Wert angezeigt.
       body.innerHTML = links.map((l) => `
         <tr data-id="${l.id}">
-          <td>
-            <strong>${escapeHtml(l.customer_name)}</strong><br>
-            <span class="token-short">${l.token.slice(0, 8)}…</span>
+          <td class="cell-address" data-label="Adresse">
+            <div>
+              <strong>${escapeHtml(l.customer_name)}</strong><br>
+              <span class="token-short">${l.token.slice(0, 8)}…</span>
+            </div>
           </td>
-          <td>${escapeHtml(l.note || '')}</td>
-          <td>${fmtDate(l.created_at)}</td>
-          <td>${fmtDate(l.last_viewed_at)}</td>
-          <td>${l.view_count || 0}</td>
-          <td>
+          <td data-label="Notiz">${escapeHtml(l.note || '')}</td>
+          <td data-label="Erstellt">${fmtDate(l.created_at)}</td>
+          <td data-label="Letzter Aufruf">${fmtDate(l.last_viewed_at)}</td>
+          <td data-label="Aufrufe">${l.view_count || 0}</td>
+          <td data-label="Status">
             <span class="status ${l.is_active ? 'active' : 'inactive'}">
               ${l.is_active ? 'Aktiv' : 'Inaktiv'}
             </span>
           </td>
-          <td>
+          <td class="actions-cell" data-label="Aktionen">
             <div class="actions">
               <button data-action="copy" data-token="${l.token}">Link kopieren</button>
               <button data-action="toggle" data-id="${l.id}" data-active="${l.is_active ? '1' : '0'}">
