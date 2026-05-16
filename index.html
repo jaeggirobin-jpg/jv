@@ -379,6 +379,7 @@
               <thead>
                 <tr>
                   <th>Name</th><th>Adresse</th><th>Termin</th>
+                  <th>Besuche</th><th>Markiert</th>
                   <th>Status</th><th>Aktionen</th>
                 </tr>
               </thead>
@@ -651,20 +652,28 @@
     function renderKunden(kunden) {
       var body = $('kundenBody');
       if (!kunden.length) {
-        body.innerHTML = '<tr><td colspan="5" class="muted">Noch keine Kunden.</td></tr>';
+        body.innerHTML = '<tr><td colspan="7" class="muted">Noch keine Kunden.</td></tr>';
         return;
       }
-      var katLabels = { person:'Person', familie:'Familie' };
       body.innerHTML = kunden.map(function(k) {
         var name = (k.anrede_typ==='familie' ? 'Familie ' : '') + escapeHtml((k.vorname?k.vorname+' ':'')+k.nachname);
         var statusCls = k.status==='aktiv' ? 'active' : 'inactive';
+        // Statistiken
+        var besuchInfo = k.besuche
+          ? k.besuche + '× · ' + fmtDate(k.letzter_besuch)
+          : '<span class="muted">—</span>';
+        var markiertInfo = k.markierte_punkte
+          ? k.markierte_punkte + ' Punkte' + (k.kommentare ? ', ' + k.kommentare + ' Notizen' : '')
+          : '<span class="muted">—</span>';
         return '<tr>'
           + '<td><strong>'+name+'</strong><br><span class="token-short">'+k.access_token.slice(0,8)+'…</span></td>'
           + '<td>'+escapeHtml(k.projekt_adresse||'')+'</td>'
           + '<td>'+(k.termin_datum ? fmtDateShort(k.termin_datum) + (k.termin_uhrzeit ? ' '+k.termin_uhrzeit.slice(0,5) : '') : '—')+'</td>'
+          + '<td>'+besuchInfo+'</td>'
+          + '<td>'+markiertInfo+'</td>'
           + '<td><span class="status '+statusCls+'">'+escapeHtml(k.status)+'</span></td>'
           + '<td><div class="actions">'
-            + '<button data-kaction="link" data-token="'+k.access_token+'">Inspiration-Link</button>'
+            + '<button data-kaction="link" data-token="'+k.access_token+'">Link</button>'
             + '<button data-kaction="detail" data-id="'+k.id+'">Details</button>'
             + '<button data-kaction="toggle" data-id="'+k.id+'" data-status="'+k.status+'">'+(k.status==='aktiv'?'Deaktivieren':'Aktivieren')+'</button>'
             + '<button class="danger" data-kaction="delete" data-id="'+k.id+'" data-name="'+name+'">Löschen</button>'

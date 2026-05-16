@@ -49,5 +49,48 @@ exports.handler = async (event) => {
     return respond(500, { error: 'Datenbankfehler: ' + error.message });
   }
 
-  return respond(200, { ok: true, kunden: data || [] });
+  const kunden = data || [];
+
+  // Statistiken pro Kunde laden (Besuche, Interessen, Kommentare)
+  if (kunden.length > 0) {
+    const ids = kunden.map(k => k.id);
+
+    // Besuche (seite_geoeffnet) und letzter Besuch aus aktivitaet_log
+    const { data: logStats } = await supabase
+      .from('aktivitaet_log')
+      .select('kunden_id, timestamp')
+      .in('kunden_id', ids)
+      .eq('aktion', 'seite_geoeffnet')
+      .order('timestamp', { ascending: false });
+
+    // Interessen und Kommentare aus kunden_interessen
+    const { data: interessen } = await supabase
+      .from('kunden_interessen')
+      .select('kunden_id, interessiert, kommentar')
+      .in('kunden_id', ids);
+
+    // Stats pro Kunde zusammenbauen
+    const besucheMap = {};
+    const letztMap = {};
+    (logStats || []).forEach(function(l) {
+      besucheMap[l.kunden_id] = (besucheMap[l.kunden_id] || 0) + 1;
+      if (!letztMap[l.kunden_id]) letztMap[l.kunden_id] = l.timestamp;
+    });
+
+    const markiertMap = {};
+    const kommentarMap = {};
+    (interessen || []).forEach(function(i) {
+      if (i.interessiert) markiertMap[i.kunden_id] = (markiertMap[i.kunden_id] || 0) + 1;
+      if (i.kommentar && i.kommentar.trim()) kommentarMap[i.kunden_id] = (kommentarMap[i.kunden_id] || 0) + 1;
+    });
+
+    kunden.forEach(function(k) {
+      k.besuche = besucheMap[k.id] || 0;
+      k.letzter_besuch = letztMap[k.id] || null;
+      k.markierte_punkte = markiertMap[k.id] || 0;
+      k.kommentare = kommentarMap[k.id] || 0;
+    });
+  }
+
+  return respond(200, { ok: true, kunden: kunden });
 };
