@@ -260,7 +260,7 @@
       <label for="pwd">Passwort</label>
       <input type="password" id="pwd" autocomplete="current-password" />
       <div id="loginMsg"></div>
-      <button class="primary" id="loginBtn">Anmelden</button>
+      <button class="primary" id="loginBtn" type="button" onclick="doLogin()">Anmelden</button>
     </div>
   </div>
 
@@ -470,22 +470,24 @@
     function setPwd(p) { sessionStorage.setItem(STORAGE_KEY, p); }
     function clearPwd() { sessionStorage.removeItem(STORAGE_KEY); }
 
-    async function apiCall(path, options) {
+    function apiCall(path, options) {
       options = options || {};
-      const headers = Object.assign({}, options.headers || {}, {
-        'Authorization': 'Bearer ' + getPwd(),
+      var h = { 'Authorization': 'Bearer ' + getPwd() };
+      if (options.body && typeof options.body === 'string') h['Content-Type'] = 'application/json';
+      return fetch(API + path, {
+        method: options.method || 'GET',
+        headers: h,
+        body: options.body || undefined
+      }).then(function(res) {
+        return res.json().catch(function() { return {}; }).then(function(data) {
+          if (!res.ok) {
+            var err = new Error(data.error || 'Fehler ' + res.status);
+            err.status = res.status;
+            throw err;
+          }
+          return data;
+        });
       });
-      if (options.body && !(options.body instanceof FormData)) {
-        headers['Content-Type'] = 'application/json';
-      }
-      const res = await fetch(API + path, Object.assign({}, options, { headers: headers }));
-      const data = await res.json().catch(function() { return {}; });
-      if (!res.ok) {
-        var err = new Error(data.error || 'Fehler ' + res.status);
-        err.status = res.status;
-        throw err;
-      }
-      return data;
     }
 
     function escapeHtml(s) {
@@ -521,12 +523,28 @@
     }
 
     // ============================================================
-    // LOGIN — wird als Erstes registriert, damit es immer funktioniert
+    // LOGIN — inline onclick, kann von nichts blockiert werden
     // ============================================================
-    async function tryLogin(pwd) {
+    function tryLogin(pwd) {
       setPwd(pwd);
-      try { await apiCall('/list-links'); return true; }
-      catch (e) { if (e.status === 401) { clearPwd(); return false; } return true; }
+      return apiCall('/list-links').then(function() {
+        return true;
+      }).catch(function(e) {
+        if (e.status === 401) { clearPwd(); return false; }
+        return true;
+      });
+    }
+
+    function doLogin() {
+      var pwd = $('pwd') ? $('pwd').value : '';
+      if (!pwd) { showMsg('loginMsg', 'Passwort eingeben.', 'error'); return; }
+      showMsg('loginMsg', 'Prüfe…', 'info');
+      tryLogin(pwd).then(function(ok) {
+        if (ok) { showMsg('loginMsg','',''); showApp(); }
+        else { showMsg('loginMsg', 'Passwort falsch.', 'error'); }
+      }).catch(function(e) {
+        showMsg('loginMsg', 'Fehler: ' + e.message, 'error');
+      });
     }
 
     function showApp() {
@@ -541,22 +559,12 @@
       if ($('pwd')) $('pwd').focus();
     }
 
-    if ($('loginBtn')) {
-      $('loginBtn').addEventListener('click', function() {
-        var pwd = $('pwd').value;
-        if (!pwd) { showMsg('loginMsg', 'Passwort eingeben.', 'error'); return; }
-        showMsg('loginMsg', 'Prüfe…', 'info');
-        tryLogin(pwd).then(function(ok) {
-          if (ok) { showMsg('loginMsg','',''); showApp(); }
-          else { showMsg('loginMsg', 'Passwort falsch.', 'error'); }
-        });
-      });
-    }
+    // Enter-Taste im Passwortfeld
     if ($('pwd')) {
-      $('pwd').addEventListener('keydown', function(e) { if (e.key==='Enter' && $('loginBtn')) $('loginBtn').click(); });
+      $('pwd').onkeydown = function(e) { if (e.key === 'Enter') doLogin(); };
     }
     if ($('logoutBtn')) {
-      $('logoutBtn').addEventListener('click', function() { clearPwd(); showLogin(); });
+      $('logoutBtn').onclick = function() { clearPwd(); showLogin(); };
     }
 
     // ============================================================
