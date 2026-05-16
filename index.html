@@ -398,12 +398,8 @@
           <div class="form-row">
             <div>
               <label for="np-kategorie">Kategorie *</label>
-              <select id="np-kategorie">
-                <option value="wc">WC / Toilette</option>
-                <option value="waschtisch">Waschtisch</option>
-                <option value="armaturen">Armaturen</option>
-                <option value="dusche">Dusche</option>
-              </select>
+              <input type="text" id="np-kategorie" list="kat-vorschlaege" placeholder="z.B. dusche, boden, spiegel" />
+              <datalist id="kat-vorschlaege"></datalist>
             </div>
             <div>
               <label for="np-titel">Titel *</label>
@@ -942,7 +938,20 @@
         var data = await apiCall('/list-punkte');
         katalogPunkte = data.punkte || [];
         renderKatalog();
+        updateKatVorschlaege();
       } catch(e) { showMsg('katalogMsg','Fehler: '+e.message,'error'); }
+    }
+
+    // Datalist mit existierenden Kategorien befüllen
+    function updateKatVorschlaege() {
+      var kats = [];
+      katalogPunkte.forEach(function(p) {
+        if (kats.indexOf(p.kategorie) === -1) kats.push(p.kategorie);
+      });
+      var dl = document.getElementById('kat-vorschlaege');
+      dl.innerHTML = kats.map(function(k) {
+        return '<option value="'+escapeHtml(k)+'">';
+      }).join('');
     }
 
     function renderKatalog() {
@@ -982,7 +991,7 @@
       this.disabled = true;
       try {
         await apiCall('/create-punkt', { method:'POST', body: JSON.stringify({
-          kategorie: $('np-kategorie').value,
+          kategorie: $('np-kategorie').value.trim().toLowerCase(),
           titel: titel,
           kurzbeschreibung: $('np-kurz').value.trim(),
           vorteil: $('np-vorteil').value.trim(),
@@ -1062,7 +1071,7 @@
       var p = katalogPunkte.find(function(x) { return x.id === id; });
       if (!p) return;
       $('detailContent').innerHTML = '<h3>Punkt bearbeiten</h3>'
-        + '<label>Kategorie</label><select id="ed-kat"><option value="wc"'+(p.kategorie==='wc'?' selected':'')+'>WC / Toilette</option><option value="waschtisch"'+(p.kategorie==='waschtisch'?' selected':'')+'>Waschtisch</option><option value="armaturen"'+(p.kategorie==='armaturen'?' selected':'')+'>Armaturen</option><option value="dusche"'+(p.kategorie==='dusche'?' selected':'')+'>Dusche</option></select>'
+        + '<label>Kategorie</label><input type="text" id="ed-kat" list="kat-vorschlaege" value="'+escapeHtml(p.kategorie)+'" />'
         + '<label>Titel</label><input type="text" id="ed-titel" value="'+escapeHtml(p.titel)+'" />'
         + '<label>Kurzbeschreibung</label><textarea id="ed-kurz">'+(p.kurzbeschreibung||'')+'</textarea>'
         + '<label>Vorteil</label><textarea id="ed-vorteil">'+(p.vorteil||'')+'</textarea>'
@@ -1079,7 +1088,7 @@
         try {
           await apiCall('/update-punkt', { method:'POST', body: JSON.stringify({
             id: id,
-            kategorie: $('ed-kat').value,
+            kategorie: $('ed-kat').value.trim().toLowerCase(),
             titel: $('ed-titel').value.trim(),
             kurzbeschreibung: $('ed-kurz').value.trim(),
             vorteil: $('ed-vorteil').value.trim(),

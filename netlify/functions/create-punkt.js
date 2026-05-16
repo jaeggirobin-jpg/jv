@@ -48,10 +48,8 @@ exports.handler = async (event) => {
     return respond(400, { error: 'Kategorie und Titel sind erforderlich' });
   }
 
-  const validKategorien = ['wc', 'waschtisch', 'armaturen', 'dusche'];
-  if (!validKategorien.includes(kategorie)) {
-    return respond(400, { error: 'Ungültige Kategorie. Erlaubt: ' + validKategorien.join(', ') });
-  }
+  // Kategorie wird als Kleinbuchstaben gespeichert (Konsistenz)
+  // Keine fixe Liste — neue Kategorien werden automatisch erkannt.
 
   const supabase = createClient(
     process.env.SUPABASE_URL,

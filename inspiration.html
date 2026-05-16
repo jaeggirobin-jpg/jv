@@ -1278,25 +1278,31 @@ const HERO_IMGS = { wc: IMG.wcHero, waschtisch: IMG.waschHero, armaturen: IMG.ar
 // Falls DB keine Daten liefert, bleiben die Original-Texte erhalten.
 let categories = [];
 const CAT_META = {
-  wc:         { num: '01', title: 'Toilette',   intro: 'Die Toilette ist das meistgenutzte Element im Bad. Was sie kann, hat sich in den letzten Jahren deutlich verändert.' },
-  waschtisch: { num: '02', title: 'Waschtisch',  intro: 'Wahrscheinlich das prägendste Möbelstück im Bad — und das, was Sie morgens als Erstes berühren.' },
-  armaturen:  { num: '03', title: 'Armaturen',   intro: 'Hier entscheidet sich, wie das Bad sich anfühlt — jeden Tag, jedes Mal.' },
-  dusche:     { num: '04', title: 'Dusche',      intro: 'Vom funktionalen Element zum Rückzugsort — wenige Quadratmeter, grosse Wirkung.' },
+  wc:         { title: 'Toilette',    intro: 'Die Toilette ist das meistgenutzte Element im Bad. Was sie kann, hat sich in den letzten Jahren deutlich verändert.' },
+  waschtisch: { title: 'Waschtisch',  intro: 'Wahrscheinlich das prägendste Möbelstück im Bad — und das, was Sie morgens als Erstes berühren.' },
+  armaturen:  { title: 'Armaturen',   intro: 'Hier entscheidet sich, wie das Bad sich anfühlt — jeden Tag, jedes Mal.' },
+  dusche:     { title: 'Dusche',      intro: 'Vom funktionalen Element zum Rückzugsort — wenige Quadratmeter, grosse Wirkung.' },
 };
 
-// Baut categories-Array aus den DB-Punkten
+// Baut categories-Array aus den DB-Punkten — beliebige Kategorien werden unterstützt
 function buildCategories(punkte) {
   const grouped = {};
+  const catOrder = [];
   for (const p of punkte) {
-    if (!grouped[p.kategorie]) grouped[p.kategorie] = [];
+    if (!grouped[p.kategorie]) { grouped[p.kategorie] = []; catOrder.push(p.kategorie); }
     grouped[p.kategorie].push(p);
   }
-  const order = ['wc','waschtisch','armaturen','dusche'];
-  return order.filter(k => grouped[k]).map(k => {
-    const meta = CAT_META[k];
+  // Bekannte Kategorien zuerst, dann neue in der Reihenfolge wie sie in der DB vorkommen
+  const knownOrder = ['wc','waschtisch','armaturen','dusche'];
+  const order = knownOrder.filter(k => grouped[k]);
+  catOrder.forEach(k => { if (order.indexOf(k) === -1) order.push(k); });
+
+  let num = 1;
+  return order.map(k => {
+    const meta = CAT_META[k] || { title: k.charAt(0).toUpperCase() + k.slice(1), intro: '' };
     const fallback = FALLBACK_IMGS[k] || [];
     return {
-      id: k, num: meta.num, title: meta.title, intro: meta.intro,
+      id: k, num: String(num++).padStart(2,'0'), title: meta.title, intro: meta.intro,
       items: grouped[k].sort((a,b) => a.reihenfolge - b.reihenfolge).map((p, i) => ({
         id: p.id,
         img: p.bild_url || fallback[i] || '/assets/inspiration/bathMain.jpg',
