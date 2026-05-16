@@ -114,7 +114,7 @@
     background-size: cover;
     background-position: center;
     background-image:
-      url("/assets/inspiration/heroBg.jpg");
+      var(--hero-bg, url("/assets/inspiration/heroBg.jpg"));
     animation: kenBurns 22s var(--ease) infinite alternate;
     z-index: -2;
     transform: translateY(var(--py-bg));
@@ -1951,6 +1951,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (i.interessiert) state.marked.add(i.punkt_id);
       if (i.kommentar) state.notes.set(i.punkt_id, i.kommentar);
     }
+
+    // Hero-Hintergrundbild aus Storage laden (falls vorhanden)
+    try {
+      const { data: heroFiles } = await sb.storage.from('inspiration-medien').list('hero');
+      if (heroFiles && heroFiles.length > 0) {
+        const { data: heroUrl } = sb.storage.from('inspiration-medien').getPublicUrl('hero/' + heroFiles[0].name);
+        if (heroUrl && heroUrl.publicUrl) {
+          document.querySelector('.hero__bg').style.setProperty('--hero-bg', 'url("' + heroUrl.publicUrl + '")');
+        }
+      }
+    } catch(e) { /* Fallback-Bild bleibt */ }
 
     // Rendering (gleiche Reihenfolge wie im Original)
     renderCategories();
