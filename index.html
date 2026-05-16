@@ -283,26 +283,26 @@
       <!-- ============ Tab: Dokumente (bestehend) ============ -->
       <div class="tab-panel active" id="tab-dokumente">
         <div class="card">
-          <h2>Neuen Link erstellen</h2>
-          <label for="address">Adresse *</label>
-          <input type="text" id="address" placeholder="z.B. Musterstrasse 12, 4057 Basel" />
-          <label for="note">Notiz (optional)</label>
-          <textarea id="note" placeholder="z.B. Visualisierung Bad OG"></textarea>
+          <h2>Visualisierung hochladen</h2>
+          <label for="doc-kunde">Kunde *</label>
+          <select id="doc-kunde">
+            <option value="">— Kunde auswählen —</option>
+          </select>
+          <label for="note">Bezeichnung</label>
+          <input type="text" id="note" placeholder="z.B. Visualisierung Bad OG" />
           <label for="pdfFile">PDF-Datei *</label>
           <input type="file" id="pdfFile" accept="application/pdf" />
-          <label for="linkToken">Kunden-Token (optional)</label>
-          <input type="text" id="linkToken" placeholder="Leer = neuer Token, oder bestehenden Kunden-Token einfügen" />
           <div id="createMsg"></div>
-          <button class="primary" id="createBtn">Link erstellen</button>
+          <button class="primary" id="createBtn">Hochladen</button>
         </div>
         <div class="card">
-          <h2>Alle Links</h2>
+          <h2>Alle Dokumente</h2>
           <div id="listMsg"></div>
           <div class="table-wrap">
             <table id="linksTable">
               <thead>
                 <tr>
-                  <th>Adresse</th><th>Notiz</th><th>Erstellt</th>
+                  <th>Bezeichnung</th><th>Notiz</th><th>Erstellt</th>
                   <th>Letzter Aufruf</th><th>Aufrufe</th><th>Status</th><th>Aktionen</th>
                 </tr>
               </thead>
@@ -505,6 +505,7 @@
       $('login').classList.add('hidden');
       $('app').classList.remove('hidden');
       loadLinks();
+      loadDocKundenDropdown();
     }
     function showLogin() {
       $('app').classList.add('hidden');
@@ -591,27 +592,49 @@
       }
     });
 
+    // Kunden-Dropdown im Dokumente-Tab laden
+    async function loadDocKundenDropdown() {
+      try {
+        var data = await apiCall('/list-kunden');
+        var sel = $('doc-kunde');
+        var val = sel.value;
+        sel.innerHTML = '<option value="">— Kunde auswählen —</option>';
+        (data.kunden || []).forEach(function(k) {
+          if (k.status !== 'aktiv') return;
+          var name = (k.anrede_typ==='familie'?'Familie ':'') + (k.vorname?k.vorname+' ':'')+k.nachname;
+          var opt = document.createElement('option');
+          opt.value = k.access_token;
+          opt.textContent = name + (k.projekt_adresse ? ' — '+k.projekt_adresse : '');
+          sel.appendChild(opt);
+        });
+        if (val) sel.value = val;
+      } catch(e) { /* still */ }
+    }
+
     $('createBtn').addEventListener('click', async function() {
-      var address = $('address').value.trim();
+      var kundeToken = $('doc-kunde').value;
       var note = $('note').value.trim();
       var file = $('pdfFile').files[0];
-      var token = $('linkToken').value.trim();
       showMsg('createMsg','','');
-      if (!address) { showMsg('createMsg','Adresse fehlt.','error'); return; }
+      if (!kundeToken) { showMsg('createMsg','Bitte Kunde auswählen.','error'); return; }
       if (!file) { showMsg('createMsg','PDF-Datei auswählen.','error'); return; }
       var btn = $('createBtn');
       btn.disabled = true; btn.textContent = 'Lädt hoch…';
       try {
         var base64 = await fileToBase64(file);
-        var payload = { customer_name: address, note: note, file_name: file.name, file_base64: base64 };
-        if (token) payload.token = token;
-        var data = await apiCall('/create-link', { method:'POST', body: JSON.stringify(payload) });
-        var shareUrl = buildShareUrl(data.link.token);
-        showMsg('createMsg', 'Link: <a href="'+shareUrl+'" target="_blank">'+shareUrl+'</a>', 'success');
-        $('address').value=''; $('note').value=''; $('pdfFile').value=''; $('linkToken').value='';
+        var payload = {
+          customer_name: note || 'Dokument',
+          note: note,
+          file_name: file.name,
+          file_base64: base64,
+          token: kundeToken,
+        };
+        await apiCall('/create-link', { method:'POST', body: JSON.stringify(payload) });
+        showMsg('createMsg', 'Dokument hochgeladen und mit Kunde verknüpft.', 'success');
+        $('note').value=''; $('pdfFile').value='';
         await loadLinks();
       } catch(e) { showMsg('createMsg','Fehler: '+e.message,'error'); }
-      finally { btn.disabled=false; btn.textContent='Link erstellen'; }
+      finally { btn.disabled=false; btn.textContent='Hochladen'; }
     });
 
     // ============================================================
@@ -746,6 +769,7 @@
         $('k-notizen').value='';
         document.querySelectorAll('#punkteCheckboxes input:checked').forEach(function(c) { c.checked=false; });
         await loadKunden();
+        loadDocKundenDropdown();
       } catch(e) { showMsg('kundeCreateMsg','Fehler: '+e.message,'error'); }
       finally { btn.disabled=false; }
     });
