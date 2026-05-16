@@ -4,13 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>JV Docs – Admin</title>
+  <title>JV Admin</title>
   <style>
-    /* Farben: #BF853B (gold), #4B575D (dunkel), #929A9D (grau) */
     * { box-sizing: border-box; }
     html, body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       background: #f5f5f5;
       color: #4B575D;
@@ -25,287 +23,209 @@
       justify-content: space-between;
       border-bottom: 3px solid #BF853B;
     }
-    header .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.9rem;
-    }
-    header .logo img {
-      height: 48px;
-      width: auto;
-      display: block;
-    }
+    header .logo { display: flex; align-items: center; gap: 0.9rem; }
+    header .logo img { height: 48px; width: auto; display: block; }
     header .logo .label {
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: #929A9D;
-      border-left: 1px solid #d0d0d0;
-      padding-left: 0.9rem;
+      font-size: 0.95rem; font-weight: 500; color: #929A9D;
+      border-left: 1px solid #d0d0d0; padding-left: 0.9rem;
     }
     header button {
-      background: transparent;
-      border: 1px solid #929A9D;
-      color: #4B575D;
-      padding: 0.4rem 0.8rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.85rem;
+      background: transparent; border: 1px solid #929A9D; color: #4B575D;
+      padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem;
     }
     header button:hover { background: #BF853B; border-color: #BF853B; color: #fff; }
-    #login .login-logo {
-      text-align: center;
-      margin-bottom: 1.2rem;
-    }
-    #login .login-logo img {
-      max-width: 240px;
-      width: 80%;
-      height: auto;
-    }
-    main {
-      max-width: 1100px;
-      margin: 2rem auto;
-      padding: 0 1.5rem;
-    }
+    #login .login-logo { text-align: center; margin-bottom: 1.2rem; }
+    #login .login-logo img { max-width: 240px; width: 80%; height: auto; }
+    main { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
     .card {
-      background: #fff;
-      border-radius: 6px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      background: #fff; border-radius: 6px; padding: 1.5rem;
+      margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     .card h2 {
-      margin: 0 0 1rem 0;
-      font-size: 1.05rem;
-      color: #4B575D;
-      border-bottom: 2px solid #BF853B;
-      padding-bottom: 0.5rem;
+      margin: 0 0 1rem 0; font-size: 1.05rem; color: #4B575D;
+      border-bottom: 2px solid #BF853B; padding-bottom: 0.5rem;
     }
     label {
-      display: block;
-      font-size: 0.85rem;
-      margin: 0.75rem 0 0.25rem;
-      color: #4B575D;
-      font-weight: 500;
+      display: block; font-size: 0.85rem; margin: 0.75rem 0 0.25rem;
+      color: #4B575D; font-weight: 500;
     }
-    input[type="text"], input[type="password"], input[type="file"], textarea {
-      width: 100%;
-      padding: 0.55rem 0.7rem;
-      border: 1px solid #929A9D;
-      border-radius: 4px;
-      font-size: 0.95rem;
-      font-family: inherit;
-      background: #fff;
-      color: #4B575D;
+    input[type="text"], input[type="password"], input[type="file"],
+    input[type="email"], input[type="tel"], input[type="date"],
+    input[type="time"], textarea, select {
+      width: 100%; padding: 0.55rem 0.7rem; border: 1px solid #929A9D;
+      border-radius: 4px; font-size: 0.95rem; font-family: inherit;
+      background: #fff; color: #4B575D;
     }
+    select { appearance: auto; }
     textarea { min-height: 60px; resize: vertical; }
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: #BF853B;
+    input:focus, textarea:focus, select:focus {
+      outline: none; border-color: #BF853B;
       box-shadow: 0 0 0 2px rgba(191,133,59,0.2);
     }
     button.primary {
-      background: #BF853B;
-      color: #fff;
-      border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      font-weight: 500;
-      margin-top: 1rem;
+      background: #BF853B; color: #fff; border: none;
+      padding: 0.6rem 1.2rem; border-radius: 4px; cursor: pointer;
+      font-size: 0.95rem; font-weight: 500; margin-top: 1rem;
     }
     button.primary:hover { background: #a8722e; }
     button.primary:disabled { background: #929A9D; cursor: not-allowed; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.88rem;
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
     th, td {
-      padding: 0.7rem 0.6rem;
-      text-align: left;
-      border-bottom: 1px solid #e5e5e5;
-      vertical-align: middle;
+      padding: 0.7rem 0.6rem; text-align: left;
+      border-bottom: 1px solid #e5e5e5; vertical-align: middle;
     }
     th {
-      background: #f5f5f5;
-      color: #4B575D;
-      font-weight: 600;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
+      background: #f5f5f5; color: #4B575D; font-weight: 600;
+      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em;
     }
     tr:hover td { background: #fafafa; }
     .status {
-      display: inline-block;
-      padding: 0.2rem 0.6rem;
-      border-radius: 10px;
-      font-size: 0.75rem;
-      font-weight: 600;
+      display: inline-block; padding: 0.2rem 0.6rem; border-radius: 10px;
+      font-size: 0.75rem; font-weight: 600;
     }
     .status.active { background: #e6f4e6; color: #2d7a2d; }
     .status.inactive { background: #f5e6e6; color: #963030; }
     .actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
     .actions button {
-      border: 1px solid #929A9D;
-      background: #fff;
-      color: #4B575D;
-      padding: 0.3rem 0.6rem;
-      border-radius: 3px;
-      cursor: pointer;
-      font-size: 0.78rem;
+      border: 1px solid #929A9D; background: #fff; color: #4B575D;
+      padding: 0.3rem 0.6rem; border-radius: 3px; cursor: pointer; font-size: 0.78rem;
     }
     .actions button:hover { background: #4B575D; color: #fff; border-color: #4B575D; }
     .actions button.danger:hover { background: #963030; border-color: #963030; }
-
-    #login {
-      max-width: 380px;
-      margin: 5rem auto;
-    }
-    .msg {
-      padding: 0.7rem 1rem;
-      border-radius: 4px;
-      margin: 0.5rem 0;
-      font-size: 0.9rem;
-    }
+    #login { max-width: 380px; margin: 5rem auto; }
+    .msg { padding: 0.7rem 1rem; border-radius: 4px; margin: 0.5rem 0; font-size: 0.9rem; }
     .msg.error { background: #f5e6e6; color: #963030; border-left: 3px solid #963030; }
     .msg.success { background: #e6f4e6; color: #2d7a2d; border-left: 3px solid #2d7a2d; }
     .msg.info { background: #eef2f5; color: #4B575D; border-left: 3px solid #929A9D; }
     .muted { color: #929A9D; font-size: 0.8rem; }
     .hidden { display: none !important; }
     .token-short { font-family: monospace; font-size: 0.8rem; color: #929A9D; }
-
-    /* Container für die Tabelle, damit sie auf mittleren Screens
-       horizontal scrollen kann, ohne das Layout zu sprengen */
     .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-    /* ===========================================================
-       Responsive – Tablet (≤ 900 px)
-       =========================================================== */
+    /* ======= Tabs ======= */
+    .tabs {
+      display: flex; gap: 0; margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e5e5e5;
+    }
+    .tabs button {
+      background: none; border: none; border-bottom: 2px solid transparent;
+      margin-bottom: -2px; padding: 0.7rem 1.2rem;
+      font-size: 0.9rem; font-weight: 500; color: #929A9D;
+      cursor: pointer; transition: color 0.2s, border-color 0.2s;
+    }
+    .tabs button:hover { color: #4B575D; }
+    .tabs button.active { color: #BF853B; border-bottom-color: #BF853B; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ======= Formular-Zeile (2 Spalten) ======= */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.2rem; }
+
+    /* ======= Katalog-Grid ======= */
+    .kat-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+    .kat-card {
+      background: #fff; border: 1px solid #e5e5e5; border-radius: 6px;
+      overflow: hidden;
+    }
+    .kat-card .kat-img {
+      width: 100%; height: 160px; object-fit: cover; display: block;
+      background: #eee;
+    }
+    .kat-card .kat-placeholder {
+      width: 100%; height: 160px; display: flex; align-items: center;
+      justify-content: center; background: #eee; color: #929A9D;
+      font-size: 0.85rem;
+    }
+    .kat-card .kat-body { padding: 0.9rem; }
+    .kat-card .kat-body h3 {
+      margin: 0 0 0.4rem 0; font-size: 0.95rem; color: #4B575D;
+    }
+    .kat-card .kat-body .kat-cat {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
+      color: #BF853B; font-weight: 600; margin-bottom: 0.3rem;
+    }
+    .kat-card .kat-body p {
+      font-size: 0.82rem; color: #929A9D; margin: 0.3rem 0;
+      line-height: 1.4;
+    }
+    .kat-card .kat-actions {
+      padding: 0 0.9rem 0.9rem; display: flex; gap: 0.4rem; flex-wrap: wrap;
+    }
+    .kat-card .kat-actions button {
+      font-size: 0.75rem; padding: 0.3rem 0.55rem; border: 1px solid #929A9D;
+      border-radius: 3px; background: #fff; color: #4B575D; cursor: pointer;
+    }
+    .kat-card .kat-actions button:hover { background: #4B575D; color: #fff; border-color: #4B575D; }
+
+    /* ======= Kunden-Detail-Panel ======= */
+    .detail-panel {
+      position: fixed; top: 0; right: -460px; width: 440px; max-width: 90vw;
+      height: 100vh; background: #fff; box-shadow: -4px 0 20px rgba(0,0,0,0.12);
+      z-index: 100; transition: right 0.3s ease; overflow-y: auto; padding: 1.5rem;
+    }
+    .detail-panel.open { right: 0; }
+    .detail-panel .detail-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #929A9D;
+    }
+    .detail-panel .detail-close:hover { color: #4B575D; }
+    .detail-panel h3 { margin: 0 0 1rem 0; color: #4B575D; font-size: 1.1rem; border-bottom: 2px solid #BF853B; padding-bottom: 0.5rem; }
+    .detail-panel .interest-item {
+      padding: 0.6rem 0; border-bottom: 1px solid #f0f0f0;
+    }
+    .detail-panel .interest-item .int-title { font-weight: 600; font-size: 0.88rem; }
+    .detail-panel .interest-item .int-cat { font-size: 0.7rem; color: #BF853B; text-transform: uppercase; }
+    .detail-panel .interest-item .int-comment { font-size: 0.82rem; color: #929A9D; margin-top: 0.2rem; font-style: italic; }
+    .detail-panel .log-entry { font-size: 0.78rem; color: #929A9D; padding: 0.25rem 0; border-bottom: 1px dashed #f0f0f0; }
+
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; display: none; }
+    .overlay.open { display: block; }
+
+    /* ======= Responsive ======= */
     @media (max-width: 900px) {
       header { padding: 0.8rem 1rem; }
       header .logo img { height: 40px; }
-      header .logo .label {
-        font-size: 0.8rem;
-        padding-left: 0.7rem;
-      }
+      header .logo .label { font-size: 0.8rem; padding-left: 0.7rem; }
       main { margin: 1.25rem auto; padding: 0 1rem; }
       .card { padding: 1.1rem; }
       table { font-size: 0.82rem; }
       th, td { padding: 0.55rem 0.45rem; }
+      .form-row { grid-template-columns: 1fr; }
     }
-
-    /* ===========================================================
-       Responsive – Handy (≤ 640 px)
-       Tabelle wird zu gestapelten Karten, Header kompakter
-       =========================================================== */
     @media (max-width: 640px) {
-      header {
-        padding: 0.7rem 0.9rem;
-      }
+      header { padding: 0.7rem 0.9rem; }
       header .logo { gap: 0.6rem; }
       header .logo img { height: 34px; }
-      header .logo .label {
-        /* Label auf kleinen Handys ausblenden — Logo spricht für sich */
-        display: none;
-      }
-      header button {
-        padding: 0.35rem 0.7rem;
-        font-size: 0.8rem;
-      }
+      header .logo .label { display: none; }
+      header button { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
       main { margin: 0.9rem auto; padding: 0 0.75rem; }
       .card { padding: 0.95rem; border-radius: 5px; }
       .card h2 { font-size: 1rem; }
       label { font-size: 0.82rem; }
-      input[type="text"], input[type="password"], input[type="file"], textarea {
-        font-size: 16px; /* verhindert iOS-Zoom beim Fokus */
+      input[type="text"], input[type="password"], input[type="file"],
+      input[type="email"], input[type="tel"], input[type="date"],
+      input[type="time"], textarea, select {
+        font-size: 16px;
       }
-      button.primary {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
-      }
-
-      /* Login-Ansicht auf Handy-Breite ausfüllen */
-      #login {
-        max-width: 100%;
-        margin: 2rem auto;
-        padding: 0 0.9rem;
-      }
+      button.primary { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; }
+      #login { max-width: 100%; margin: 2rem auto; padding: 0 0.9rem; }
       #login .login-logo img { max-width: 220px; }
-
-      /* Tabelle → Karten-Layout.
-         Kopfzeile ausblenden, jede Zeile wird ein Block mit
-         Label (via data-label) + Wert pro Zelle. */
-      #linksTable thead { display: none; }
-      #linksTable, #linksTable tbody { display: block; width: 100%; }
-      #linksTable tr {
-        display: block;
-        width: 100%;
-        border: 1px solid #e5e5e5;
-        border-radius: 6px;
-        margin-bottom: 0.9rem;
-        padding: 0.35rem 0.85rem;
-        background: #fff;
-      }
-      #linksTable tr:hover td { background: transparent; }
-      #linksTable td {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 1rem;
-        padding: 0.55rem 0;
-        border-bottom: 1px dashed #eee;
-        font-size: 0.9rem;
-        text-align: right;
-      }
-      #linksTable td:last-child { border-bottom: none; }
-      #linksTable td::before {
-        content: attr(data-label);
-        font-weight: 600;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        color: #929A9D;
-        flex-shrink: 0;
-        padding-top: 0.1rem;
-        text-align: left;
-      }
-      /* Aktionen links ausrichten und umbrechen lassen */
-      #linksTable td.actions-cell { flex-direction: column; align-items: stretch; text-align: left; }
-      #linksTable td.actions-cell::before { margin-bottom: 0.4rem; }
-      #linksTable td.actions-cell .actions { justify-content: flex-start; }
-      #linksTable td.actions-cell .actions button {
-        flex: 1 1 auto;
-        min-width: 0;
-        padding: 0.45rem 0.6rem;
-        font-size: 0.82rem;
-      }
-      /* Mehrzeilige Zellen (Adresse mit Token) links ausrichten */
-      #linksTable td.cell-address { flex-direction: column; align-items: flex-start; text-align: left; }
-      #linksTable td.cell-address::before { margin-bottom: 0.25rem; }
-    }
-
-    /* ===========================================================
-       Responsive – sehr schmale Handys (≤ 380 px)
-       =========================================================== */
-    @media (max-width: 380px) {
-      header .logo img { height: 28px; }
-      .card { padding: 0.8rem; }
-      #linksTable td.actions-cell .actions { flex-direction: column; }
+      .tabs button { padding: 0.6rem 0.7rem; font-size: 0.8rem; }
+      .kat-grid { grid-template-columns: 1fr; }
+      .detail-panel { width: 100%; max-width: 100%; right: -100%; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Login-Ansicht -->
+  <!-- Login -->
   <div id="login">
     <div class="card">
-      <div class="login-logo">
-        <img src="/logo.png" alt="Jäggi Vollmer" />
-      </div>
-      <h2>Dokumenten-Admin</h2>
+      <div class="login-logo"><img src="/logo.png" alt="Jäggi Vollmer" /></div>
+      <h2>Admin</h2>
       <label for="pwd">Passwort</label>
       <input type="password" id="pwd" autocomplete="current-password" />
       <div id="loginMsg"></div>
@@ -313,115 +233,237 @@
     </div>
   </div>
 
-  <!-- Admin-Ansicht -->
+  <!-- App -->
   <div id="app" class="hidden">
     <header>
       <div class="logo">
         <img src="/logo.png" alt="Jäggi Vollmer" />
-        <span class="label">Dokumenten-Admin</span>
+        <span class="label">Admin</span>
       </div>
       <button id="logoutBtn">Abmelden</button>
     </header>
+
     <main>
-      <!-- Neuer Link -->
-      <div class="card">
-        <h2>Neuen Link erstellen</h2>
-        <label for="address">Adresse *</label>
-        <input type="text" id="address" placeholder="z.B. Musterstrasse 12, 4057 Basel" />
-
-        <label for="note">Notiz (optional)</label>
-        <textarea id="note" placeholder="z.B. Visualisierung Bad OG"></textarea>
-
-        <label for="pdfFile">PDF-Datei *</label>
-        <input type="file" id="pdfFile" accept="application/pdf" />
-
-        <div id="createMsg"></div>
-        <button class="primary" id="createBtn">Link erstellen</button>
+      <div class="tabs">
+        <button class="active" data-tab="dokumente">Dokumente</button>
+        <button data-tab="kunden">Kunden</button>
+        <button data-tab="katalog">Katalog</button>
       </div>
 
-      <!-- Liste -->
-      <div class="card">
-        <h2>Alle Links</h2>
-        <div id="listMsg"></div>
-        <div class="table-wrap">
-          <table id="linksTable">
-            <thead>
-              <tr>
-                <th>Adresse</th>
-                <th>Notiz</th>
-                <th>Erstellt</th>
-                <th>Letzter Aufruf</th>
-                <th>Aufrufe</th>
-                <th>Status</th>
-                <th>Aktionen</th>
-              </tr>
-            </thead>
-            <tbody id="linksBody">
-              <tr><td colspan="7" class="muted">Lade…</td></tr>
-            </tbody>
-          </table>
+      <!-- ============ Tab: Dokumente (bestehend) ============ -->
+      <div class="tab-panel active" id="tab-dokumente">
+        <div class="card">
+          <h2>Neuen Link erstellen</h2>
+          <label for="address">Adresse *</label>
+          <input type="text" id="address" placeholder="z.B. Musterstrasse 12, 4057 Basel" />
+          <label for="note">Notiz (optional)</label>
+          <textarea id="note" placeholder="z.B. Visualisierung Bad OG"></textarea>
+          <label for="pdfFile">PDF-Datei *</label>
+          <input type="file" id="pdfFile" accept="application/pdf" />
+          <label for="linkToken">Kunden-Token (optional)</label>
+          <input type="text" id="linkToken" placeholder="Leer = neuer Token, oder bestehenden Kunden-Token einfügen" />
+          <div id="createMsg"></div>
+          <button class="primary" id="createBtn">Link erstellen</button>
+        </div>
+        <div class="card">
+          <h2>Alle Links</h2>
+          <div id="listMsg"></div>
+          <div class="table-wrap">
+            <table id="linksTable">
+              <thead>
+                <tr>
+                  <th>Adresse</th><th>Notiz</th><th>Erstellt</th>
+                  <th>Letzter Aufruf</th><th>Aufrufe</th><th>Status</th><th>Aktionen</th>
+                </tr>
+              </thead>
+              <tbody id="linksBody">
+                <tr><td colspan="7" class="muted">Lade…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Tab: Kunden ============ -->
+      <div class="tab-panel" id="tab-kunden">
+        <div class="card">
+          <h2>Neuen Kunden anlegen</h2>
+          <div class="form-row">
+            <div>
+              <label for="k-anrede">Anrede *</label>
+              <select id="k-anrede">
+                <option value="person">Person (Frau/Herr)</option>
+                <option value="familie">Familie</option>
+              </select>
+            </div>
+            <div>
+              <label for="k-vorname">Vorname</label>
+              <input type="text" id="k-vorname" placeholder="Lisa" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="k-nachname">Nachname *</label>
+              <input type="text" id="k-nachname" placeholder="Müller" />
+            </div>
+            <div>
+              <label for="k-adresse">Projekt-Adresse</label>
+              <input type="text" id="k-adresse" placeholder="Hauptstrasse 5, 4051 Basel" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="k-email">E-Mail</label>
+              <input type="email" id="k-email" placeholder="lisa@example.com" />
+            </div>
+            <div>
+              <label for="k-telefon">Telefon</label>
+              <input type="tel" id="k-telefon" placeholder="+41 79 ..." />
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="k-datum">Termin Datum</label>
+              <input type="date" id="k-datum" />
+            </div>
+            <div>
+              <label for="k-uhrzeit">Termin Uhrzeit</label>
+              <input type="time" id="k-uhrzeit" value="14:00" />
+            </div>
+          </div>
+          <label for="k-notizen">Admin-Notizen (intern)</label>
+          <textarea id="k-notizen" placeholder="Nur für dich sichtbar"></textarea>
+          <div id="kundeCreateMsg"></div>
+          <button class="primary" id="kundeCreateBtn">Kunde anlegen</button>
+        </div>
+        <div class="card">
+          <h2>Alle Kunden</h2>
+          <div id="kundenMsg"></div>
+          <div class="table-wrap">
+            <table id="kundenTable">
+              <thead>
+                <tr>
+                  <th>Name</th><th>Adresse</th><th>Termin</th>
+                  <th>Status</th><th>Aktionen</th>
+                </tr>
+              </thead>
+              <tbody id="kundenBody">
+                <tr><td colspan="5" class="muted">Lade…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Tab: Katalog ============ -->
+      <div class="tab-panel" id="tab-katalog">
+        <div class="card">
+          <h2>Inspiration-Katalog</h2>
+          <p class="muted" style="margin-top:-0.5rem">Bilder, Videos und Texte der 14 Inspiration-Punkte verwalten. Änderungen sind sofort für Kunden sichtbar.</p>
+          <div id="katalogMsg"></div>
+          <div class="kat-grid" id="katalogGrid">
+            <div class="muted">Lade…</div>
+          </div>
         </div>
       </div>
     </main>
   </div>
 
-  <script>
-    // Einfacher Admin-Client. Passwort wird im sessionStorage gehalten
-    // und als Bearer-Token an alle Function-Calls mitgegeben.
+  <!-- Kunden-Detail (Slide-in Panel) -->
+  <div class="overlay" id="detailOverlay"></div>
+  <div class="detail-panel" id="detailPanel">
+    <button class="detail-close" id="detailClose">&times;</button>
+    <div id="detailContent"></div>
+  </div>
 
+  <!-- Versteckter File-Input für Medien-Upload -->
+  <input type="file" id="mediaUpload" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" style="display:none" />
+
+  <script>
     const STORAGE_KEY = 'jv_admin_pwd';
     const API = '/.netlify/functions';
-
     const $ = (id) => document.getElementById(id);
 
     function showMsg(elId, text, type) {
       const el = $(elId);
-      el.innerHTML = text ? `<div class="msg ${type}">${text}</div>` : '';
+      if (el) el.innerHTML = text ? `<div class="msg ${type}">${text}</div>` : '';
     }
+    function getPwd() { return sessionStorage.getItem(STORAGE_KEY) || ''; }
+    function setPwd(p) { sessionStorage.setItem(STORAGE_KEY, p); }
+    function clearPwd() { sessionStorage.removeItem(STORAGE_KEY); }
 
-    function getPwd() {
-      return sessionStorage.getItem(STORAGE_KEY) || '';
-    }
-
-    function setPwd(p) {
-      sessionStorage.setItem(STORAGE_KEY, p);
-    }
-
-    function clearPwd() {
-      sessionStorage.removeItem(STORAGE_KEY);
-    }
-
-    async function apiCall(path, options = {}) {
+    async function apiCall(path, options) {
+      options = options || {};
       const headers = Object.assign({}, options.headers || {}, {
         'Authorization': 'Bearer ' + getPwd(),
       });
       if (options.body && !(options.body instanceof FormData)) {
         headers['Content-Type'] = 'application/json';
       }
-      const res = await fetch(API + path, Object.assign({}, options, { headers }));
-      const data = await res.json().catch(() => ({}));
+      const res = await fetch(API + path, Object.assign({}, options, { headers: headers }));
+      const data = await res.json().catch(function() { return {}; });
       if (!res.ok) {
-        const err = new Error(data.error || 'Fehler ' + res.status);
+        var err = new Error(data.error || 'Fehler ' + res.status);
         err.status = res.status;
         throw err;
       }
       return data;
     }
 
-    // Login-Flow: wir testen das Passwort über list-links
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      var d = new Date(iso);
+      return d.toLocaleString('de-CH', {
+        day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
+      });
+    }
+
+    function fmtDateShort(iso) {
+      if (!iso) return '—';
+      var d = new Date(iso);
+      return d.toLocaleDateString('de-CH', { day:'2-digit', month:'2-digit', year:'numeric' });
+    }
+
+    function fileToBase64(file) {
+      return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function() {
+          var result = reader.result || '';
+          var comma = result.indexOf(',');
+          resolve(comma >= 0 ? result.slice(comma + 1) : result);
+        };
+        reader.onerror = function() { reject(new Error('Datei konnte nicht gelesen werden')); };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ============================================================
+    // TABS
+    // ============================================================
+    document.querySelector('.tabs').addEventListener('click', function(ev) {
+      var btn = ev.target.closest('button[data-tab]');
+      if (!btn) return;
+      var tab = btn.dataset.tab;
+      document.querySelectorAll('.tabs button').forEach(function(b) { b.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      $('tab-' + tab).classList.add('active');
+      if (tab === 'kunden') loadKunden();
+      if (tab === 'katalog') loadKatalog();
+    });
+
+    // ============================================================
+    // LOGIN
+    // ============================================================
     async function tryLogin(pwd) {
       setPwd(pwd);
-      try {
-        await apiCall('/list-links');
-        return true;
-      } catch (e) {
-        if (e.status === 401) {
-          clearPwd();
-          return false;
-        }
-        // Andere Fehler (Netz, Server) bedeuten nicht «falsches Passwort»
-        return true;
-      }
+      try { await apiCall('/list-links'); return true; }
+      catch (e) { if (e.status === 401) { clearPwd(); return false; } return true; }
     }
 
     function showApp() {
@@ -429,228 +471,388 @@
       $('app').classList.remove('hidden');
       loadLinks();
     }
-
     function showLogin() {
       $('app').classList.add('hidden');
       $('login').classList.remove('hidden');
       $('pwd').focus();
     }
 
-    // Datum schweizerisch formatieren
-    function fmtDate(iso) {
-      if (!iso) return '—';
-      const d = new Date(iso);
-      return d.toLocaleString('de-CH', {
-        day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit',
-      });
-    }
+    $('loginBtn').addEventListener('click', async function() {
+      var pwd = $('pwd').value;
+      if (!pwd) return;
+      showMsg('loginMsg', 'Prüfe Passwort…', 'info');
+      var ok = await tryLogin(pwd);
+      if (ok) { showMsg('loginMsg','',''); showApp(); }
+      else { showMsg('loginMsg', 'Passwort falsch.', 'error'); }
+    });
+    $('pwd').addEventListener('keydown', function(e) { if (e.key==='Enter') $('loginBtn').click(); });
+    $('logoutBtn').addEventListener('click', function() { clearPwd(); showLogin(); });
 
-    function escapeHtml(s) {
-      if (!s) return '';
-      return String(s)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-
+    // ============================================================
+    // DOKUMENTE (bestehende Logik)
+    // ============================================================
     function buildShareUrl(token) {
-      return `${location.origin}/view.html?t=${token}`;
+      return location.origin + '/view.html?t=' + token;
     }
 
     async function loadLinks() {
-      showMsg('listMsg', '', '');
+      showMsg('listMsg','','');
       try {
-        const data = await apiCall('/list-links');
+        var data = await apiCall('/list-links');
         renderLinks(data.links || []);
       } catch (e) {
-        if (e.status === 401) { clearPwd(); showLogin(); return; }
-        showMsg('listMsg', 'Fehler beim Laden: ' + e.message, 'error');
+        if (e.status===401) { clearPwd(); showLogin(); return; }
+        showMsg('listMsg', 'Fehler: ' + e.message, 'error');
       }
     }
 
     function renderLinks(links) {
-      const body = $('linksBody');
+      var body = $('linksBody');
       if (!links.length) {
-        body.innerHTML = '<tr><td colspan="7" class="muted">Noch keine Links vorhanden.</td></tr>';
+        body.innerHTML = '<tr><td colspan="7" class="muted">Noch keine Links.</td></tr>';
         return;
       }
-      // data-label wird in der Mobile-Darstellung (Card-Layout) als
-      // Label vor jedem Wert angezeigt.
-      body.innerHTML = links.map((l) => `
-        <tr data-id="${l.id}">
-          <td class="cell-address" data-label="Adresse">
-            <div>
-              <strong>${escapeHtml(l.customer_name)}</strong><br>
-              <span class="token-short">${l.token.slice(0, 8)}…</span>
-            </div>
-          </td>
-          <td data-label="Notiz">${escapeHtml(l.note || '')}</td>
-          <td data-label="Erstellt">${fmtDate(l.created_at)}</td>
-          <td data-label="Letzter Aufruf">${fmtDate(l.last_viewed_at)}</td>
-          <td data-label="Aufrufe">${l.view_count || 0}</td>
-          <td data-label="Status">
-            <span class="status ${l.is_active ? 'active' : 'inactive'}">
-              ${l.is_active ? 'Aktiv' : 'Inaktiv'}
-            </span>
-          </td>
-          <td class="actions-cell" data-label="Aktionen">
-            <div class="actions">
-              <button data-action="copy" data-token="${l.token}">Link kopieren</button>
-              <button data-action="toggle" data-id="${l.id}" data-active="${l.is_active ? '1' : '0'}">
-                ${l.is_active ? 'Deaktivieren' : 'Aktivieren'}
-              </button>
-              <button class="danger" data-action="delete" data-id="${l.id}" data-name="${escapeHtml(l.customer_name)}">Löschen</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
-      // Hinweis: Das DB-Feld heisst weiterhin `customer_name`,
-      // enthält aber neu die Adresse — kein Schema-Migrationsbedarf.
+      body.innerHTML = links.map(function(l) {
+        return '<tr data-id="'+l.id+'">'
+          + '<td><strong>'+escapeHtml(l.customer_name)+'</strong><br><span class="token-short">'+l.token.slice(0,8)+'…</span></td>'
+          + '<td>'+escapeHtml(l.note||'')+'</td>'
+          + '<td>'+fmtDate(l.created_at)+'</td>'
+          + '<td>'+fmtDate(l.last_viewed_at)+'</td>'
+          + '<td>'+(l.view_count||0)+'</td>'
+          + '<td><span class="status '+(l.is_active?'active':'inactive')+'">'+(l.is_active?'Aktiv':'Inaktiv')+'</span></td>'
+          + '<td><div class="actions">'
+            + '<button data-action="copy" data-token="'+l.token+'">Link kopieren</button>'
+            + '<button data-action="toggle" data-id="'+l.id+'" data-active="'+(l.is_active?'1':'0')+'">'+(l.is_active?'Deaktivieren':'Aktivieren')+'</button>'
+            + '<button class="danger" data-action="delete" data-id="'+l.id+'" data-name="'+escapeHtml(l.customer_name)+'">Löschen</button>'
+          + '</div></td></tr>';
+      }).join('');
     }
 
-    // Event-Delegation für die Tabellen-Buttons
-    $('linksBody').addEventListener('click', async (ev) => {
-      const btn = ev.target.closest('button[data-action]');
+    $('linksBody').addEventListener('click', async function(ev) {
+      var btn = ev.target.closest('button[data-action]');
       if (!btn) return;
-      const action = btn.dataset.action;
-
+      var action = btn.dataset.action;
       if (action === 'copy') {
-        const url = buildShareUrl(btn.dataset.token);
-        try {
-          await navigator.clipboard.writeText(url);
-          showMsg('listMsg', 'Link in Zwischenablage kopiert.', 'success');
-        } catch (e) {
-          showMsg('listMsg', 'Kopieren fehlgeschlagen. Link: ' + url, 'info');
-        }
+        var url = buildShareUrl(btn.dataset.token);
+        try { await navigator.clipboard.writeText(url); showMsg('listMsg','Link kopiert.','success'); }
+        catch(e) { showMsg('listMsg','Link: '+url,'info'); }
         return;
       }
-
       if (action === 'toggle') {
-        const id = btn.dataset.id;
-        const currentlyActive = btn.dataset.active === '1';
         btn.disabled = true;
         try {
-          await apiCall('/toggle-link', {
-            method: 'POST',
-            body: JSON.stringify({ id, is_active: !currentlyActive }),
-          });
+          await apiCall('/toggle-link', { method:'POST', body: JSON.stringify({ id:btn.dataset.id, is_active: btn.dataset.active!=='1' }) });
           await loadLinks();
-        } catch (e) {
-          showMsg('listMsg', 'Fehler: ' + e.message, 'error');
-          btn.disabled = false;
-        }
+        } catch(e) { showMsg('listMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
         return;
       }
-
       if (action === 'delete') {
-        const id = btn.dataset.id;
-        const name = btn.dataset.name;
-        if (!confirm(`Link für «${name}» wirklich löschen? Die Datei wird ebenfalls entfernt.`)) return;
+        if (!confirm('Link wirklich löschen?')) return;
         btn.disabled = true;
         try {
-          await apiCall('/delete-link', {
-            method: 'POST',
-            body: JSON.stringify({ id }),
-          });
-          await loadLinks();
-          showMsg('listMsg', 'Link gelöscht.', 'success');
-        } catch (e) {
-          showMsg('listMsg', 'Fehler: ' + e.message, 'error');
-          btn.disabled = false;
-        }
+          await apiCall('/delete-link', { method:'POST', body: JSON.stringify({ id:btn.dataset.id }) });
+          await loadLinks(); showMsg('listMsg','Gelöscht.','success');
+        } catch(e) { showMsg('listMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
       }
     });
 
-    // Datei als Base64 einlesen
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const result = reader.result || '';
-          const comma = result.indexOf(',');
-          resolve(comma >= 0 ? result.slice(comma + 1) : result);
-        };
-        reader.onerror = () => reject(new Error('Datei konnte nicht gelesen werden'));
-        reader.readAsDataURL(file);
+    $('createBtn').addEventListener('click', async function() {
+      var address = $('address').value.trim();
+      var note = $('note').value.trim();
+      var file = $('pdfFile').files[0];
+      var token = $('linkToken').value.trim();
+      showMsg('createMsg','','');
+      if (!address) { showMsg('createMsg','Adresse fehlt.','error'); return; }
+      if (!file) { showMsg('createMsg','PDF-Datei auswählen.','error'); return; }
+      var btn = $('createBtn');
+      btn.disabled = true; btn.textContent = 'Lädt hoch…';
+      try {
+        var base64 = await fileToBase64(file);
+        var payload = { customer_name: address, note: note, file_name: file.name, file_base64: base64 };
+        if (token) payload.token = token;
+        var data = await apiCall('/create-link', { method:'POST', body: JSON.stringify(payload) });
+        var shareUrl = buildShareUrl(data.link.token);
+        showMsg('createMsg', 'Link: <a href="'+shareUrl+'" target="_blank">'+shareUrl+'</a>', 'success');
+        $('address').value=''; $('note').value=''; $('pdfFile').value=''; $('linkToken').value='';
+        await loadLinks();
+      } catch(e) { showMsg('createMsg','Fehler: '+e.message,'error'); }
+      finally { btn.disabled=false; btn.textContent='Link erstellen'; }
+    });
+
+    // ============================================================
+    // KUNDEN
+    // ============================================================
+    async function loadKunden() {
+      showMsg('kundenMsg','','');
+      try {
+        var data = await apiCall('/list-kunden');
+        renderKunden(data.kunden || []);
+      } catch(e) { showMsg('kundenMsg','Fehler: '+e.message,'error'); }
+    }
+
+    function renderKunden(kunden) {
+      var body = $('kundenBody');
+      if (!kunden.length) {
+        body.innerHTML = '<tr><td colspan="5" class="muted">Noch keine Kunden.</td></tr>';
+        return;
+      }
+      var katLabels = { person:'Person', familie:'Familie' };
+      body.innerHTML = kunden.map(function(k) {
+        var name = (k.anrede_typ==='familie' ? 'Familie ' : '') + escapeHtml((k.vorname?k.vorname+' ':'')+k.nachname);
+        var statusCls = k.status==='aktiv' ? 'active' : 'inactive';
+        return '<tr>'
+          + '<td><strong>'+name+'</strong><br><span class="token-short">'+k.access_token.slice(0,8)+'…</span></td>'
+          + '<td>'+escapeHtml(k.projekt_adresse||'')+'</td>'
+          + '<td>'+(k.termin_datum ? fmtDateShort(k.termin_datum) + (k.termin_uhrzeit ? ' '+k.termin_uhrzeit.slice(0,5) : '') : '—')+'</td>'
+          + '<td><span class="status '+statusCls+'">'+escapeHtml(k.status)+'</span></td>'
+          + '<td><div class="actions">'
+            + '<button data-kaction="link" data-token="'+k.access_token+'">Inspiration-Link</button>'
+            + '<button data-kaction="detail" data-id="'+k.id+'">Details</button>'
+            + '<button data-kaction="toggle" data-id="'+k.id+'" data-status="'+k.status+'">'+(k.status==='aktiv'?'Deaktivieren':'Aktivieren')+'</button>'
+            + '<button class="danger" data-kaction="delete" data-id="'+k.id+'" data-name="'+name+'">Löschen</button>'
+          + '</div></td></tr>';
+      }).join('');
+    }
+
+    $('kundenBody').addEventListener('click', async function(ev) {
+      var btn = ev.target.closest('button[data-kaction]');
+      if (!btn) return;
+      var action = btn.dataset.kaction;
+      if (action === 'link') {
+        var url = location.origin + '/inspiration.html?t=' + btn.dataset.token;
+        try { await navigator.clipboard.writeText(url); showMsg('kundenMsg','Inspiration-Link kopiert.','success'); }
+        catch(e) { showMsg('kundenMsg','Link: '+url,'info'); }
+        return;
+      }
+      if (action === 'detail') {
+        openKundeDetail(btn.dataset.id);
+        return;
+      }
+      if (action === 'toggle') {
+        btn.disabled = true;
+        var newStatus = btn.dataset.status === 'aktiv' ? 'deaktiviert' : 'aktiv';
+        try {
+          await apiCall('/update-kunde', { method:'POST', body: JSON.stringify({ id:btn.dataset.id, status:newStatus }) });
+          await loadKunden();
+        } catch(e) { showMsg('kundenMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
+        return;
+      }
+      if (action === 'delete') {
+        if (!confirm('Kunde wirklich löschen? Alle Interessen und Logs werden entfernt.')) return;
+        btn.disabled = true;
+        try {
+          await apiCall('/delete-kunde', { method:'POST', body: JSON.stringify({ id:btn.dataset.id }) });
+          await loadKunden(); showMsg('kundenMsg','Gelöscht.','success');
+        } catch(e) { showMsg('kundenMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
+      }
+    });
+
+    $('kundeCreateBtn').addEventListener('click', async function() {
+      var nachname = $('k-nachname').value.trim();
+      showMsg('kundeCreateMsg','','');
+      if (!nachname) { showMsg('kundeCreateMsg','Nachname fehlt.','error'); return; }
+      var btn = $('kundeCreateBtn');
+      btn.disabled = true;
+      try {
+        var data = await apiCall('/create-kunde', { method:'POST', body: JSON.stringify({
+          anrede_typ: $('k-anrede').value,
+          vorname: $('k-vorname').value.trim(),
+          nachname: nachname,
+          email: $('k-email').value.trim(),
+          telefon: $('k-telefon').value.trim(),
+          projekt_adresse: $('k-adresse').value.trim(),
+          termin_datum: $('k-datum').value || null,
+          termin_uhrzeit: $('k-uhrzeit').value || null,
+          admin_notizen: $('k-notizen').value.trim(),
+        }) });
+        var inspoUrl = location.origin + '/inspiration.html?t=' + data.kunde.access_token;
+        showMsg('kundeCreateMsg',
+          'Kunde angelegt! Inspiration-Link: <a href="'+inspoUrl+'" target="_blank">'+inspoUrl+'</a>','success');
+        $('k-vorname').value=''; $('k-nachname').value=''; $('k-email').value='';
+        $('k-telefon').value=''; $('k-adresse').value=''; $('k-datum').value='';
+        $('k-notizen').value='';
+        await loadKunden();
+      } catch(e) { showMsg('kundeCreateMsg','Fehler: '+e.message,'error'); }
+      finally { btn.disabled=false; }
+    });
+
+    // Kunden-Detail-Panel
+    async function openKundeDetail(id) {
+      $('detailContent').innerHTML = '<div class="muted">Lade…</div>';
+      $('detailPanel').classList.add('open');
+      $('detailOverlay').classList.add('open');
+      try {
+        var data = await apiCall('/get-kunde-interessen?id=' + id);
+        var k = data.kunde;
+        var name = (k.anrede_typ==='familie'?'Familie ':'') + escapeHtml((k.vorname?k.vorname+' ':'')+k.nachname);
+        var html = '<h3>'+name+'</h3>';
+        html += '<p style="font-size:0.85rem;color:#929A9D;margin-bottom:1rem">';
+        html += escapeHtml(k.projekt_adresse||'') + (k.termin_datum ? '<br>Termin: '+fmtDateShort(k.termin_datum) : '') + '</p>';
+        html += '<p style="font-size:0.82rem;margin-bottom:0.3rem"><strong>Token:</strong> <span class="token-short">'+k.access_token+'</span></p>';
+        if (k.admin_notizen) html += '<p style="font-size:0.82rem;color:#929A9D;font-style:italic;margin-bottom:1rem">'+escapeHtml(k.admin_notizen)+'</p>';
+
+        // Interessen
+        var interessen = data.interessen || [];
+        var marked = interessen.filter(function(i) { return i.interessiert; });
+        html += '<h3 style="margin-top:1.5rem">Interessen ('+marked.length+' markiert)</h3>';
+        if (!marked.length) {
+          html += '<p class="muted">Noch nichts markiert.</p>';
+        } else {
+          marked.forEach(function(i) {
+            html += '<div class="interest-item">';
+            html += '<div class="int-cat">'+escapeHtml(i.kategorie||'')+'</div>';
+            html += '<div class="int-title">'+escapeHtml(i.titel||i.punkt_id)+'</div>';
+            if (i.kommentar) html += '<div class="int-comment">«'+escapeHtml(i.kommentar)+'»</div>';
+            html += '</div>';
+          });
+        }
+
+        // Aktivitätslog
+        var log = data.log || [];
+        if (log.length) {
+          html += '<h3 style="margin-top:1.5rem">Letzte Aktivität</h3>';
+          log.slice(0,20).forEach(function(l) {
+            html += '<div class="log-entry">'+fmtDate(l.timestamp)+' — '+escapeHtml(l.aktion)+'</div>';
+          });
+        }
+
+        $('detailContent').innerHTML = html;
+      } catch(e) {
+        $('detailContent').innerHTML = '<div class="msg error">Fehler: '+escapeHtml(e.message)+'</div>';
+      }
+    }
+
+    function closeDetail() {
+      $('detailPanel').classList.remove('open');
+      $('detailOverlay').classList.remove('open');
+    }
+    $('detailClose').addEventListener('click', closeDetail);
+    $('detailOverlay').addEventListener('click', closeDetail);
+
+    // ============================================================
+    // KATALOG
+    // ============================================================
+    var katalogPunkte = [];
+    var katLabels = { wc:'WC', waschtisch:'Waschtisch', armaturen:'Armaturen', dusche:'Dusche' };
+
+    async function loadKatalog() {
+      showMsg('katalogMsg','','');
+      try {
+        var data = await apiCall('/list-punkte');
+        katalogPunkte = data.punkte || [];
+        renderKatalog();
+      } catch(e) { showMsg('katalogMsg','Fehler: '+e.message,'error'); }
+    }
+
+    function renderKatalog() {
+      var grid = $('katalogGrid');
+      if (!katalogPunkte.length) {
+        grid.innerHTML = '<div class="muted">Keine Punkte im Katalog.</div>';
+        return;
+      }
+      grid.innerHTML = katalogPunkte.map(function(p) {
+        var imgHtml = p.bild_url
+          ? '<img class="kat-img" src="'+escapeHtml(p.bild_url)+'" alt="'+escapeHtml(p.titel)+'" loading="lazy" />'
+          : '<div class="kat-placeholder">Kein Bild</div>';
+        return '<div class="kat-card" data-punkt-id="'+p.id+'">'
+          + imgHtml
+          + '<div class="kat-body">'
+            + '<div class="kat-cat">'+(katLabels[p.kategorie]||p.kategorie)+' · '+p.reihenfolge+'</div>'
+            + '<h3>'+escapeHtml(p.titel)+'</h3>'
+            + '<p>'+escapeHtml(p.kurzbeschreibung||'')+'</p>'
+          + '</div>'
+          + '<div class="kat-actions">'
+            + '<button data-kataction="bild" data-id="'+p.id+'">Bild '+(p.bild_url?'ersetzen':'hochladen')+'</button>'
+            + '<button data-kataction="video" data-id="'+p.id+'">Video '+(p.video_url?'ersetzen':'hochladen')+'</button>'
+            + '<button data-kataction="edit" data-id="'+p.id+'">Texte bearbeiten</button>'
+          + '</div></div>';
+      }).join('');
+    }
+
+    // Medien-Upload
+    var mediaUploadTarget = null;
+    var mediaUploadType = null;
+
+    $('katalogGrid').addEventListener('click', function(ev) {
+      var btn = ev.target.closest('button[data-kataction]');
+      if (!btn) return;
+      var action = btn.dataset.kataction;
+      var id = btn.dataset.id;
+
+      if (action === 'bild' || action === 'video') {
+        mediaUploadTarget = id;
+        mediaUploadType = action;
+        var input = $('mediaUpload');
+        input.accept = action === 'bild' ? 'image/jpeg,image/png,image/webp' : 'video/mp4,video/webm';
+        input.value = '';
+        input.click();
+        return;
+      }
+
+      if (action === 'edit') {
+        openTextEditor(id);
+      }
+    });
+
+    $('mediaUpload').addEventListener('change', async function() {
+      var file = this.files[0];
+      if (!file || !mediaUploadTarget) return;
+      showMsg('katalogMsg', 'Lädt hoch…', 'info');
+      try {
+        var base64 = await fileToBase64(file);
+        await apiCall('/upload-inspiration-media', { method:'POST', body: JSON.stringify({
+          punkt_id: mediaUploadTarget,
+          file_base64: base64,
+          file_name: file.name,
+          media_type: mediaUploadType,
+        }) });
+        showMsg('katalogMsg', (mediaUploadType==='bild'?'Bild':'Video')+' hochgeladen.', 'success');
+        await loadKatalog();
+      } catch(e) {
+        showMsg('katalogMsg', 'Upload fehlgeschlagen: '+e.message, 'error');
+      }
+      mediaUploadTarget = null;
+      mediaUploadType = null;
+    });
+
+    // Inline-Text-Editor
+    function openTextEditor(id) {
+      var p = katalogPunkte.find(function(x) { return x.id === id; });
+      if (!p) return;
+      $('detailContent').innerHTML = '<h3>Texte bearbeiten</h3>'
+        + '<label>Titel</label><input type="text" id="ed-titel" value="'+escapeHtml(p.titel)+'" />'
+        + '<label>Kurzbeschreibung</label><textarea id="ed-kurz">'+(p.kurzbeschreibung||'')+'</textarea>'
+        + '<label>Vorteil</label><textarea id="ed-vorteil">'+(p.vorteil||'')+'</textarea>'
+        + '<label>Zu bedenken</label><textarea id="ed-bedenken">'+(p.zu_bedenken||'')+'</textarea>'
+        + '<div id="edMsg"></div>'
+        + '<button class="primary" id="edSave">Speichern</button>';
+      $('detailPanel').classList.add('open');
+      $('detailOverlay').classList.add('open');
+
+      $('edSave').addEventListener('click', async function() {
+        this.disabled = true;
+        showMsg('edMsg','','');
+        try {
+          await apiCall('/update-punkt', { method:'POST', body: JSON.stringify({
+            id: id,
+            titel: $('ed-titel').value.trim(),
+            kurzbeschreibung: $('ed-kurz').value.trim(),
+            vorteil: $('ed-vorteil').value.trim(),
+            zu_bedenken: $('ed-bedenken').value.trim(),
+          }) });
+          showMsg('edMsg','Gespeichert.','success');
+          await loadKatalog();
+          setTimeout(closeDetail, 800);
+        } catch(e) { showMsg('edMsg','Fehler: '+e.message,'error'); this.disabled=false; }
       });
     }
 
-    // Neuen Link erstellen
-    $('createBtn').addEventListener('click', async () => {
-      const address = $('address').value.trim();
-      const note = $('note').value.trim();
-      const file = $('pdfFile').files[0];
-
-      showMsg('createMsg', '', '');
-
-      if (!address) { showMsg('createMsg', 'Adresse fehlt.', 'error'); return; }
-      if (!file) { showMsg('createMsg', 'Bitte eine PDF-Datei auswählen.', 'error'); return; }
-      if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-        showMsg('createMsg', 'Nur PDF-Dateien erlaubt.', 'error'); return;
-      }
-
-      const btn = $('createBtn');
-      btn.disabled = true;
-      btn.textContent = 'Lädt hoch…';
-
-      try {
-        const base64 = await fileToBase64(file);
-        // Wir senden weiterhin `customer_name` an die Function,
-        // damit das DB-Schema unverändert bleibt; Inhalt ist die Adresse.
-        const data = await apiCall('/create-link', {
-          method: 'POST',
-          body: JSON.stringify({
-            customer_name: address,
-            note,
-            file_name: file.name,
-            file_base64: base64,
-          }),
-        });
-        const shareUrl = buildShareUrl(data.link.token);
-        showMsg('createMsg',
-          `Link erstellt: <a href="${shareUrl}" target="_blank">${shareUrl}</a>`,
-          'success');
-        $('address').value = '';
-        $('note').value = '';
-        $('pdfFile').value = '';
-        await loadLinks();
-      } catch (e) {
-        showMsg('createMsg', 'Fehler: ' + e.message, 'error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Link erstellen';
-      }
-    });
-
-    // Login-Handler
-    $('loginBtn').addEventListener('click', async () => {
-      const pwd = $('pwd').value;
-      if (!pwd) return;
-      showMsg('loginMsg', 'Prüfe Passwort…', 'info');
-      const ok = await tryLogin(pwd);
-      if (ok) {
-        showMsg('loginMsg', '', '');
-        showApp();
-      } else {
-        showMsg('loginMsg', 'Passwort falsch.', 'error');
-      }
-    });
-
-    $('pwd').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') $('loginBtn').click();
-    });
-
-    $('logoutBtn').addEventListener('click', () => {
-      clearPwd();
-      showLogin();
-    });
-
-    // Initial: falls Passwort schon da, direkt versuchen
+    // ============================================================
+    // INIT
+    // ============================================================
     (async function init() {
       if (getPwd()) {
-        const ok = await tryLogin(getPwd());
+        var ok = await tryLogin(getPwd());
         if (ok) { showApp(); return; }
       }
       showLogin();
