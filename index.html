@@ -521,22 +521,7 @@
     }
 
     // ============================================================
-    // TABS
-    // ============================================================
-    document.querySelector('.tabs').addEventListener('click', function(ev) {
-      var btn = ev.target.closest('button[data-tab]');
-      if (!btn) return;
-      var tab = btn.dataset.tab;
-      document.querySelectorAll('.tabs button').forEach(function(b) { b.classList.remove('active'); });
-      document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
-      btn.classList.add('active');
-      $('tab-' + tab).classList.add('active');
-      if (tab === 'kunden') { loadKunden(); loadPunkteCheckboxes(); }
-      if (tab === 'katalog') loadKatalog();
-    });
-
-    // ============================================================
-    // LOGIN
+    // LOGIN — wird als Erstes registriert, damit es immer funktioniert
     // ============================================================
     async function tryLogin(pwd) {
       setPwd(pwd);
@@ -553,19 +538,41 @@
     function showLogin() {
       $('app').classList.add('hidden');
       $('login').classList.remove('hidden');
-      $('pwd').focus();
+      if ($('pwd')) $('pwd').focus();
     }
 
-    $('loginBtn').addEventListener('click', async function() {
-      var pwd = $('pwd').value;
-      if (!pwd) return;
-      showMsg('loginMsg', 'Prüfe Passwort…', 'info');
-      var ok = await tryLogin(pwd);
-      if (ok) { showMsg('loginMsg','',''); showApp(); }
-      else { showMsg('loginMsg', 'Passwort falsch.', 'error'); }
+    if ($('loginBtn')) {
+      $('loginBtn').addEventListener('click', function() {
+        var pwd = $('pwd').value;
+        if (!pwd) { showMsg('loginMsg', 'Passwort eingeben.', 'error'); return; }
+        showMsg('loginMsg', 'Prüfe…', 'info');
+        tryLogin(pwd).then(function(ok) {
+          if (ok) { showMsg('loginMsg','',''); showApp(); }
+          else { showMsg('loginMsg', 'Passwort falsch.', 'error'); }
+        });
+      });
+    }
+    if ($('pwd')) {
+      $('pwd').addEventListener('keydown', function(e) { if (e.key==='Enter' && $('loginBtn')) $('loginBtn').click(); });
+    }
+    if ($('logoutBtn')) {
+      $('logoutBtn').addEventListener('click', function() { clearPwd(); showLogin(); });
+    }
+
+    // ============================================================
+    // TABS
+    // ============================================================
+    document.querySelector('.tabs').addEventListener('click', function(ev) {
+      var btn = ev.target.closest('button[data-tab]');
+      if (!btn) return;
+      var tab = btn.dataset.tab;
+      document.querySelectorAll('.tabs button').forEach(function(b) { b.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      $('tab-' + tab).classList.add('active');
+      if (tab === 'kunden') { loadKunden(); loadPunkteCheckboxes(); }
+      if (tab === 'katalog') loadKatalog();
     });
-    $('pwd').addEventListener('keydown', function(e) { if (e.key==='Enter') $('loginBtn').click(); });
-    $('logoutBtn').addEventListener('click', function() { clearPwd(); showLogin(); });
 
     // ============================================================
     // DOKUMENTE (bestehende Logik)
@@ -1139,13 +1146,15 @@
     // ============================================================
     // INIT
     // ============================================================
-    (async function init() {
-      if (getPwd()) {
-        var ok = await tryLogin(getPwd());
-        if (ok) { showApp(); return; }
-      }
+    // Auto-Login falls Passwort im sessionStorage
+    if (getPwd()) {
+      tryLogin(getPwd()).then(function(ok) {
+        if (ok) showApp();
+        else showLogin();
+      });
+    } else {
       showLogin();
-    })();
+    }
   </script>
 </body>
 </html>
