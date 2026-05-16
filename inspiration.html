@@ -395,13 +395,14 @@
     gap: 24px;
   }
   .nav__brand {
-    font-size: 11px;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--ink);
-    font-weight: 500;
+    display: flex;
+    align-items: center;
   }
-  .nav__brand span { color: var(--gold); }
+  .nav__brand img {
+    height: 32px;
+    width: auto;
+    display: block;
+  }
   .nav__links {
     display: flex;
     gap: clamp(14px, 2.4vw, 32px);
@@ -473,7 +474,8 @@
     .nav__links { display: none; }
     .nav__menu-btn { display: inline-flex; justify-self: start; }
     .nav__inner { grid-template-columns: auto 1fr auto; }
-    .nav__brand { justify-self: start; display: none; }
+    .nav__brand { justify-self: center; }
+    .nav__brand img { height: 26px; }
     .nav__menu-btn ~ * { }
   }
 
@@ -1018,13 +1020,14 @@
     z-index: 2;
   }
   .footer__mark {
-    font-size: 12px;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: var(--ink);
     margin-bottom: 18px;
   }
-  .footer__mark span { color: var(--gold); }
+  .footer__mark img {
+    height: 36px;
+    width: auto;
+    display: block;
+    margin: 0 auto;
+  }
   .footer__hint { margin-top: 18px; font-style: italic; }
 
   /* ============== Responsive ============== */
@@ -1132,7 +1135,7 @@
           <path d="M3 7h18M3 12h18M3 17h18"></path>
         </svg>
       </button>
-      <div class="nav__brand">JÄGGI <span>·</span> VOLLMER</div>
+      <div class="nav__brand"><img src="/logo.png" alt="Jäggi Vollmer" /></div>
       <div class="nav__links">
         <a href="#wc" class="nav__link" data-target="wc">WC</a>
         <a href="#waschtisch" class="nav__link" data-target="waschtisch">Waschtisch</a>
@@ -1196,7 +1199,7 @@
       <div class="termin__addr" data-termin-addr="">Hauptstrasse 5, 4051 Basel</div>
       <div class="termin__rule"></div>
       <div class="termin__contact">
-        Robin Jäggi · <a href="tel:+41612000000" class="tabular">+41 61 200 00 00</a>
+        Robin Jäggi · <a href="tel:+41612000000" class="tabular">+41 61 692 03 11</a>
       </div>
       <div class="termin__hint">Bei Fragen jederzeit per Anruf oder WhatsApp.</div>
     </div>
@@ -1204,7 +1207,7 @@
 
   <!-- ====================== FOOTER ====================== -->
   <footer class="footer" data-screen-label="09 Footer">
-    <div class="footer__mark">JÄGGI <span>·</span> VOLLMER</div>
+    <div class="footer__mark"><img src="/logo.png" alt="Jäggi Vollmer" /></div>
     <div>Jäggi Vollmer GmbH · Horburgstrasse 96 · 4057 Basel</div>
     <div>Seit 2002 · Suissetec-zertifiziert</div>
     <div class="footer__hint">Diese Seite wurde persönlich für Sie erstellt.</div>
