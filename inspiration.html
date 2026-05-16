@@ -1117,13 +1117,6 @@
       </div>
     </div>
 
-    <div class="hero__variants" role="radiogroup" aria-label="Objekt-Variante">
-      <span class="hero__variants-label">Objekt</span>
-      <button class="hero__variant active" data-variant="faucet" style="--swatch:#bf853b" role="radio" aria-checked="true" aria-label="Standarmatur"></button>
-      <button class="hero__variant" data-variant="shower" style="--swatch:#c79a55" role="radio" aria-checked="false" aria-label="Regenbrause"></button>
-      <button class="hero__variant" data-variant="tub" style="--swatch:#e8ddc9" role="radio" aria-checked="false" aria-label="Freistehende Wanne"></button>
-    </div>
-
     <div class="hero__scroll" aria-hidden="true"></div>
   </section>
 
@@ -1199,7 +1192,7 @@
       <div class="termin__addr" data-termin-addr="">Hauptstrasse 5, 4051 Basel</div>
       <div class="termin__rule"></div>
       <div class="termin__contact">
-        Robin Jäggi · <a href="tel:+41612000000" class="tabular">+41 61 692 03 11</a>
+        Jäggi Vollmer · <a href="tel:+41616920311" class="tabular">+41 61 692 03 11</a>
       </div>
       <div class="termin__hint">Bei Fragen jederzeit per Anruf oder WhatsApp.</div>
     </div>
@@ -1226,7 +1219,7 @@ const token = new URLSearchParams(location.search).get('t') || '';
 let kunde = {
   anredeTyp: 'person', anrede: '', vorname: '', nachname: '',
   termin: { datum: '', uhrzeit: '', adresse: '' },
-  kontakt: { berater: 'Robin Jäggi', telefon: '+41 61 692 03 11' }
+  kontakt: { berater: 'Jäggi Vollmer', telefon: '+41 61 692 03 11' }
 };
 
 function getGreeting(k) {
@@ -1240,7 +1233,7 @@ function formatTermin(t) {
   const monate = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
   const wt = wochentage[d.getDay()];
   const datumLang = `${wt}, ${d.getDate()}. ${monate[d.getMonth()]} ${d.getFullYear()}`;
-  const uhrzeit = t.uhrzeit + ' Uhr';
+  const uhrzeit = (t.uhrzeit || '').slice(0, 5) + ' Uhr';
   return { wt, datumLang, uhrzeit };
 }
 
@@ -1991,7 +1984,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
   } catch (e) {
-    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:DM Sans,sans-serif;background:#F4EDE3;color:#4B575D;text-align:center;padding:2rem"><div><h2 style="color:#BF853B">Zugang nicht möglich</h2><p>Dieser Link ist nicht mehr aktiv oder existiert nicht.<br>Bei Fragen kontaktieren Sie uns gerne.<br><br><strong>Robin Jäggi</strong><br>+41 61 692 03 11</p></div></div>';
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:DM Sans,sans-serif;background:#F4EDE3;color:#4B575D;text-align:center;padding:2rem"><div><h2 style="color:#BF853B">Zugang nicht möglich</h2><p>Dieser Link ist nicht mehr aktiv oder existiert nicht.<br>Bei Fragen kontaktieren Sie uns gerne.<br><br><strong>Jäggi Vollmer</strong><br>+41 61 692 03 11</p></div></div>';
   }
 });
 </script>
