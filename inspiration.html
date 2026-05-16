@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Inspiration – Jäggi Vollmer</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===== Reset & Basis ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #BF853B;
+      --gold-light: #d4a65c;
+      --dark: #4B575D;
+      --grey: #929A9D;
+      --bg: #F4EDE3;
+      --card: #ffffff;
+      --green: #3a7d56;
+      --green-bg: #e8f5ec;
+      --amber: #9a6b1e;
+      --amber-bg: #fef7e8;
+      --font-serif: 'Fraunces', Georgia, serif;
+      --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --max-width: 1200px;
+      --nav-height: 64px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--dark);
+      line-height: 1.6;
+      -webkit-text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+
+    /* ===== Loading State ===== */
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 10000;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    #loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loading-logo {
+      font-family: var(--font-serif);
+      font-size: 2.5rem;
+      font-style: italic;
+      color: var(--dark);
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+    }
+
+    .loading-bar {
+      width: 160px;
+      height: 2px;
+      background: rgba(75, 87, 93, 0.15);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .loading-bar::after {
+      content: '';
+      display: block;
+      width: 40%;
+      height: 100%;
+      background: var(--gold);
+      border-radius: 2px;
+      animation: loadSlide 1.2s ease-in-out infinite;
+    }
+
+    @keyframes loadSlide {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(400%); }
+    }
+
+    /* ===== Error State ===== */
+    #error-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 9999;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    #error-screen.visible {
+      display: flex;
+    }
+
+    #error-screen h2 {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin-bottom: 1rem;
+      color: var(--dark);
+    }
+
+    #error-screen p {
+      color: var(--grey);
+      max-width: 400px;
+      margin-bottom: 1.5rem;
+    }
+
+    #error-screen button {
+      background: var(--gold);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #error-screen button:hover {
+      background: var(--gold-light);
+    }
+
+    /* ===== Main Content (hidden until loaded) ===== */
+    #main-content {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    #main-content.visible {
+      display: block;
+      opacity: 1;
+    }
+
+    /* ===== Sticky Navigation ===== */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(75, 87, 93, 0.08);
+      height: var(--nav-height);
+      transition: box-shadow 0.3s;
+    }
+
+    .nav.scrolled {
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 2rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      color: var(--dark);
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--grey);
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--dark);
+    }
+
+    .nav-counter {
+      background: var(--gold);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+
+    /* Hamburger */
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--dark);
+      position: absolute;
+      left: 6px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .nav-hamburger span:nth-child(1) { top: 9px; }
+    .nav-hamburger span:nth-child(2) { top: 15px; }
+    .nav-hamburger span:nth-child(3) { top: 21px; }
+
+    .nav-hamburger.open span:nth-child(1) { transform: rotate(45deg); top: 15px; }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: rotate(-45deg); top: 15px; }
+
+    .nav-mobile-menu {
+      display: none;
+      position: fixed;
+      top: var(--nav-height);
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(12px);
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid rgba(75, 87, 93, 0.08);
+      z-index: 999;
+    }
+
+    .nav-mobile-menu.open {
+      display: block;
+    }
+
+    .nav-mobile-menu a {
+      display: block;
+      padding: 0.75rem 0;
+      text-decoration: none;
+      color: var(--dark);
+      font-size: 1rem;
+      font-weight: 500;
+      border-bottom: 1px solid rgba(75, 87, 93, 0.06);
+    }
+
+    .nav-mobile-menu a:last-child {
+      border-bottom: none;
+    }
+
+    /* ===== Hero Section ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-content {
+      max-width: 640px;
+    }
+
+    .hero-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-greeting {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 300;
+      line-height: 1.25;
+      color: var(--dark);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-greeting em {
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .hero-meta {
+      font-size: 0.9rem;
+      color: var(--grey);
+      margin-bottom: 2rem;
+      line-height: 1.8;
+    }
+
+    .hero-meta strong {
+      color: var(--dark);
+      font-weight: 500;
+    }
+
+    .hero-intro {
+      font-size: 1.05rem;
+      color: var(--dark);
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--grey);
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      animation: gentleBounce 2.5s ease-in-out infinite;
+    }
+
+    .hero-scroll svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--grey);
+    }
+
+    @keyframes gentleBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ===== Section Intro ===== */
+    .section-intro {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 6rem 2rem 4rem;
+      text-align: center;
+    }
+
+    .section-intro h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--dark);
+      margin-bottom: 1rem;
+    }
+
+    .section-intro p {
+      font-size: 1rem;
+      color: var(--grey);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ===== Category Sections ===== */
+    .category-section {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    .category-header {
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(75, 87, 93, 0.1);
+    }
+
+    .category-number {
+      font-family: var(--font-serif);
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .category-title {
+      font-family: var(--font-serif);
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 400;
+      color: var(--dark);
+      margin-bottom: 0.75rem;
+    }
+
+    .category-desc {
+      font-size: 0.95rem;
+      color: var(--grey);
+      max-width: 500px;
+      line-height: 1.6;
+    }
+
+    /* ===== Item Cards ===== */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .item-card {
+      background: var(--card);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .item-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .item-card.interessiert {
+      box-shadow: 0 2px 12px rgba(191, 133, 59, 0.15), 0 0 0 2px var(--gold);
+    }
+
+    .item-card.interessiert:hover {
+      box-shadow: 0 8px 30px rgba(191, 133, 59, 0.15), 0 0 0 2px var(--gold);
+    }
+
+    /* Bild / Platzhalter */
+    .card-media {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #e8e4de;
+      overflow: hidden;
+    }
+
+    .card-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .item-card:hover .card-media img {
+      transform: scale(1.02);
+    }
+
+    .card-media video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--grey);
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .card-play-btn {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.25);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .card-play-btn:hover {
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .card-play-btn svg {
+      width: 48px;
+      height: 48px;
+      fill: #fff;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    }
+
+    /* Card Body */
+    .card-body {
+      padding: 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--grey);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .card-badges {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-badge {
+      font-size: 0.8rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      line-height: 1.4;
+    }
+
+    .card-badge.vorteil {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+
+    .card-badge.bedenken {
+      background: var(--amber-bg);
+      color: var(--amber);
+    }
+
+    .card-badge-label {
+      font-weight: 600;
+      margin-right: 0.25rem;
+    }
+
+    /* Card Actions */
+    .card-actions {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(75, 87, 93, 0.06);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn-interesse {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border: 1.5px solid var(--grey);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--dark);
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-interesse:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .btn-interesse.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #fff;
+    }
+
+    .btn-interesse svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .btn-notiz {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.85rem;
+      border: 1.5px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--grey);
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-notiz:hover {
+      color: var(--dark);
+      background: rgba(75, 87, 93, 0.05);
+    }
+
+    .btn-notiz.has-content {
+      color: var(--dark);
+    }
+
+    .btn-notiz svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    /* Notiz Textarea */
+    .card-notiz {
+      padding: 0 1.5rem 1.5rem;
+      display: none;
+    }
+
+    .card-notiz.open {
+      display: block;
+    }
+
+    .card-notiz textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid rgba(75, 87, 93, 0.15);
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      color: var(--dark);
+      background: var(--bg);
+      resize: vertical;
+      transition: border-color 0.2s;
+      line-height: 1.5;
+    }
+
+    .card-notiz textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    .card-notiz textarea::placeholder {
+      color: var(--grey);
+    }
+
+    .card-notiz-status {
+      font-size: 0.72rem;
+      color: var(--grey);
+      margin-top: 0.4rem;
+      min-height: 1rem;
+    }
+
+    /* ===== Summary Section ===== */
+    .summary-section {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    .summary-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .summary-header h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--dark);
+      margin-bottom: 0.75rem;
+    }
+
+    .summary-header p {
+      font-size: 0.95rem;
+      color: var(--grey);
+    }
+
+    .summary-empty {
+      text-align: center;
+      color: var(--grey);
+      font-size: 0.9rem;
+      padding: 2rem;
+    }
+
+    .summary-category {
+      margin-bottom: 2rem;
+    }
+
+    .summary-category-title {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+
+    .summary-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .summary-item {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .summary-item-title {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--dark);
+      margin-bottom: 0.25rem;
+    }
+
+    .summary-item-comment {
+      font-size: 0.82rem;
+      color: var(--grey);
+      font-style: italic;
+    }
+
+    /* ===== Appointment Card ===== */
+    .appointment-section {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .appointment-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 2.5rem;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .appointment-card-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .appointment-card h3 {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .appointment-card p {
+      font-size: 0.9rem;
+      color: var(--grey);
+      line-height: 1.7;
+      margin-bottom: 0.25rem;
+    }
+
+    .appointment-card .contact {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(75, 87, 93, 0.08);
+      font-size: 0.88rem;
+      color: var(--dark);
+    }
+
+    .appointment-card .contact a {
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .appointment-card .contact a:hover {
+      text-decoration: underline;
+    }
+
+    /* ===== Dokumente Button ===== */
+    .docs-section {
+      text-align: center;
+      padding: 2rem 2rem 4rem;
+    }
+
+    .btn-docs {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 1.8rem;
+      background: var(--dark);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 10px;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .btn-docs:hover {
+      background: #3a464b;
+      transform: translateY(-1px);
+    }
+
+    .btn-docs svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ===== Footer ===== */
+    .footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      border-top: 1px solid rgba(75, 87, 93, 0.08);
+      font-size: 0.8rem;
+      color: var(--grey);
+    }
+
+    /* ===== Toast ===== */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100%);
+      background: var(--dark);
+      color: #fff;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      z-index: 9000;
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ===== Reveal Animations ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .nav-hamburger {
+        display: block;
+      }
+
+      .hero {
+        min-height: 90vh;
+        padding: 3rem 1.5rem;
+      }
+
+      .section-intro {
+        padding: 4rem 1.5rem 3rem;
+      }
+
+      .category-section {
+        padding: 3rem 1.5rem 4rem;
+      }
+
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-section {
+        padding: 3rem 1.5rem 4rem;
+      }
+
+      .appointment-section {
+        padding: 1.5rem;
+      }
+
+      .appointment-card {
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-greeting {
+        font-size: 1.8rem;
+      }
+
+      .card-body {
+        padding: 1.25rem;
+      }
+
+      .card-notiz {
+        padding: 0 1.25rem 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ladebildschirm -->
+  <div id="loading-screen">
+    <div class="loading-logo">JV</div>
+    <div class="loading-bar"></div>
+  </div>
+
+  <!-- Fehlerbildschirm -->
+  <div id="error-screen">
+    <h2 id="error-title">Ein Fehler ist aufgetreten</h2>
+    <p id="error-message"></p>
+    <button id="error-retry" style="display:none;" onclick="location.reload()">Erneut versuchen</button>
+  </div>
+
+  <!-- Hauptinhalt -->
+  <div id="main-content">
+
+    <!-- Sticky Navigation -->
+    <nav class="nav" id="nav">
+      <div class="nav-inner">
+        <div class="nav-brand">Jäggi · Vollmer</div>
+        <ul class="nav-links" id="nav-links">
+          <!-- Wird dynamisch befüllt -->
+        </ul>
+        <span class="nav-counter" id="nav-counter" style="display:none;">0 markiert</span>
+        <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="nav-mobile-menu" id="nav-mobile-menu">
+      <!-- Wird dynamisch befüllt -->
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+      <div class="hero-content">
+        <div class="hero-label">Ihre Badezimmer-Inspiration</div>
+        <h1 class="hero-greeting" id="hero-greeting"></h1>
+        <div class="hero-meta" id="hero-meta"></div>
+        <p class="hero-intro">
+          Wir haben eine Auswahl an Produkten zusammengestellt, die wir für Ihr Projekt empfehlen.
+          Markieren Sie, was Ihnen gefällt — wir besprechen alles Weitere bei unserem Termin.
+        </p>
+      </div>
+      <div class="hero-scroll">
+        <span>Entdecken</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Einführungstext -->
+    <div class="section-intro reveal" id="section-intro">
+      <h2>Es gibt mehr als nur ein WC.</h2>
+      <p>
+        Badezimmerprodukte haben sich enorm weiterentwickelt. Schauen Sie sich in Ruhe um
+        und lassen Sie sich inspirieren. Was Sie hier markieren, dient uns als Gesprächsgrundlage
+        bei Ihrem Beratungstermin.
+      </p>
+    </div>
+
+    <!-- Kategorie-Sektionen (dynamisch befüllt) -->
+    <div id="categories-container"></div>
+
+    <!-- Zusammenfassung -->
+    <section class="summary-section reveal" id="summary-section">
+      <div class="summary-header">
+        <h2>Ihre Auswahl</h2>
+        <p>Wir haben uns notiert, was Sie inspiriert.</p>
+      </div>
+      <div id="summary-content">
+        <p class="summary-empty">Sie haben noch keine Produkte markiert.</p>
+      </div>
+    </section>
+
+    <!-- Termin-Karte -->
+    <section class="appointment-section reveal" id="appointment-section">
+      <div class="appointment-card">
+        <div class="appointment-card-label">Ihr Beratungstermin</div>
+        <h3 id="appointment-date"></h3>
+        <p id="appointment-time"></p>
+        <p id="appointment-address"></p>
+        <div class="contact">
+          Robin Jäggi · <a href="tel:+41616920311">+41 61 692 03 11</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dokumente Button -->
+    <section class="docs-section" id="docs-section" style="display:none;">
+      <a class="btn-docs" id="docs-link" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+        Ihre Pläne &amp; Visualisierungen ansehen
+      </a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      &copy; Jäggi Vollmer GmbH · Horburgstrasse 96, 4057 Basel
+    </footer>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // ===== Konfiguration =====
+      var SUPABASE_URL = 'https://ywcnccpjhnnspbkcmpng.supabase.co';
+      var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3Y25jY3BqaG5uc3Bia2NtcG5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMTg4MTMsImV4cCI6MjA5MTY5NDgxM30.xylQ_9hBQsKNIJJrXU6hTr6T2uSnYq62OPV7HZf-0-Y';
+
+      // Kategorie-Konfiguration
+      var KATEGORIE_CONFIG = {
+        wc: { name: 'Toilette', nummer: '01', intro: 'Moderne WCs bieten weit mehr als nur Grundfunktion — von Dusch-WCs bis hin zu spüllosen Systemen.' },
+        waschtisch: { name: 'Waschtisch', nummer: '02', intro: 'Der Waschtisch ist das Herzstück Ihres Badezimmers — hier beginnt und endet jeder Tag.' },
+        armaturen: { name: 'Armaturen', nummer: '03', intro: 'Armaturen definieren, wie sich Ihr Bad anfühlt. Sensorik, Design und Wassersparen vereint.' },
+        dusche: { name: 'Dusche', nummer: '04', intro: 'Von der Regenbrause bis zur bodenbündigen Duschwanne — Ihre tägliche Erfrischung, neu gedacht.' }
+      };
+
+      // Kategorie-Reihenfolge
+      var KATEGORIE_ORDER = ['wc', 'waschtisch', 'armaturen', 'dusche'];
+
+      // ===== Globaler State =====
+      var token = null;
+      var sb = null;
+      var state = {
+        kunde: null,
+        punkte: [],
+        interessen: {}  // punkt_id -> { interessiert: bool, kommentar: string }
+      };
+      var debounceTimers = {};
+
+      // ===== DOM-Referenzen =====
+      var loadingScreen = document.getElementById('loading-screen');
+      var errorScreen = document.getElementById('error-screen');
+      var errorTitle = document.getElementById('error-title');
+      var errorMessage = document.getElementById('error-message');
+      var errorRetry = document.getElementById('error-retry');
+      var mainContent = document.getElementById('main-content');
+      var toastEl = document.getElementById('toast');
+
+      // ===== Initialisierung =====
+      init();
+
+      function init() {
+        // Token aus URL lesen
+        token = new URLSearchParams(location.search).get('t');
+
+        if (!token) {
+          showError('Link unvollständig', 'Dieser Link scheint unvollständig zu sein.', false);
+          return;
+        }
+
+        // Supabase Client initialisieren
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Daten laden
+        loadData();
+      }
+
+      async function loadData() {
+        try {
+          var result = await sb.rpc('get_inspiration_data', { p_token: token });
+
+          if (result.error) {
+            // RPC-Fehler bedeutet inaktiver oder ungültiger Token
+            showError(
+              'Link nicht mehr aktiv',
+              'Dieser Link ist nicht mehr aktiv. Bei Fragen: Robin Jäggi, +41 61 692 03 11',
+              false
+            );
+            return;
+          }
+
+          var data = result.data;
+
+          // State befüllen
+          state.kunde = data.kunde;
+          state.punkte = data.punkte || [];
+
+          // Interessen-Array in Map umwandeln
+          if (data.interessen && Array.isArray(data.interessen)) {
+            data.interessen.forEach(function(i) {
+              state.interessen[i.punkt_id] = {
+                interessiert: i.interessiert || false,
+                kommentar: i.kommentar || ''
+              };
+            });
+          }
+
+          // Seite rendern
+          renderPage(data.hat_dokumente);
+
+        } catch (err) {
+          console.error('Fehler beim Laden:', err);
+          showError('Netzwerkfehler', 'Die Daten konnten nicht geladen werden. Bitte prüfen Sie Ihre Verbindung.', true);
+        }
+      }
+
+      // ===== Fehleranzeige =====
+      function showError(title, message, retryable) {
+        loadingScreen.classList.add('hidden');
+        errorTitle.textContent = title;
+        errorMessage.textContent = message;
+        errorRetry.style.display = retryable ? 'inline-block' : 'none';
+        errorScreen.classList.add('visible');
+      }
+
+      // ===== Toast =====
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        setTimeout(function() {
+          toastEl.classList.remove('show');
+        }, 2500);
+      }
+
+      // ===== Seite rendern =====
+      function renderPage(hatDokumente) {
+        renderHero();
+        renderNav();
+        renderCategories();
+        renderSummary();
+        renderAppointment();
+
+        if (hatDokumente) {
+          var docsSection = document.getElementById('docs-section');
+          var docsLink = document.getElementById('docs-link');
+          docsSection.style.display = 'block';
+          docsLink.href = '/view.html?t=' + encodeURIComponent(token);
+        }
+
+        // Ladebildschirm ausblenden, Inhalt anzeigen
+        loadingScreen.classList.add('hidden');
+        mainContent.classList.add('visible');
+
+        // Scroll-Reveal aktivieren
+        initRevealObserver();
+
+        // Navigation Scroll-Effekt
+        initNavScroll();
+
+        // Counter aktualisieren
+        updateCounter();
+      }
+
+      // ===== Hero =====
+      function renderHero() {
+        var kunde = state.kunde;
+        var greeting = '';
+
+        if (kunde.anrede_typ === 'familie') {
+          greeting = 'Willkommen, <em>Familie ' + escapeHtml(kunde.nachname) + '</em>';
+        } else {
+          // person
+          var name = kunde.vorname
+            ? escapeHtml(kunde.vorname) + ' ' + escapeHtml(kunde.nachname)
+            : escapeHtml(kunde.nachname);
+          greeting = 'Willkommen, <em>' + name + '</em>';
+        }
+
+        document.getElementById('hero-greeting').innerHTML = greeting;
+
+        // Meta-Informationen
+        var metaParts = [];
+        if (kunde.termin_datum) {
+          metaParts.push('<strong>' + formatDate(kunde.termin_datum) + '</strong>');
+        }
+        if (kunde.termin_uhrzeit) {
+          metaParts.push(formatTime(kunde.termin_uhrzeit) + ' Uhr');
+        }
+        if (kunde.projekt_adresse) {
+          metaParts.push(escapeHtml(kunde.projekt_adresse));
+        }
+
+        document.getElementById('hero-meta').innerHTML = metaParts.join(' · ');
+      }
+
+      // ===== Navigation =====
+      function renderNav() {
+        var navLinks = document.getElementById('nav-links');
+        var mobileMenu = document.getElementById('nav-mobile-menu');
+        var html = '';
+        var mobileHtml = '';
+
+        KATEGORIE_ORDER.forEach(function(key) {
+          var config = KATEGORIE_CONFIG[key];
+          html += '<li><a href="#cat-' + key + '">' + config.name + '</a></li>';
+          mobileHtml += '<a href="#cat-' + key + '">' + config.name + '</a>';
+        });
+
+        navLinks.innerHTML = html;
+        mobileMenu.innerHTML = mobileHtml;
+
+        // Hamburger Toggle
+        var hamburger = document.getElementById('nav-hamburger');
+        hamburger.addEventListener('click', function() {
+          hamburger.classList.toggle('open');
+          mobileMenu.classList.toggle('open');
+        });
+
+        // Mobile-Menu Links schliessen Menu
+        mobileMenu.querySelectorAll('a').forEach(function(a) {
+          a.addEventListener('click', function() {
+            hamburger.classList.remove('open');
+            mobileMenu.classList.remove('open');
+          });
+        });
+      }
+
+      function initNavScroll() {
+        var nav = document.getElementById('nav');
+        window.addEventListener('scroll', function() {
+          if (window.scrollY > 100) {
+            nav.classList.add('scrolled');
+          } else {
+            nav.classList.remove('scrolled');
+          }
+        }, { passive: true });
+      }
+
+      // ===== Kategorien =====
+      function renderCategories() {
+        var container = document.getElementById('categories-container');
+        var html = '';
+
+        // Punkte nach Kategorie gruppieren
+        var grouped = {};
+        state.punkte.forEach(function(p) {
+          if (!grouped[p.kategorie]) grouped[p.kategorie] = [];
+          grouped[p.kategorie].push(p);
+        });
+
+        // Nach Reihenfolge sortieren
+        Object.keys(grouped).forEach(function(key) {
+          grouped[key].sort(function(a, b) { return a.reihenfolge - b.reihenfolge; });
+        });
+
+        KATEGORIE_ORDER.forEach(function(key) {
+          var config = KATEGORIE_CONFIG[key];
+          var punkte = grouped[key] || [];
+
+          if (punkte.length === 0) return;
+
+          html += '<section class="category-section reveal" id="cat-' + key + '">';
+          html += '  <div class="category-header">';
+          html += '    <div class="category-number">' + config.nummer + '</div>';
+          html += '    <h2 class="category-title">' + config.name + '</h2>';
+          html += '    <p class="category-desc">' + config.intro + '</p>';
+          html += '  </div>';
+          html += '  <div class="cards-grid">';
+
+          punkte.forEach(function(punkt) {
+            html += renderCard(punkt, key);
+          });
+
+          html += '  </div>';
+          html += '</section>';
+        });
+
+        container.innerHTML = html;
+
+        // Event-Listener für Karten
+        bindCardEvents();
+      }
+
+      function renderCard(punkt, kategorie) {
+        var interesse = state.interessen[punkt.id];
+        var isInteressiert = interesse && interesse.interessiert;
+        var kommentar = interesse ? (interesse.kommentar || '') : '';
+
+        var html = '';
+        html += '<div class="item-card' + (isInteressiert ? ' interessiert' : '') + '" data-id="' + punkt.id + '">';
+
+        // Media
+        html += '<div class="card-media">';
+        if (punkt.bild_url) {
+          html += '<img src="' + escapeAttr(punkt.bild_url) + '" alt="' + escapeAttr(punkt.titel) + '" loading="lazy" />';
+          if (punkt.video_url) {
+            html += '<div class="card-play-btn" data-video="' + escapeAttr(punkt.video_url) + '">';
+            html += '  <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+            html += '</div>';
+          }
+        } else {
+          html += '<div class="card-placeholder">' + escapeHtml(KATEGORIE_CONFIG[kategorie].name) + '</div>';
+          if (punkt.video_url) {
+            html += '<div class="card-play-btn" data-video="' + escapeAttr(punkt.video_url) + '">';
+            html += '  <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+            html += '</div>';
+          }
+        }
+        html += '</div>';
+
+        // Body
+        html += '<div class="card-body">';
+        html += '  <h3 class="card-title">' + escapeHtml(punkt.titel) + '</h3>';
+        if (punkt.kurzbeschreibung) {
+          html += '  <p class="card-desc">' + escapeHtml(punkt.kurzbeschreibung) + '</p>';
+        }
+
+        // Badges
+        if (punkt.vorteil || punkt.zu_bedenken) {
+          html += '<div class="card-badges">';
+          if (punkt.vorteil) {
+            html += '<div class="card-badge vorteil"><span class="card-badge-label">Vorteil:</span>' + escapeHtml(punkt.vorteil) + '</div>';
+          }
+          if (punkt.zu_bedenken) {
+            html += '<div class="card-badge bedenken"><span class="card-badge-label">Zu bedenken:</span>' + escapeHtml(punkt.zu_bedenken) + '</div>';
+          }
+          html += '</div>';
+        }
+
+        // Actions
+        html += '<div class="card-actions">';
+        html += '  <button class="btn-interesse' + (isInteressiert ? ' active' : '') + '" data-id="' + punkt.id + '">';
+        html += '    <svg viewBox="0 0 24 24" fill="' + (isInteressiert ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
+        html += '    <span>' + (isInteressiert ? 'Markiert' : 'Interessiert') + '</span>';
+        html += '  </button>';
+        html += '  <button class="btn-notiz' + (kommentar ? ' has-content' : '') + '" data-id="' + punkt.id + '">';
+        html += '    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>';
+        html += '    <span>Notiz</span>';
+        html += '  </button>';
+        html += '</div>';
+
+        html += '</div>';  // card-body end
+
+        // Notiz Textarea
+        html += '<div class="card-notiz" data-id="' + punkt.id + '">';
+        html += '  <textarea placeholder="Ihre Notiz zu diesem Produkt..." data-id="' + punkt.id + '">' + escapeHtml(kommentar) + '</textarea>';
+        html += '  <div class="card-notiz-status" data-id="' + punkt.id + '"></div>';
+        html += '</div>';
+
+        html += '</div>';  // item-card end
+
+        return html;
+      }
+
+      // ===== Event Binding =====
+      function bindCardEvents() {
+        // Interesse-Buttons
+        document.querySelectorAll('.btn-interesse').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var id = btn.getAttribute('data-id');
+            toggleInteresse(id, btn);
+          });
+        });
+
+        // Notiz-Buttons
+        document.querySelectorAll('.btn-notiz').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var id = btn.getAttribute('data-id');
+            toggleNotiz(id);
+          });
+        });
+
+        // Textarea-Input (Debounce)
+        document.querySelectorAll('.card-notiz textarea').forEach(function(textarea) {
+          textarea.addEventListener('input', function() {
+            var id = textarea.getAttribute('data-id');
+            debounceSaveKommentar(id, textarea.value);
+          });
+        });
+
+        // Video Play-Buttons
+        document.querySelectorAll('.card-play-btn').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var videoUrl = btn.getAttribute('data-video');
+            var media = btn.closest('.card-media');
+            media.innerHTML = '<video src="' + escapeAttr(videoUrl) + '" autoplay muted playsinline loop controls></video>';
+          });
+        });
+      }
+
+      // ===== Interesse Toggle =====
+      async function toggleInteresse(punktId, btn) {
+        // Aktuellen Zustand ermitteln
+        var current = state.interessen[punktId];
+        var wasInteressiert = current ? current.interessiert : false;
+        var newValue = !wasInteressiert;
+
+        // Optimistic UI Update
+        if (!state.interessen[punktId]) {
+          state.interessen[punktId] = { interessiert: false, kommentar: '' };
+        }
+        state.interessen[punktId].interessiert = newValue;
+
+        updateInteresseUI(punktId, newValue);
+        updateCounter();
+        renderSummary();
+
+        // Supabase speichern
+        try {
+          var result = await sb.rpc('upsert_interesse', {
+            p_token: token,
+            p_punkt_id: punktId,
+            p_interessiert: newValue
+          });
+
+          if (result.error) {
+            throw new Error(result.error.message);
+          }
+        } catch (err) {
+          // Rollback
+          state.interessen[punktId].interessiert = wasInteressiert;
+          updateInteresseUI(punktId, wasInteressiert);
+          updateCounter();
+          renderSummary();
+          showToast('Speichern fehlgeschlagen. Bitte erneut versuchen.');
+          console.error('Interesse-Toggle Fehler:', err);
+        }
+      }
+
+      function updateInteresseUI(punktId, isInteressiert) {
+        var card = document.querySelector('.item-card[data-id="' + punktId + '"]');
+        var btn = document.querySelector('.btn-interesse[data-id="' + punktId + '"]');
+
+        if (!card || !btn) return;
+
+        if (isInteressiert) {
+          card.classList.add('interessiert');
+          btn.classList.add('active');
+          btn.querySelector('svg').setAttribute('fill', 'currentColor');
+          btn.querySelector('span').textContent = 'Markiert';
+        } else {
+          card.classList.remove('interessiert');
+          btn.classList.remove('active');
+          btn.querySelector('svg').setAttribute('fill', 'none');
+          btn.querySelector('span').textContent = 'Interessiert';
+        }
+      }
+
+      // ===== Notiz Toggle =====
+      function toggleNotiz(punktId) {
+        var notizArea = document.querySelector('.card-notiz[data-id="' + punktId + '"]');
+        if (notizArea) {
+          notizArea.classList.toggle('open');
+          if (notizArea.classList.contains('open')) {
+            notizArea.querySelector('textarea').focus();
+          }
+        }
+      }
+
+      // ===== Kommentar speichern (mit Debounce) =====
+      function debounceSaveKommentar(punktId, text) {
+        // State sofort aktualisieren
+        if (!state.interessen[punktId]) {
+          state.interessen[punktId] = { interessiert: false, kommentar: '' };
+        }
+        state.interessen[punktId].kommentar = text;
+
+        // Notiz-Button Styling aktualisieren
+        var notizBtn = document.querySelector('.btn-notiz[data-id="' + punktId + '"]');
+        if (notizBtn) {
+          if (text.trim()) {
+            notizBtn.classList.add('has-content');
+          } else {
+            notizBtn.classList.remove('has-content');
+          }
+        }
+
+        // Status anzeigen
+        var statusEl = document.querySelector('.card-notiz-status[data-id="' + punktId + '"]');
+        if (statusEl) statusEl.textContent = 'Speichern...';
+
+        // Debounce
+        if (debounceTimers[punktId]) {
+          clearTimeout(debounceTimers[punktId]);
+        }
+
+        debounceTimers[punktId] = setTimeout(function() {
+          saveKommentar(punktId, text);
+        }, 500);
+
+        // Zusammenfassung aktualisieren
+        renderSummary();
+      }
+
+      async function saveKommentar(punktId, text) {
+        var statusEl = document.querySelector('.card-notiz-status[data-id="' + punktId + '"]');
+
+        try {
+          var result = await sb.rpc('update_kommentar', {
+            p_token: token,
+            p_punkt_id: punktId,
+            p_kommentar: text
+          });
+
+          if (result.error) {
+            throw new Error(result.error.message);
+          }
+
+          if (statusEl) statusEl.textContent = 'Gespeichert';
+          setTimeout(function() {
+            if (statusEl) statusEl.textContent = '';
+          }, 2000);
+
+        } catch (err) {
+          if (statusEl) statusEl.textContent = 'Fehler beim Speichern';
+          console.error('Kommentar-Speichern Fehler:', err);
+        }
+      }
+
+      // ===== Counter =====
+      function updateCounter() {
+        var count = 0;
+        Object.keys(state.interessen).forEach(function(key) {
+          if (state.interessen[key].interessiert) count++;
+        });
+
+        var counterEl = document.getElementById('nav-counter');
+        if (count > 0) {
+          counterEl.textContent = count + ' markiert';
+          counterEl.style.display = 'inline-block';
+        } else {
+          counterEl.style.display = 'none';
+        }
+      }
+
+      // ===== Zusammenfassung =====
+      function renderSummary() {
+        var container = document.getElementById('summary-content');
+
+        // Markierte Punkte sammeln
+        var marked = [];
+        state.punkte.forEach(function(p) {
+          var interesse = state.interessen[p.id];
+          if (interesse && interesse.interessiert) {
+            marked.push({
+              punkt: p,
+              kommentar: interesse.kommentar || ''
+            });
+          }
+        });
+
+        if (marked.length === 0) {
+          container.innerHTML = '<p class="summary-empty">Sie haben noch keine Produkte markiert.</p>';
+          return;
+        }
+
+        // Nach Kategorie gruppieren
+        var grouped = {};
+        marked.forEach(function(item) {
+          var key = item.punkt.kategorie;
+          if (!grouped[key]) grouped[key] = [];
+          grouped[key].push(item);
+        });
+
+        var html = '';
+        KATEGORIE_ORDER.forEach(function(key) {
+          if (!grouped[key]) return;
+          var config = KATEGORIE_CONFIG[key];
+
+          html += '<div class="summary-category">';
+          html += '  <div class="summary-category-title">' + config.name + '</div>';
+          html += '  <div class="summary-items">';
+
+          grouped[key].forEach(function(item) {
+            html += '<div class="summary-item">';
+            html += '  <div class="summary-item-title">' + escapeHtml(item.punkt.titel) + '</div>';
+            if (item.kommentar.trim()) {
+              html += '  <div class="summary-item-comment">"' + escapeHtml(item.kommentar) + '"</div>';
+            }
+            html += '</div>';
+          });
+
+          html += '  </div>';
+          html += '</div>';
+        });
+
+        container.innerHTML = html;
+      }
+
+      // ===== Termin =====
+      function renderAppointment() {
+        var kunde = state.kunde;
+
+        if (kunde.termin_datum) {
+          document.getElementById('appointment-date').textContent = formatDate(kunde.termin_datum);
+        }
+
+        if (kunde.termin_uhrzeit) {
+          document.getElementById('appointment-time').textContent = formatTime(kunde.termin_uhrzeit) + ' Uhr';
+        }
+
+        if (kunde.projekt_adresse) {
+          document.getElementById('appointment-address').textContent = kunde.projekt_adresse;
+        }
+      }
+
+      // ===== Scroll Reveal =====
+      function initRevealObserver() {
+        var elements = document.querySelectorAll('.reveal');
+
+        if (!('IntersectionObserver' in window)) {
+          // Fallback: alles sofort anzeigen
+          elements.forEach(function(el) { el.classList.add('visible'); });
+          return;
+        }
+
+        var observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, {
+          threshold: 0.1,
+          rootMargin: '0px 0px -50px 0px'
+        });
+
+        elements.forEach(function(el) {
+          observer.observe(el);
+        });
+      }
+
+      // ===== Hilfsfunktionen =====
+      function escapeHtml(str) {
+        if (!str) return '';
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      function escapeAttr(str) {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function formatDate(dateStr) {
+        // dateStr ist z.B. "2026-06-12"
+        var tage = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+        var monate = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+        var parts = dateStr.split('-');
+        var date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+
+        var tag = tage[date.getDay()];
+        var monat = monate[date.getMonth()];
+        var nummer = date.getDate();
+        var jahr = date.getFullYear();
+
+        return tag + ', ' + nummer + '. ' + monat + ' ' + jahr;
+      }
+
+      function formatTime(timeStr) {
+        // timeStr ist z.B. "14:00" oder "14:00:00"
+        var parts = timeStr.split(':');
+        return parts[0] + ':' + parts[1];
+      }
+
+    })();
+  </script>
+</body>
+</html>
