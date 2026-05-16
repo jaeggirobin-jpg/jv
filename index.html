@@ -275,13 +275,13 @@
 
     <main>
       <div class="tabs">
-        <button class="active" data-tab="dokumente">Dokumente</button>
-        <button data-tab="kunden">Kunden</button>
+        <button class="active" data-tab="kunden">Kunden</button>
+        <button data-tab="dokumente">Dokumente</button>
         <button data-tab="katalog">Katalog</button>
       </div>
 
       <!-- ============ Tab: Dokumente (bestehend) ============ -->
-      <div class="tab-panel active" id="tab-dokumente">
+      <div class="tab-panel" id="tab-dokumente">
         <div class="card">
           <h2>Visualisierung hochladen</h2>
           <label for="doc-kunde">Kunde *</label>
@@ -315,7 +315,7 @@
       </div>
 
       <!-- ============ Tab: Kunden ============ -->
-      <div class="tab-panel" id="tab-kunden">
+      <div class="tab-panel active" id="tab-kunden">
         <div class="card">
           <h2>Neuen Kunden anlegen</h2>
           <div class="form-row">
@@ -549,8 +549,8 @@
     function showApp() {
       $('login').classList.add('hidden');
       $('app').classList.remove('hidden');
-      loadLinks();
-      loadDocKundenDropdown();
+      loadKunden();
+      loadPunkteCheckboxes();
     }
     function showLogin() {
       $('app').classList.add('hidden');
@@ -578,6 +578,7 @@
       btn.classList.add('active');
       $('tab-' + tab).classList.add('active');
       if (tab === 'kunden') { loadKunden(); loadPunkteCheckboxes(); }
+      if (tab === 'dokumente') { loadLinks(); loadDocKundenDropdown(); }
       if (tab === 'katalog') loadKatalog();
     });
 
