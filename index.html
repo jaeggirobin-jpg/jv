@@ -1059,7 +1059,7 @@
     var mediaUploadTarget = null;
     var mediaUploadType = null;
 
-    $('katalogGrid').addEventListener('click', function(ev) {
+    $('katalogGrid').addEventListener('click', async function(ev) {
       var btn = ev.target.closest('button[data-kataction]');
       if (!btn) return;
       var action = btn.dataset.kataction;
