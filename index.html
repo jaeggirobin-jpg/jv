@@ -190,6 +190,29 @@
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; display: none; }
     .overlay.open { display: block; }
 
+    /* Punkte-Checkboxen-Gruppe */
+    .punkte-group { margin-bottom: 0.8rem; }
+    .punkte-group-title {
+      font-size: 0.78rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.04em; color: #BF853B; margin: 0.6rem 0 0.3rem;
+    }
+    .punkte-group label.punkt-cb {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.85rem; font-weight: 400; margin: 0.2rem 0;
+      cursor: pointer; color: #4B575D;
+    }
+    .punkte-group input[type="checkbox"] {
+      width: auto; accent-color: #BF853B; margin: 0;
+    }
+
+    /* Dokumente im Detail-Panel */
+    .detail-doc {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0; font-size: 0.82rem;
+    }
+    .detail-doc .doc-name { color: #4B575D; }
+    .detail-doc .doc-meta { color: #929A9D; font-size: 0.75rem; }
+
     /* ======= Responsive ======= */
     @media (max-width: 900px) {
       header { padding: 0.8rem 1rem; }
@@ -340,6 +363,11 @@
           </div>
           <label for="k-notizen">Admin-Notizen (intern)</label>
           <textarea id="k-notizen" placeholder="Nur für dich sichtbar"></textarea>
+
+          <label style="margin-top:1.2rem">Sichtbare Inspiration-Punkte</label>
+          <p class="muted" style="margin:0 0 0.6rem">Nichts angehakt = Kunde sieht alles. Einzelne anhaken = nur diese werden angezeigt.</p>
+          <div id="punkteCheckboxes" class="muted">Lade Katalog…</div>
+
           <div id="kundeCreateMsg"></div>
           <button class="primary" id="kundeCreateBtn">Kunde anlegen</button>
         </div>
@@ -460,7 +488,7 @@
       document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
       btn.classList.add('active');
       $('tab-' + tab).classList.add('active');
-      if (tab === 'kunden') loadKunden();
+      if (tab === 'kunden') { loadKunden(); loadPunkteCheckboxes(); }
       if (tab === 'katalog') loadKatalog();
     });
 
@@ -654,6 +682,42 @@
       }
     });
 
+    // Punkte-Checkboxen beim Öffnen des Kunden-Tabs laden
+    var punkteCache = [];
+    async function loadPunkteCheckboxes() {
+      if (punkteCache.length > 0) return;
+      try {
+        var data = await apiCall('/list-punkte');
+        punkteCache = data.punkte || [];
+        renderPunkteCheckboxes();
+      } catch(e) { $('punkteCheckboxes').innerHTML = '<span class="muted">Fehler beim Laden.</span>'; }
+    }
+
+    function renderPunkteCheckboxes() {
+      var container = $('punkteCheckboxes');
+      var grouped = {};
+      punkteCache.forEach(function(p) {
+        if (!grouped[p.kategorie]) grouped[p.kategorie] = [];
+        grouped[p.kategorie].push(p);
+      });
+      var catLabelsLong = { wc:'WC / Toilette', waschtisch:'Waschtisch', armaturen:'Armaturen', dusche:'Dusche' };
+      var html = '';
+      ['wc','waschtisch','armaturen','dusche'].forEach(function(k) {
+        if (!grouped[k]) return;
+        html += '<div class="punkte-group"><div class="punkte-group-title">'+catLabelsLong[k]+'</div>';
+        grouped[k].forEach(function(p) {
+          html += '<label class="punkt-cb"><input type="checkbox" name="punkt" value="'+p.id+'" /> '+escapeHtml(p.titel)+'</label>';
+        });
+        html += '</div>';
+      });
+      container.innerHTML = html;
+    }
+
+    function getSelectedPunkte() {
+      var checked = document.querySelectorAll('#punkteCheckboxes input[name="punkt"]:checked');
+      return Array.from(checked).map(function(cb) { return cb.value; });
+    }
+
     $('kundeCreateBtn').addEventListener('click', async function() {
       var nachname = $('k-nachname').value.trim();
       showMsg('kundeCreateMsg','','');
@@ -661,6 +725,7 @@
       var btn = $('kundeCreateBtn');
       btn.disabled = true;
       try {
+        var selected = getSelectedPunkte();
         var data = await apiCall('/create-kunde', { method:'POST', body: JSON.stringify({
           anrede_typ: $('k-anrede').value,
           vorname: $('k-vorname').value.trim(),
@@ -671,19 +736,22 @@
           termin_datum: $('k-datum').value || null,
           termin_uhrzeit: $('k-uhrzeit').value || null,
           admin_notizen: $('k-notizen').value.trim(),
+          sichtbare_punkte: selected.length > 0 ? selected : null,
         }) });
         var inspoUrl = location.origin + '/inspiration.html?t=' + data.kunde.access_token;
         showMsg('kundeCreateMsg',
-          'Kunde angelegt! Inspiration-Link: <a href="'+inspoUrl+'" target="_blank">'+inspoUrl+'</a>','success');
+          'Kunde angelegt! Link: <a href="'+inspoUrl+'" target="_blank">'+inspoUrl+'</a>','success');
         $('k-vorname').value=''; $('k-nachname').value=''; $('k-email').value='';
         $('k-telefon').value=''; $('k-adresse').value=''; $('k-datum').value='';
         $('k-notizen').value='';
+        document.querySelectorAll('#punkteCheckboxes input:checked').forEach(function(c) { c.checked=false; });
         await loadKunden();
       } catch(e) { showMsg('kundeCreateMsg','Fehler: '+e.message,'error'); }
       finally { btn.disabled=false; }
     });
 
     // Kunden-Detail-Panel
+    var detailKundeToken = null;
     async function openKundeDetail(id) {
       $('detailContent').innerHTML = '<div class="muted">Lade…</div>';
       $('detailPanel').classList.add('open');
@@ -691,12 +759,34 @@
       try {
         var data = await apiCall('/get-kunde-interessen?id=' + id);
         var k = data.kunde;
+        detailKundeToken = k.access_token;
         var name = (k.anrede_typ==='familie'?'Familie ':'') + escapeHtml((k.vorname?k.vorname+' ':'')+k.nachname);
         var html = '<h3>'+name+'</h3>';
-        html += '<p style="font-size:0.85rem;color:#929A9D;margin-bottom:1rem">';
+        html += '<p style="font-size:0.85rem;color:#929A9D;margin-bottom:0.5rem">';
         html += escapeHtml(k.projekt_adresse||'') + (k.termin_datum ? '<br>Termin: '+fmtDateShort(k.termin_datum) : '') + '</p>';
         html += '<p style="font-size:0.82rem;margin-bottom:0.3rem"><strong>Token:</strong> <span class="token-short">'+k.access_token+'</span></p>';
+        var inspoUrl = location.origin + '/inspiration.html?t=' + k.access_token;
+        html += '<div class="actions" style="margin:0.6rem 0 1rem"><button data-kaction="link" data-token="'+k.access_token+'">Inspiration-Link kopieren</button></div>';
         if (k.admin_notizen) html += '<p style="font-size:0.82rem;color:#929A9D;font-style:italic;margin-bottom:1rem">'+escapeHtml(k.admin_notizen)+'</p>';
+
+        // PDF-Upload
+        html += '<h3 style="margin-top:1.5rem">Visualisierungen / Pläne</h3>';
+        var docs = data.dokumente || [];
+        if (docs.length) {
+          docs.forEach(function(d) {
+            html += '<div class="detail-doc"><div><span class="doc-name">'+escapeHtml(d.note||d.customer_name||'Dokument')+'</span><br><span class="doc-meta">'+fmtDate(d.created_at)+' · '+d.view_count+' Aufrufe</span></div>'
+              + '<span class="status '+(d.is_active?'active':'inactive')+'">'+(d.is_active?'Aktiv':'Inaktiv')+'</span></div>';
+          });
+        } else {
+          html += '<p class="muted">Noch keine Dokumente.</p>';
+        }
+        html += '<div style="margin-top:0.7rem">';
+        html += '<label for="detail-doc-note" style="font-size:0.8rem">Bezeichnung</label>';
+        html += '<input type="text" id="detail-doc-note" placeholder="z.B. Visualisierung Bad OG" style="margin-bottom:0.4rem;font-size:0.85rem" />';
+        html += '<input type="file" id="detail-doc-file" accept="application/pdf" style="font-size:0.85rem" />';
+        html += '<button class="primary" id="detail-doc-upload" style="font-size:0.85rem;padding:0.5rem 1rem;margin-top:0.5rem">PDF hochladen</button>';
+        html += '<div id="detailDocMsg"></div>';
+        html += '</div>';
 
         // Interessen
         var interessen = data.interessen || [];
@@ -706,9 +796,10 @@
           html += '<p class="muted">Noch nichts markiert.</p>';
         } else {
           marked.forEach(function(i) {
+            var punkt = i.inspiration_punkte || {};
             html += '<div class="interest-item">';
-            html += '<div class="int-cat">'+escapeHtml(i.kategorie||'')+'</div>';
-            html += '<div class="int-title">'+escapeHtml(i.titel||i.punkt_id)+'</div>';
+            html += '<div class="int-cat">'+escapeHtml(punkt.kategorie||'')+'</div>';
+            html += '<div class="int-title">'+escapeHtml(punkt.titel||i.punkt_id)+'</div>';
             if (i.kommentar) html += '<div class="int-comment">«'+escapeHtml(i.kommentar)+'»</div>';
             html += '</div>';
           });
@@ -724,6 +815,40 @@
         }
 
         $('detailContent').innerHTML = html;
+
+        // PDF-Upload-Handler im Detail-Panel
+        $('detail-doc-upload').addEventListener('click', async function() {
+          var file = $('detail-doc-file').files[0];
+          var label = $('detail-doc-note').value.trim() || 'Dokument';
+          if (!file) { showMsg('detailDocMsg','Bitte PDF auswählen.','error'); return; }
+          this.disabled = true; this.textContent = 'Lädt hoch…';
+          showMsg('detailDocMsg','','');
+          try {
+            var base64 = await fileToBase64(file);
+            await apiCall('/create-link', { method:'POST', body: JSON.stringify({
+              customer_name: label,
+              note: label,
+              file_name: file.name,
+              file_base64: base64,
+              token: detailKundeToken,
+            }) });
+            showMsg('detailDocMsg','Hochgeladen!','success');
+            // Panel neu laden um neues Dokument zu zeigen
+            setTimeout(function() { openKundeDetail(id); }, 600);
+          } catch(e) { showMsg('detailDocMsg','Fehler: '+e.message,'error'); this.disabled=false; this.textContent='PDF hochladen'; }
+        });
+
+        // Link kopieren im Detail
+        $('detailContent').addEventListener('click', function(ev) {
+          var btn = ev.target.closest('button[data-kaction="link"]');
+          if (!btn) return;
+          var url = location.origin + '/inspiration.html?t=' + btn.dataset.token;
+          navigator.clipboard.writeText(url).then(function() {
+            btn.textContent = 'Kopiert!';
+            setTimeout(function() { btn.textContent = 'Inspiration-Link kopieren'; }, 1500);
+          });
+        });
+
       } catch(e) {
         $('detailContent').innerHTML = '<div class="msg error">Fehler: '+escapeHtml(e.message)+'</div>';
       }

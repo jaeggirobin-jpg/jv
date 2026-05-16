@@ -67,8 +67,8 @@ exports.handler = async (event) => {
   const { data: interessen, error: interessenError } = await supabase
     .from('kunden_interessen')
     .select('*, inspiration_punkte(id, titel, kategorie)')
-    .eq('kunde_id', id)
-    .order('created_at', { ascending: false });
+    .eq('kunden_id', id)
+    .order('markiert_am', { ascending: false });
 
   if (interessenError) {
     return respond(500, { error: 'Fehler beim Laden der Interessen: ' + interessenError.message });
@@ -78,18 +78,26 @@ exports.handler = async (event) => {
   const { data: log, error: logError } = await supabase
     .from('aktivitaet_log')
     .select('*')
-    .eq('kunde_id', id)
-    .order('created_at', { ascending: false })
+    .eq('kunden_id', id)
+    .order('timestamp', { ascending: false })
     .limit(50);
 
   if (logError) {
     return respond(500, { error: 'Fehler beim Laden des Logs: ' + logError.message });
   }
 
+  // Verknüpfte Dokumente (gleicher Token)
+  const { data: dokumente } = await supabase
+    .from('doc_links')
+    .select('id, token, customer_name, note, file_path, is_active, created_at, view_count')
+    .eq('token', kunde.access_token)
+    .order('created_at', { ascending: false });
+
   return respond(200, {
     ok: true,
     kunde,
     interessen: interessen || [],
     log: log || [],
+    dokumente: dokumente || [],
   });
 };

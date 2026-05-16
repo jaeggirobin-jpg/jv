@@ -63,6 +63,11 @@ exports.handler = async (event) => {
   if (payload.termin_uhrzeit !== undefined) insert.termin_uhrzeit = payload.termin_uhrzeit || null;
   if (payload.admin_notizen !== undefined) insert.admin_notizen = (payload.admin_notizen || '').trim() || null;
 
+  // Sichtbare Punkte: Array von UUIDs, oder null für alle
+  if (Array.isArray(payload.sichtbare_punkte) && payload.sichtbare_punkte.length > 0) {
+    insert.sichtbare_punkte = payload.sichtbare_punkte;
+  }
+
   const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_SERVICE_KEY
@@ -81,6 +86,6 @@ exports.handler = async (event) => {
   return respond(200, {
     ok: true,
     kunde: data,
-    share_url: `/inspiration.html?t=${data.token}`,
+    share_url: `/inspiration.html?t=${data.access_token}`,
   });
 };

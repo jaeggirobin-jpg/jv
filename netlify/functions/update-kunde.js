@@ -49,7 +49,7 @@ exports.handler = async (event) => {
   // Erlaubte Felder zum Aktualisieren
   const allowedFields = [
     'anrede_typ', 'vorname', 'nachname', 'email', 'telefon',
-    'projekt_adresse', 'termin_datum', 'termin_uhrzeit', 'admin_notizen', 'aktiv',
+    'projekt_adresse', 'termin_datum', 'termin_uhrzeit', 'admin_notizen', 'status',
   ];
   const updates = {};
 
@@ -57,6 +57,13 @@ exports.handler = async (event) => {
     if (payload[field] !== undefined) {
       updates[field] = payload[field];
     }
+  }
+
+  // sichtbare_punkte: Array von UUIDs oder null (alle zeigen)
+  if (payload.sichtbare_punkte !== undefined) {
+    updates.sichtbare_punkte = Array.isArray(payload.sichtbare_punkte) && payload.sichtbare_punkte.length > 0
+      ? payload.sichtbare_punkte
+      : null;
   }
 
   if (Object.keys(updates).length === 0) {
