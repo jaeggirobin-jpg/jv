@@ -1,4 +1,4 @@
-// update-punkt.js — Einen Inspirations-Punkt aktualisieren (Admin)
+// create-punkt.js — Neuen Inspiration-Punkt anlegen (Admin)
 
 const { createClient } = require('@supabase/supabase-js');
 
@@ -41,23 +41,16 @@ exports.handler = async (event) => {
     return respond(400, { error: 'Ungültiges JSON' });
   }
 
-  const id = payload.id;
-  if (!id) {
-    return respond(400, { error: 'ID fehlt' });
+  const kategorie = (payload.kategorie || '').trim();
+  const titel = (payload.titel || '').trim();
+
+  if (!kategorie || !titel) {
+    return respond(400, { error: 'Kategorie und Titel sind erforderlich' });
   }
 
-  // Erlaubte Felder zum Aktualisieren
-  const allowedFields = ['kategorie', 'reihenfolge', 'titel', 'kurzbeschreibung', 'vorteil', 'zu_bedenken', 'bild_url', 'video_url', 'aktiv'];
-  const updates = {};
-
-  for (const field of allowedFields) {
-    if (payload[field] !== undefined) {
-      updates[field] = payload[field];
-    }
-  }
-
-  if (Object.keys(updates).length === 0) {
-    return respond(400, { error: 'Keine Felder zum Aktualisieren angegeben' });
+  const validKategorien = ['wc', 'waschtisch', 'armaturen', 'dusche'];
+  if (!validKategorien.includes(kategorie)) {
+    return respond(400, { error: 'Ungültige Kategorie. Erlaubt: ' + validKategorien.join(', ') });
   }
 
   const supabase = createClient(
@@ -65,19 +58,36 @@ exports.handler = async (event) => {
     process.env.SUPABASE_SERVICE_KEY
   );
 
+  // Nächste Reihenfolge in dieser Kategorie ermitteln
+  const { data: existing } = await supabase
+    .from('inspiration_punkte')
+    .select('reihenfolge')
+    .eq('kategorie', kategorie)
+    .order('reihenfolge', { ascending: false })
+    .limit(1);
+
+  const nextOrder = (existing && existing.length > 0) ? existing[0].reihenfolge + 1 : 1;
+
+  const insert = {
+    kategorie,
+    reihenfolge: payload.reihenfolge || nextOrder,
+    titel,
+    kurzbeschreibung: (payload.kurzbeschreibung || '').trim() || null,
+    vorteil: (payload.vorteil || '').trim() || null,
+    zu_bedenken: (payload.zu_bedenken || '').trim() || null,
+    bild_url: payload.bild_url || null,
+    video_url: payload.video_url || null,
+    aktiv: payload.aktiv !== undefined ? !!payload.aktiv : true,
+  };
+
   const { data, error } = await supabase
     .from('inspiration_punkte')
-    .update(updates)
-    .eq('id', id)
+    .insert(insert)
     .select()
     .single();
 
   if (error) {
     return respond(500, { error: 'Datenbankfehler: ' + error.message });
-  }
-
-  if (!data) {
-    return respond(404, { error: 'Punkt nicht gefunden' });
   }
 
   return respond(200, { ok: true, punkt: data });

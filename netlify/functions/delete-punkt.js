@@ -1,4 +1,4 @@
-// update-punkt.js — Einen Inspirations-Punkt aktualisieren (Admin)
+// delete-punkt.js — Inspiration-Punkt löschen (Admin)
 
 const { createClient } = require('@supabase/supabase-js');
 
@@ -46,39 +46,45 @@ exports.handler = async (event) => {
     return respond(400, { error: 'ID fehlt' });
   }
 
-  // Erlaubte Felder zum Aktualisieren
-  const allowedFields = ['kategorie', 'reihenfolge', 'titel', 'kurzbeschreibung', 'vorteil', 'zu_bedenken', 'bild_url', 'video_url', 'aktiv'];
-  const updates = {};
-
-  for (const field of allowedFields) {
-    if (payload[field] !== undefined) {
-      updates[field] = payload[field];
-    }
-  }
-
-  if (Object.keys(updates).length === 0) {
-    return respond(400, { error: 'Keine Felder zum Aktualisieren angegeben' });
-  }
-
   const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_SERVICE_KEY
   );
 
-  const { data, error } = await supabase
+  // Punkt laden für allfällige Storage-Bereinigung
+  const { data: punkt } = await supabase
     .from('inspiration_punkte')
-    .update(updates)
+    .select('id, bild_url, video_url')
     .eq('id', id)
-    .select()
-    .single();
+    .maybeSingle();
 
-  if (error) {
-    return respond(500, { error: 'Datenbankfehler: ' + error.message });
-  }
-
-  if (!data) {
+  if (!punkt) {
     return respond(404, { error: 'Punkt nicht gefunden' });
   }
 
-  return respond(200, { ok: true, punkt: data });
+  // Medien im Storage löschen (falls vorhanden)
+  const toRemove = [];
+  if (punkt.bild_url && punkt.bild_url.includes('inspiration-medien')) {
+    const path = punkt.bild_url.split('/inspiration-medien/')[1];
+    if (path) toRemove.push(path);
+  }
+  if (punkt.video_url && punkt.video_url.includes('inspiration-medien')) {
+    const path = punkt.video_url.split('/inspiration-medien/')[1];
+    if (path) toRemove.push(path);
+  }
+  if (toRemove.length > 0) {
+    await supabase.storage.from('inspiration-medien').remove(toRemove);
+  }
+
+  // DB-Eintrag löschen (CASCADE löscht kunden_interessen-Referenzen)
+  const { error } = await supabase
+    .from('inspiration_punkte')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    return respond(500, { error: 'Löschen fehlgeschlagen: ' + error.message });
+  }
+
+  return respond(200, { ok: true });
 };

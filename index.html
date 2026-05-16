@@ -365,7 +365,7 @@
           <textarea id="k-notizen" placeholder="Nur für dich sichtbar"></textarea>
 
           <label style="margin-top:1.2rem">Sichtbare Inspiration-Punkte</label>
-          <p class="muted" style="margin:0 0 0.6rem">Nichts angehakt = Kunde sieht alles. Einzelne anhaken = nur diese werden angezeigt.</p>
+          <p class="muted" style="margin:0 0 0.6rem">Standardmässig alles sichtbar. Haken entfernen = Kunde sieht diesen Punkt nicht.</p>
           <div id="punkteCheckboxes" class="muted">Lade Katalog…</div>
 
           <div id="kundeCreateMsg"></div>
@@ -394,8 +394,40 @@
       <!-- ============ Tab: Katalog ============ -->
       <div class="tab-panel" id="tab-katalog">
         <div class="card">
-          <h2>Inspiration-Katalog</h2>
-          <p class="muted" style="margin-top:-0.5rem">Bilder, Videos und Texte der 14 Inspiration-Punkte verwalten. Änderungen sind sofort für Kunden sichtbar.</p>
+          <h2>Neuen Punkt hinzufügen</h2>
+          <div class="form-row">
+            <div>
+              <label for="np-kategorie">Kategorie *</label>
+              <select id="np-kategorie">
+                <option value="wc">WC / Toilette</option>
+                <option value="waschtisch">Waschtisch</option>
+                <option value="armaturen">Armaturen</option>
+                <option value="dusche">Dusche</option>
+              </select>
+            </div>
+            <div>
+              <label for="np-titel">Titel *</label>
+              <input type="text" id="np-titel" placeholder="z.B. Regenbrause" />
+            </div>
+          </div>
+          <label for="np-kurz">Kurzbeschreibung</label>
+          <input type="text" id="np-kurz" placeholder="Ein Satz, was es ist" />
+          <div class="form-row">
+            <div>
+              <label for="np-vorteil">Vorteil</label>
+              <input type="text" id="np-vorteil" placeholder="Was spricht dafür?" />
+            </div>
+            <div>
+              <label for="np-bedenken">Zu bedenken</label>
+              <input type="text" id="np-bedenken" placeholder="Was muss man wissen?" />
+            </div>
+          </div>
+          <div id="npMsg"></div>
+          <button class="primary" id="npCreateBtn">Punkt hinzufügen</button>
+        </div>
+        <div class="card">
+          <h2>Katalog-Übersicht</h2>
+          <p class="muted" style="margin-top:-0.5rem">Bilder, Videos und Texte verwalten. Änderungen sind sofort für Kunden sichtbar.</p>
           <div id="katalogMsg"></div>
           <div class="kat-grid" id="katalogGrid">
             <div class="muted">Lade…</div>
@@ -738,15 +770,19 @@
         if (!grouped[k]) return;
         html += '<div class="punkte-group"><div class="punkte-group-title">'+catLabelsLong[k]+'</div>';
         grouped[k].forEach(function(p) {
-          html += '<label class="punkt-cb"><input type="checkbox" name="punkt" value="'+p.id+'" /> '+escapeHtml(p.titel)+'</label>';
+          html += '<label class="punkt-cb"><input type="checkbox" name="punkt" value="'+p.id+'" checked /> '+escapeHtml(p.titel)+'</label>';
         });
         html += '</div>';
       });
       container.innerHTML = html;
     }
 
+    // Gibt die ausgewählten Punkte zurück:
+    // alle angehakt → null (= alles sichtbar), sonst Array der angehakten IDs
     function getSelectedPunkte() {
+      var all = document.querySelectorAll('#punkteCheckboxes input[name="punkt"]');
       var checked = document.querySelectorAll('#punkteCheckboxes input[name="punkt"]:checked');
+      if (checked.length === all.length) return null;
       return Array.from(checked).map(function(cb) { return cb.value; });
     }
 
@@ -768,7 +804,7 @@
           termin_datum: $('k-datum').value || null,
           termin_uhrzeit: $('k-uhrzeit').value || null,
           admin_notizen: $('k-notizen').value.trim(),
-          sichtbare_punkte: selected.length > 0 ? selected : null,
+          sichtbare_punkte: selected,
         }) });
         var inspoUrl = location.origin + '/inspiration.html?t=' + data.kunde.access_token;
         showMsg('kundeCreateMsg',
@@ -919,20 +955,47 @@
         var imgHtml = p.bild_url
           ? '<img class="kat-img" src="'+escapeHtml(p.bild_url)+'" alt="'+escapeHtml(p.titel)+'" loading="lazy" />'
           : '<div class="kat-placeholder">Kein Bild</div>';
+        var videoTag = p.video_url ? '<span style="font-size:0.7rem;color:#2d7a2d;font-weight:600"> + Video</span>' : '';
         return '<div class="kat-card" data-punkt-id="'+p.id+'">'
           + imgHtml
           + '<div class="kat-body">'
-            + '<div class="kat-cat">'+(katLabels[p.kategorie]||p.kategorie)+' · '+p.reihenfolge+'</div>'
+            + '<div class="kat-cat">'+(katLabels[p.kategorie]||p.kategorie)+' · '+p.reihenfolge+videoTag+'</div>'
             + '<h3>'+escapeHtml(p.titel)+'</h3>'
             + '<p>'+escapeHtml(p.kurzbeschreibung||'')+'</p>'
+            + (p.vorteil ? '<p style="font-size:0.78rem;color:#2d7a2d"><strong>+</strong> '+escapeHtml(p.vorteil)+'</p>' : '')
+            + (p.zu_bedenken ? '<p style="font-size:0.78rem;color:#BF853B"><strong>!</strong> '+escapeHtml(p.zu_bedenken)+'</p>' : '')
           + '</div>'
           + '<div class="kat-actions">'
             + '<button data-kataction="bild" data-id="'+p.id+'">Bild '+(p.bild_url?'ersetzen':'hochladen')+'</button>'
             + '<button data-kataction="video" data-id="'+p.id+'">Video '+(p.video_url?'ersetzen':'hochladen')+'</button>'
-            + '<button data-kataction="edit" data-id="'+p.id+'">Texte bearbeiten</button>'
+            + '<button data-kataction="edit" data-id="'+p.id+'">Bearbeiten</button>'
+            + '<button class="danger" data-kataction="delete" data-id="'+p.id+'">Entfernen</button>'
           + '</div></div>';
       }).join('');
     }
+
+    // Neuen Punkt anlegen
+    $('npCreateBtn').addEventListener('click', async function() {
+      var titel = $('np-titel').value.trim();
+      showMsg('npMsg','','');
+      if (!titel) { showMsg('npMsg','Titel fehlt.','error'); return; }
+      this.disabled = true;
+      try {
+        await apiCall('/create-punkt', { method:'POST', body: JSON.stringify({
+          kategorie: $('np-kategorie').value,
+          titel: titel,
+          kurzbeschreibung: $('np-kurz').value.trim(),
+          vorteil: $('np-vorteil').value.trim(),
+          zu_bedenken: $('np-bedenken').value.trim(),
+        }) });
+        showMsg('npMsg','Punkt hinzugefügt.','success');
+        $('np-titel').value=''; $('np-kurz').value=''; $('np-vorteil').value=''; $('np-bedenken').value='';
+        punkteCache = [];
+        await loadKatalog();
+        loadPunkteCheckboxes();
+      } catch(e) { showMsg('npMsg','Fehler: '+e.message,'error'); }
+      finally { this.disabled=false; }
+    });
 
     // Medien-Upload
     var mediaUploadTarget = null;
@@ -956,6 +1019,20 @@
 
       if (action === 'edit') {
         openTextEditor(id);
+        return;
+      }
+
+      if (action === 'delete') {
+        var punkt = katalogPunkte.find(function(x) { return x.id === id; });
+        if (!confirm('«'+(punkt?punkt.titel:id)+'» wirklich entfernen?')) return;
+        btn.disabled = true;
+        try {
+          await apiCall('/delete-punkt', { method:'POST', body: JSON.stringify({ id: id }) });
+          showMsg('katalogMsg','Entfernt.','success');
+          punkteCache = [];
+          await loadKatalog();
+          loadPunkteCheckboxes();
+        } catch(e) { showMsg('katalogMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
       }
     });
 
@@ -984,11 +1061,13 @@
     function openTextEditor(id) {
       var p = katalogPunkte.find(function(x) { return x.id === id; });
       if (!p) return;
-      $('detailContent').innerHTML = '<h3>Texte bearbeiten</h3>'
+      $('detailContent').innerHTML = '<h3>Punkt bearbeiten</h3>'
+        + '<label>Kategorie</label><select id="ed-kat"><option value="wc"'+(p.kategorie==='wc'?' selected':'')+'>WC / Toilette</option><option value="waschtisch"'+(p.kategorie==='waschtisch'?' selected':'')+'>Waschtisch</option><option value="armaturen"'+(p.kategorie==='armaturen'?' selected':'')+'>Armaturen</option><option value="dusche"'+(p.kategorie==='dusche'?' selected':'')+'>Dusche</option></select>'
         + '<label>Titel</label><input type="text" id="ed-titel" value="'+escapeHtml(p.titel)+'" />'
         + '<label>Kurzbeschreibung</label><textarea id="ed-kurz">'+(p.kurzbeschreibung||'')+'</textarea>'
         + '<label>Vorteil</label><textarea id="ed-vorteil">'+(p.vorteil||'')+'</textarea>'
         + '<label>Zu bedenken</label><textarea id="ed-bedenken">'+(p.zu_bedenken||'')+'</textarea>'
+        + '<label>Reihenfolge</label><input type="text" id="ed-order" value="'+p.reihenfolge+'" style="width:80px" />'
         + '<div id="edMsg"></div>'
         + '<button class="primary" id="edSave">Speichern</button>';
       $('detailPanel').classList.add('open');
@@ -1000,10 +1079,12 @@
         try {
           await apiCall('/update-punkt', { method:'POST', body: JSON.stringify({
             id: id,
+            kategorie: $('ed-kat').value,
             titel: $('ed-titel').value.trim(),
             kurzbeschreibung: $('ed-kurz').value.trim(),
             vorteil: $('ed-vorteil').value.trim(),
             zu_bedenken: $('ed-bedenken').value.trim(),
+            reihenfolge: parseInt($('ed-order').value) || 1,
           }) });
           showMsg('edMsg','Gespeichert.','success');
           await loadKatalog();
