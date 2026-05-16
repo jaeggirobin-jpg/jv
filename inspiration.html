@@ -232,16 +232,6 @@
     pointer-events: none;
     filter: drop-shadow(0 24px 40px rgba(31,26,20,0.55)) drop-shadow(0 6px 12px rgba(31,26,20,0.45));
     will-change: transform;
-    animation: heroSpin 16s linear infinite;
-  }
-  @property --ry-obj {
-    syntax: '<angle>';
-    initial-value: 0deg;
-    inherits: false;
-  }
-  @keyframes heroSpin {
-    from { --ry-obj: 0deg; }
-    to   { --ry-obj: 360deg; }
   }
   .hero__object img,
   .hero__object svg {
@@ -251,6 +241,11 @@
     display: block;
     overflow: visible;
     backface-visibility: hidden;
+    animation: heroSpin 16s linear infinite;
+  }
+  @keyframes heroSpin {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(360deg); }
   }
   .hero__object--enter {
     opacity: 0;
