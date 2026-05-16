@@ -106,12 +106,18 @@
     .tabs {
       display: flex; gap: 0; margin-bottom: 1.5rem;
       border-bottom: 2px solid #e5e5e5;
+      background: #fff;
+      border-radius: 6px 6px 0 0;
+      padding: 0 0.5rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .tabs button {
-      background: none; border: none; border-bottom: 2px solid transparent;
-      margin-bottom: -2px; padding: 0.7rem 1.2rem;
-      font-size: 0.9rem; font-weight: 500; color: #929A9D;
+      background: none; border: none; border-bottom: 3px solid transparent;
+      margin-bottom: -2px; padding: 0.8rem 1.2rem;
+      font-size: 0.95rem; font-weight: 600; color: #929A9D;
       cursor: pointer; transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap; flex-shrink: 0;
     }
     .tabs button:hover { color: #4B575D; }
     .tabs button.active { color: #BF853B; border-bottom-color: #BF853B; }
@@ -213,7 +219,8 @@
       button.primary { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; }
       #login { max-width: 100%; margin: 2rem auto; padding: 0 0.9rem; }
       #login .login-logo img { max-width: 220px; }
-      .tabs button { padding: 0.6rem 0.7rem; font-size: 0.8rem; }
+      .tabs { padding: 0 0.3rem; }
+      .tabs button { padding: 0.7rem 0.8rem; font-size: 0.88rem; }
       .kat-grid { grid-template-columns: 1fr; }
       .detail-panel { width: 100%; max-width: 100%; right: -100%; }
     }
