@@ -322,7 +322,8 @@
             <div>
               <label for="k-anrede">Anrede *</label>
               <select id="k-anrede">
-                <option value="person">Person (Frau/Herr)</option>
+                <option value="frau">Frau</option>
+                <option value="herr">Herr</option>
                 <option value="familie">Familie</option>
               </select>
             </div>
@@ -684,7 +685,8 @@
         return;
       }
       body.innerHTML = kunden.map(function(k) {
-        var name = (k.anrede_typ==='familie' ? 'Familie ' : '') + escapeHtml((k.vorname?k.vorname+' ':'')+k.nachname);
+        var anredePrefix = {frau:'Frau ',herr:'Herr ',familie:'Familie '};
+        var name = (anredePrefix[k.anrede_typ]||'') + escapeHtml((k.anrede_typ!=='familie'&&k.vorname?k.vorname+' ':'')+k.nachname);
         var statusCls = k.status==='aktiv' ? 'active' : 'inactive';
         // Statistiken
         var besuchInfo = k.besuche
@@ -825,7 +827,8 @@
         var data = await apiCall('/get-kunde-interessen?id=' + id);
         var k = data.kunde;
         detailKundeToken = k.access_token;
-        var name = (k.anrede_typ==='familie'?'Familie ':'') + escapeHtml((k.vorname?k.vorname+' ':'')+k.nachname);
+        var ap = {frau:'Frau ',herr:'Herr ',familie:'Familie '};
+        var name = (ap[k.anrede_typ]||'') + escapeHtml((k.anrede_typ!=='familie'&&k.vorname?k.vorname+' ':'')+k.nachname);
         var html = '<h3>'+name+'</h3>';
         html += '<p style="font-size:0.85rem;color:#929A9D;margin-bottom:0.5rem">';
         html += escapeHtml(k.projekt_adresse||'') + (k.termin_datum ? '<br>Termin: '+fmtDateShort(k.termin_datum) : '') + '</p>';

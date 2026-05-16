@@ -1931,6 +1931,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Kundendaten befüllen
     const k = data.kunde;
     kunde.anredeTyp = k.anrede_typ;
+    var anredeMap = {frau:'Frau',herr:'Herr'};
+    kunde.anrede = anredeMap[k.anrede_typ] || '';
     kunde.vorname = k.vorname || '';
     kunde.nachname = k.nachname || '';
     kunde.termin.datum = k.termin_datum || '';
