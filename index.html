@@ -201,11 +201,31 @@
     .ap-item .ap-info strong { font-size: 0.9rem; }
     .ap-item .ap-info .muted { font-size: 0.78rem; }
 
+    /* Drag-Handle (6 Punkte) */
+    .drag-handle {
+      display: inline-flex; flex-direction: column; gap: 2px;
+      cursor: grab; padding: 4px 6px; color: #929A9D; flex-shrink: 0;
+    }
+    .drag-handle::before, .drag-handle::after {
+      content: ''; display: block;
+      width: 12px; height: 2px;
+      background: radial-gradient(circle, #929A9D 1.5px, transparent 1.5px);
+      background-size: 6px 2px;
+    }
+    .drag-handle:active { cursor: grabbing; color: #BF853B; }
+    .drag-handle:active::before, .drag-handle:active::after {
+      background: radial-gradient(circle, #BF853B 1.5px, transparent 1.5px);
+      background-size: 6px 2px;
+    }
+
     /* Kategorie-Inline-Editor */
     .kat-header-edit {
       background: #f9f7f4; border: 1px solid #e5e5e5; border-radius: 6px;
       padding: 0.9rem; margin-bottom: 0.8rem;
+      cursor: grab; transition: box-shadow 0.2s, opacity 0.15s;
     }
+    .kat-header-edit.dragging { opacity: 0.5; }
+    .kat-header-edit.drag-over { box-shadow: 0 0 0 2px #BF853B; }
     .kat-header-edit h3 { margin: 0 0 0.5rem; font-size: 0.95rem; color: #BF853B; }
     .kat-header-edit input, .kat-header-edit textarea {
       width: 100%; margin-bottom: 0.4rem;
@@ -213,7 +233,8 @@
     .kat-header-edit textarea { min-height: 40px; }
 
     /* Drag & Drop für Katalog-Karten */
-    .kat-card { cursor: grab; transition: box-shadow 0.2s, transform 0.15s; }
+    .kat-card { transition: box-shadow 0.2s, transform 0.15s; position: relative; }
+    .kat-card > .drag-handle { position: absolute; top: 6px; left: 6px; z-index: 1; background: rgba(255,255,255,0.85); border-radius: 3px; }
     .kat-card.dragging { opacity: 0.5; transform: scale(0.97); }
     .kat-card.drag-over { box-shadow: 0 0 0 2px #BF853B; }
 
@@ -1061,6 +1082,7 @@
           : '<div class="kat-placeholder">Kein Bild</div>';
         var videoTag = p.video_url ? '<span style="font-size:0.7rem;color:#2d7a2d;font-weight:600"> + Video</span>' : '';
         return '<div class="kat-card" data-punkt-id="'+p.id+'" data-punkt-kat="'+escapeHtml(p.kategorie)+'" draggable="true">'
+          + '<div class="drag-handle" title="Verschieben"></div>'
           + imgHtml
           + '<div class="kat-body">'
             + '<div class="kat-cat">'+(katLabels[p.kategorie]||p.kategorie)+' · '+p.reihenfolge+videoTag+'</div>'
@@ -1327,6 +1349,7 @@
         var data = await apiCall('/list-kategorien');
         kategorienCache = data.kategorien || [];
         renderKategorien();
+        setupKatDragDrop();
       } catch(e) { $('kategorienBody').innerHTML = '<span class="muted">Fehler.</span>'; }
     }
 
@@ -1334,8 +1357,8 @@
       var el = $('kategorienBody');
       if (!kategorienCache.length) { el.innerHTML = '<span class="muted">Keine Kategorien.</span>'; return; }
       el.innerHTML = kategorienCache.map(function(k) {
-        return '<div class="kat-header-edit" data-kat-id="'+escapeHtml(k.id)+'">'
-          + '<h3>'+escapeHtml(k.titel)+' <span class="muted">('+escapeHtml(k.id)+')</span></h3>'
+        return '<div class="kat-header-edit" data-kat-id="'+escapeHtml(k.id)+'" data-kat-order="'+k.reihenfolge+'" draggable="true">'
+          + '<div style="display:flex;align-items:center;gap:0.5rem"><div class="drag-handle" title="Verschieben"></div><h3 style="margin:0;flex:1">'+escapeHtml(k.titel)+' <span class="muted">('+escapeHtml(k.id)+')</span></h3></div>'
           + '<input type="text" value="'+escapeHtml(k.titel)+'" data-kat-field="titel" placeholder="Titel" />'
           + '<textarea data-kat-field="intro" placeholder="Intro-Text">'+escapeHtml(k.intro||'')+'</textarea>'
           + '<div style="display:flex;gap:0.5rem;align-items:center">'
@@ -1422,6 +1445,63 @@
         try {
           await apiCall('/update-punkte-order', { method:'POST', body: JSON.stringify({ updates: updates }) });
           await loadKatalog();
+        } catch(e) { alert('Fehler: '+e.message); }
+      });
+    }
+
+    // ============================================================
+    // DRAG & DROP FÜR KATEGORIEN
+    // ============================================================
+    function setupKatDragDrop() {
+      var container = $('kategorienBody');
+      if (!container) return;
+      var dragKatItem = null;
+
+      container.addEventListener('dragstart', function(e) {
+        var el = e.target.closest('.kat-header-edit');
+        if (!el) return;
+        dragKatItem = el.dataset.katId;
+        el.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      container.addEventListener('dragend', function(e) {
+        var el = e.target.closest('.kat-header-edit');
+        if (el) el.classList.remove('dragging');
+        container.querySelectorAll('.drag-over').forEach(function(c) { c.classList.remove('drag-over'); });
+        dragKatItem = null;
+      });
+
+      container.addEventListener('dragover', function(e) {
+        var el = e.target.closest('.kat-header-edit');
+        if (!el || el.dataset.katId === dragKatItem) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        container.querySelectorAll('.drag-over').forEach(function(c) { c.classList.remove('drag-over'); });
+        el.classList.add('drag-over');
+      });
+
+      container.addEventListener('drop', async function(e) {
+        e.preventDefault();
+        var target = e.target.closest('.kat-header-edit');
+        if (!target || !dragKatItem || target.dataset.katId === dragKatItem) return;
+        target.classList.remove('drag-over');
+
+        var items = Array.from(container.querySelectorAll('.kat-header-edit'));
+        var ids = items.map(function(el) { return el.dataset.katId; });
+        var fromIdx = ids.indexOf(dragKatItem);
+        var toIdx = ids.indexOf(target.dataset.katId);
+        ids.splice(fromIdx, 1);
+        ids.splice(toIdx, 0, dragKatItem);
+
+        // Alle Kategorien mit neuer Reihenfolge updaten
+        try {
+          for (var i = 0; i < ids.length; i++) {
+            await apiCall('/update-kategorie', { method:'POST', body: JSON.stringify({
+              id: ids[i], reihenfolge: i + 1
+            }) });
+          }
+          await loadKategorien();
         } catch(e) { alert('Fehler: '+e.message); }
       });
     }
