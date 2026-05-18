@@ -190,6 +190,33 @@
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; display: none; }
     .overlay.open { display: block; }
 
+    /* Ansprechpersonen-Liste */
+    .ap-item {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 0.6rem 0; border-bottom: 1px solid #f0f0f0;
+    }
+    .ap-item img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #BF853B; }
+    .ap-item .ap-placeholder { width: 44px; height: 44px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; color: #929A9D; font-size: 0.75rem; }
+    .ap-item .ap-info { flex: 1; }
+    .ap-item .ap-info strong { font-size: 0.9rem; }
+    .ap-item .ap-info .muted { font-size: 0.78rem; }
+
+    /* Kategorie-Inline-Editor */
+    .kat-header-edit {
+      background: #f9f7f4; border: 1px solid #e5e5e5; border-radius: 6px;
+      padding: 0.9rem; margin-bottom: 0.8rem;
+    }
+    .kat-header-edit h3 { margin: 0 0 0.5rem; font-size: 0.95rem; color: #BF853B; }
+    .kat-header-edit input, .kat-header-edit textarea {
+      width: 100%; margin-bottom: 0.4rem;
+    }
+    .kat-header-edit textarea { min-height: 40px; }
+
+    /* Drag & Drop für Katalog-Karten */
+    .kat-card { cursor: grab; transition: box-shadow 0.2s, transform 0.15s; }
+    .kat-card.dragging { opacity: 0.5; transform: scale(0.97); }
+    .kat-card.drag-over { box-shadow: 0 0 0 2px #BF853B; }
+
     /* Punkte-Checkboxen-Gruppe */
     .punkte-group { margin-bottom: 0.8rem; }
     .punkte-group-title {
@@ -362,6 +389,11 @@
               <input type="time" id="k-uhrzeit" value="14:00" />
             </div>
           </div>
+          <label for="k-ansprechperson">Ansprechperson</label>
+          <select id="k-ansprechperson">
+            <option value="">— Keine —</option>
+          </select>
+
           <label for="k-notizen">Admin-Notizen (intern)</label>
           <textarea id="k-notizen" placeholder="Nur für dich sichtbar"></textarea>
 
@@ -394,6 +426,34 @@
 
       <!-- ============ Tab: Katalog ============ -->
       <div class="tab-panel" id="tab-katalog">
+        <!-- Ansprechpersonen -->
+        <div class="card">
+          <h2>Ansprechpersonen</h2>
+          <p class="muted" style="margin-top:-0.5rem">Projektleiter/Berater, die beim Kunden in der Termin-Karte erscheinen.</p>
+          <div id="ansprechBody" class="muted">Lade…</div>
+          <div class="form-row" style="margin-top:0.8rem">
+            <div>
+              <label for="ap-name">Name *</label>
+              <input type="text" id="ap-name" placeholder="Robin Jäggi" autocomplete="off" />
+            </div>
+            <div>
+              <label for="ap-email">E-Mail</label>
+              <input type="email" id="ap-email" placeholder="robin@jaeggivollmer.ch" autocomplete="off" />
+            </div>
+          </div>
+          <label for="ap-telefon">Telefon</label>
+          <input type="tel" id="ap-telefon" placeholder="+41 79 ..." autocomplete="off" style="max-width:300px" />
+          <div id="apMsg"></div>
+          <button class="primary" id="apCreateBtn">Hinzufügen</button>
+        </div>
+
+        <!-- Kategorien -->
+        <div class="card">
+          <h2>Kategorien</h2>
+          <p class="muted" style="margin-top:-0.5rem">Titel und Intro-Texte der Kategorien bearbeiten, Reihenfolge festlegen.</p>
+          <div id="kategorienBody" class="muted">Lade…</div>
+        </div>
+
         <div class="card">
           <h2>Hero-Hintergrundbild</h2>
           <p class="muted" style="margin-top:-0.5rem">Das grosse Bild auf der Startseite der Inspiration. Empfohlen: Querformat, mind. 1920px breit, max. 5 MB.</p>
@@ -830,6 +890,7 @@
           termin_datum: $('k-datum').value || null,
           termin_uhrzeit: $('k-uhrzeit').value || null,
           admin_notizen: $('k-notizen').value.trim(),
+          ansprechperson_id: $('k-ansprechperson').value || null,
           sichtbare_punkte: selected,
         }) });
         var inspoUrl = location.origin + '/inspiration.html?t=' + data.kunde.access_token;
@@ -970,6 +1031,9 @@
         katalogPunkte = data.punkte || [];
         renderKatalog();
         updateKatVorschlaege();
+        setupDragDrop();
+        await loadKategorien();
+        await loadAnsprechpersonen();
       } catch(e) { showMsg('katalogMsg','Fehler: '+e.message,'error'); }
     }
 
@@ -996,7 +1060,7 @@
           ? '<img class="kat-img" src="'+escapeHtml(p.bild_url)+'" alt="'+escapeHtml(p.titel)+'" loading="lazy" />'
           : '<div class="kat-placeholder">Kein Bild</div>';
         var videoTag = p.video_url ? '<span style="font-size:0.7rem;color:#2d7a2d;font-weight:600"> + Video</span>' : '';
-        return '<div class="kat-card" data-punkt-id="'+p.id+'">'
+        return '<div class="kat-card" data-punkt-id="'+p.id+'" data-punkt-kat="'+escapeHtml(p.kategorie)+'" draggable="true">'
           + imgHtml
           + '<div class="kat-body">'
             + '<div class="kat-cat">'+(katLabels[p.kategorie]||p.kategorie)+' · '+p.reihenfolge+videoTag+'</div>'
@@ -1097,19 +1161,32 @@
     $('mediaUpload').addEventListener('change', async function() {
       var file = this.files[0];
       if (!file || !mediaUploadTarget) return;
-      showMsg('katalogMsg', 'Lädt hoch…', 'info');
-      try {
-        var base64 = await fileToBase64(file);
-        await apiCall('/upload-inspiration-media', { method:'POST', body: JSON.stringify({
-          punkt_id: mediaUploadTarget,
-          file_base64: base64,
-          file_name: file.name,
-          media_type: mediaUploadType,
-        }) });
-        showMsg('katalogMsg', (mediaUploadType==='bild'?'Bild':'Video')+' hochgeladen.', 'success');
-        await loadKatalog();
-      } catch(e) {
-        showMsg('katalogMsg', 'Upload fehlgeschlagen: '+e.message, 'error');
+
+      if (mediaUploadType === 'ap-foto') {
+        showMsg('apMsg', 'Lädt Foto hoch…', 'info');
+        try {
+          var base64 = await fileToBase64(file);
+          await apiCall('/upload-ansprechperson-foto', { method:'POST', body: JSON.stringify({
+            ansprechperson_id: mediaUploadTarget,
+            file_base64: base64,
+            file_name: file.name,
+          }) });
+          showMsg('apMsg', 'Foto hochgeladen.', 'success');
+          await loadAnsprechpersonen();
+        } catch(e) { showMsg('apMsg', 'Fehler: '+e.message, 'error'); }
+      } else {
+        showMsg('katalogMsg', 'Lädt hoch…', 'info');
+        try {
+          var base64 = await fileToBase64(file);
+          await apiCall('/upload-inspiration-media', { method:'POST', body: JSON.stringify({
+            punkt_id: mediaUploadTarget,
+            file_base64: base64,
+            file_name: file.name,
+            media_type: mediaUploadType,
+          }) });
+          showMsg('katalogMsg', (mediaUploadType==='bild'?'Bild':'Video')+' hochgeladen.', 'success');
+          await loadKatalog();
+        } catch(e) { showMsg('katalogMsg', 'Fehler: '+e.message, 'error'); }
       }
       mediaUploadTarget = null;
       mediaUploadType = null;
@@ -1154,6 +1231,205 @@
     // ============================================================
     // INIT
     // ============================================================
+    // ============================================================
+    // ANSPRECHPERSONEN
+    // ============================================================
+    async function loadAnsprechpersonen() {
+      try {
+        var data = await apiCall('/list-ansprechpersonen');
+        renderAnsprechpersonen(data.ansprechpersonen || []);
+        updateAnsprechDropdown(data.ansprechpersonen || []);
+      } catch(e) { $('ansprechBody').innerHTML = '<span class="muted">Fehler.</span>'; }
+    }
+
+    function renderAnsprechpersonen(list) {
+      var el = $('ansprechBody');
+      if (!list.length) { el.innerHTML = '<span class="muted">Noch keine Ansprechpersonen.</span>'; return; }
+      el.innerHTML = list.map(function(a) {
+        var foto = a.foto_url
+          ? '<img src="'+escapeHtml(a.foto_url)+'" alt="'+escapeHtml(a.name)+'" />'
+          : '<div class="ap-placeholder">?</div>';
+        return '<div class="ap-item" data-ap-id="'+a.id+'">'
+          + foto
+          + '<div class="ap-info"><strong>'+escapeHtml(a.name)+'</strong><br><span class="muted">'+escapeHtml(a.email||'')+' · '+escapeHtml(a.telefon||'')+'</span></div>'
+          + '<div class="actions">'
+            + '<button data-apaction="foto" data-id="'+a.id+'">Foto</button>'
+            + '<button class="danger" data-apaction="delete" data-id="'+a.id+'">Entfernen</button>'
+          + '</div></div>';
+      }).join('');
+    }
+
+    // Dropdown im Kunden-Formular befüllen
+    function updateAnsprechDropdown(list) {
+      var sel = $('k-ansprechperson');
+      if (!sel) return;
+      var val = sel.value;
+      sel.innerHTML = '<option value="">— Keine —</option>';
+      list.forEach(function(a) {
+        if (!a.aktiv) return;
+        var opt = document.createElement('option');
+        opt.value = a.id;
+        opt.textContent = a.name;
+        sel.appendChild(opt);
+      });
+      if (val) sel.value = val;
+    }
+
+    if ($('apCreateBtn')) {
+      $('apCreateBtn').addEventListener('click', async function() {
+        var name = $('ap-name').value.trim();
+        if (!name) { showMsg('apMsg','Name fehlt.','error'); return; }
+        this.disabled = true;
+        try {
+          await apiCall('/create-ansprechperson', { method:'POST', body: JSON.stringify({
+            name: name, email: $('ap-email').value.trim(), telefon: $('ap-telefon').value.trim()
+          }) });
+          showMsg('apMsg','Hinzugefügt.','success');
+          $('ap-name').value=''; $('ap-email').value=''; $('ap-telefon').value='';
+          await loadAnsprechpersonen();
+        } catch(e) { showMsg('apMsg','Fehler: '+e.message,'error'); }
+        finally { this.disabled=false; }
+      });
+    }
+
+    if ($('ansprechBody')) {
+      $('ansprechBody').addEventListener('click', async function(ev) {
+        var btn = ev.target.closest('button[data-apaction]');
+        if (!btn) return;
+        var id = btn.dataset.id;
+        if (btn.dataset.apaction === 'foto') {
+          mediaUploadTarget = id;
+          mediaUploadType = 'ap-foto';
+          var input = $('mediaUpload');
+          input.accept = 'image/jpeg,image/png,image/webp';
+          input.value = '';
+          input.click();
+          return;
+        }
+        if (btn.dataset.apaction === 'delete') {
+          if (!confirm('Ansprechperson entfernen?')) return;
+          btn.disabled = true;
+          try {
+            await apiCall('/delete-ansprechperson', { method:'POST', body: JSON.stringify({ id: id }) });
+            await loadAnsprechpersonen();
+          } catch(e) { showMsg('apMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
+        }
+      });
+    }
+
+    // ============================================================
+    // KATEGORIEN-EDITOR
+    // ============================================================
+    var kategorienCache = [];
+
+    async function loadKategorien() {
+      try {
+        var data = await apiCall('/list-kategorien');
+        kategorienCache = data.kategorien || [];
+        renderKategorien();
+      } catch(e) { $('kategorienBody').innerHTML = '<span class="muted">Fehler.</span>'; }
+    }
+
+    function renderKategorien() {
+      var el = $('kategorienBody');
+      if (!kategorienCache.length) { el.innerHTML = '<span class="muted">Keine Kategorien.</span>'; return; }
+      el.innerHTML = kategorienCache.map(function(k) {
+        return '<div class="kat-header-edit" data-kat-id="'+escapeHtml(k.id)+'">'
+          + '<h3>'+escapeHtml(k.titel)+' <span class="muted">('+escapeHtml(k.id)+')</span></h3>'
+          + '<input type="text" value="'+escapeHtml(k.titel)+'" data-kat-field="titel" placeholder="Titel" />'
+          + '<textarea data-kat-field="intro" placeholder="Intro-Text">'+escapeHtml(k.intro||'')+'</textarea>'
+          + '<div style="display:flex;gap:0.5rem;align-items:center">'
+            + '<label style="margin:0;font-size:0.8rem">Reihenfolge:</label>'
+            + '<input type="number" value="'+k.reihenfolge+'" data-kat-field="reihenfolge" style="width:60px" />'
+            + '<button class="primary" data-kat-save="'+escapeHtml(k.id)+'" style="margin:0;font-size:0.8rem;padding:0.35rem 0.8rem">Speichern</button>'
+          + '</div></div>';
+      }).join('');
+
+      // Save-Handler
+      el.querySelectorAll('button[data-kat-save]').forEach(function(btn) {
+        btn.addEventListener('click', async function() {
+          var katId = this.dataset.katSave;
+          var container = el.querySelector('[data-kat-id="'+katId+'"]');
+          btn.disabled = true;
+          try {
+            await apiCall('/update-kategorie', { method:'POST', body: JSON.stringify({
+              id: katId,
+              titel: container.querySelector('[data-kat-field="titel"]').value.trim(),
+              intro: container.querySelector('[data-kat-field="intro"]').value.trim(),
+              reihenfolge: parseInt(container.querySelector('[data-kat-field="reihenfolge"]').value) || 0,
+            }) });
+            container.querySelector('h3').innerHTML = escapeHtml(container.querySelector('[data-kat-field="titel"]').value.trim()) + ' <span class="muted">('+escapeHtml(katId)+')</span>';
+          } catch(e) { alert('Fehler: '+e.message); }
+          finally { btn.disabled=false; }
+        });
+      });
+    }
+
+    // ============================================================
+    // DRAG & DROP FÜR KATALOG-PUNKTE
+    // ============================================================
+    var dragItem = null;
+    var dragKat = null;
+
+    function setupDragDrop() {
+      var grid = $('katalogGrid');
+      if (!grid) return;
+
+      grid.addEventListener('dragstart', function(e) {
+        var card = e.target.closest('.kat-card');
+        if (!card) return;
+        dragItem = card.dataset.punktId;
+        dragKat = card.dataset.punktKat;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      grid.addEventListener('dragend', function(e) {
+        var card = e.target.closest('.kat-card');
+        if (card) card.classList.remove('dragging');
+        grid.querySelectorAll('.drag-over').forEach(function(c) { c.classList.remove('drag-over'); });
+        dragItem = null;
+        dragKat = null;
+      });
+
+      grid.addEventListener('dragover', function(e) {
+        var card = e.target.closest('.kat-card');
+        if (!card || card.dataset.punktId === dragItem) return;
+        if (card.dataset.punktKat !== dragKat) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        grid.querySelectorAll('.drag-over').forEach(function(c) { c.classList.remove('drag-over'); });
+        card.classList.add('drag-over');
+      });
+
+      grid.addEventListener('drop', async function(e) {
+        e.preventDefault();
+        var target = e.target.closest('.kat-card');
+        if (!target || !dragItem || target.dataset.punktId === dragItem) return;
+        if (target.dataset.punktKat !== dragKat) return;
+        target.classList.remove('drag-over');
+
+        // Neue Reihenfolge berechnen: alle Karten der gleichen Kategorie
+        var cards = Array.from(grid.querySelectorAll('.kat-card[data-punkt-kat="'+dragKat+'"]'));
+        var ids = cards.map(function(c) { return c.dataset.punktId; });
+        var fromIdx = ids.indexOf(dragItem);
+        var toIdx = ids.indexOf(target.dataset.punktId);
+        ids.splice(fromIdx, 1);
+        ids.splice(toIdx, 0, dragItem);
+
+        // Updates senden
+        var updates = ids.map(function(id, i) { return { id: id, reihenfolge: i + 1 }; });
+        try {
+          await apiCall('/update-punkte-order', { method:'POST', body: JSON.stringify({ updates: updates }) });
+          await loadKatalog();
+        } catch(e) { alert('Fehler: '+e.message); }
+      });
+    }
+
+    // ============================================================
+    // KATALOG loadKatalog erweitert
+    // ============================================================
+
     // Auto-Login falls Passwort im sessionStorage
     if (getPwd()) {
       tryLogin(getPwd()).then(function(ok) {

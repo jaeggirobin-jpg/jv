@@ -63,6 +63,9 @@ exports.handler = async (event) => {
   if (payload.termin_uhrzeit !== undefined) insert.termin_uhrzeit = payload.termin_uhrzeit || null;
   if (payload.admin_notizen !== undefined) insert.admin_notizen = (payload.admin_notizen || '').trim() || null;
 
+  // Ansprechperson zuweisen
+  if (payload.ansprechperson_id) insert.ansprechperson_id = payload.ansprechperson_id;
+
   // Sichtbare Punkte: Array von UUIDs, oder null für alle
   if (Array.isArray(payload.sichtbare_punkte) && payload.sichtbare_punkte.length > 0) {
     insert.sichtbare_punkte = payload.sichtbare_punkte;

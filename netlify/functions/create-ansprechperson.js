@@ -1,4 +1,4 @@
-// update-kunde.js — Kundendaten aktualisieren (Admin)
+// create-ansprechperson.js — Neue Ansprechperson erstellen (Admin)
 
 const { createClient } = require('@supabase/supabase-js');
 
@@ -22,6 +22,7 @@ function checkAuth(event) {
 }
 
 exports.handler = async (event) => {
+  // CORS-Preflight
   if (event.httpMethod === 'OPTIONS') {
     return respond(200, { ok: true });
   }
@@ -34,6 +35,7 @@ exports.handler = async (event) => {
     return respond(401, { error: 'Nicht autorisiert' });
   }
 
+  // Request-Body parsen
   let payload;
   try {
     payload = JSON.parse(event.body || '{}');
@@ -41,34 +43,13 @@ exports.handler = async (event) => {
     return respond(400, { error: 'Ungültiges JSON' });
   }
 
-  const id = payload.id;
-  if (!id) {
-    return respond(400, { error: 'ID fehlt' });
-  }
+  const name = (payload.name || '').trim();
+  const email = (payload.email || '').trim();
+  const telefon = (payload.telefon || '').trim();
 
-  // Erlaubte Felder zum Aktualisieren
-  const allowedFields = [
-    'anrede_typ', 'vorname', 'nachname', 'email', 'telefon',
-    'projekt_adresse', 'termin_datum', 'termin_uhrzeit', 'admin_notizen', 'status',
-    'ansprechperson_id',
-  ];
-  const updates = {};
-
-  for (const field of allowedFields) {
-    if (payload[field] !== undefined) {
-      updates[field] = payload[field];
-    }
-  }
-
-  // sichtbare_punkte: Array von UUIDs oder null (alle zeigen)
-  if (payload.sichtbare_punkte !== undefined) {
-    updates.sichtbare_punkte = Array.isArray(payload.sichtbare_punkte) && payload.sichtbare_punkte.length > 0
-      ? payload.sichtbare_punkte
-      : null;
-  }
-
-  if (Object.keys(updates).length === 0) {
-    return respond(400, { error: 'Keine Felder zum Aktualisieren angegeben' });
+  // Input-Validierung
+  if (!name) {
+    return respond(400, { error: 'Name fehlt' });
   }
 
   const supabase = createClient(
@@ -77,19 +58,18 @@ exports.handler = async (event) => {
   );
 
   const { data, error } = await supabase
-    .from('kunden')
-    .update(updates)
-    .eq('id', id)
+    .from('ansprechpersonen')
+    .insert({
+      name,
+      email: email || null,
+      telefon: telefon || null,
+    })
     .select()
     .single();
 
   if (error) {
-    return respond(500, { error: 'Datenbankfehler: ' + error.message });
+    return respond(500, { error: 'Erstellen fehlgeschlagen: ' + error.message });
   }
 
-  if (!data) {
-    return respond(404, { error: 'Kunde nicht gefunden' });
-  }
-
-  return respond(200, { ok: true, kunde: data });
+  return respond(200, { ok: true, ansprechperson: data });
 };

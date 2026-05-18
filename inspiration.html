@@ -1006,6 +1006,22 @@
     border-bottom: 1px solid var(--gold);
     font-variant-numeric: tabular-nums;
   }
+  .termin__person {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    margin-bottom: 14px;
+  }
+  .termin__person-foto {
+    width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+    border: 2px solid var(--gold);
+  }
+  .termin__person-name {
+    font-family: var(--serif); font-size: 18px; font-weight: 500; color: var(--ink);
+  }
+  .termin__person-email {
+    font-size: 13px; color: var(--muted);
+  }
+  .termin__person-email a { color: var(--gold); text-decoration: none; }
+  .termin__person-email a:hover { text-decoration: underline; }
   .termin__hint {
     font-size: 13px;
     color: var(--muted);
@@ -1200,9 +1216,7 @@
       <div class="termin__date tabular" data-termin-date="">Donnerstag, 12. Juni 2026</div>
       <div class="termin__time tabular" data-termin-time="">14:00 Uhr</div>
       <div class="termin__rule"></div>
-      <div class="termin__contact">
-        Jäggi Vollmer · <a href="tel:+41616920311" class="tabular">+41 61 692 03 11</a>
-      </div>
+      <div id="termin-ansprechperson"></div>
       <div class="termin__hint">Bei Fragen jederzeit per <a href="tel:+41616920311">Anruf</a> oder <a href="https://wa.me/41799360311" target="_blank" rel="noopener">WhatsApp</a>.</div>
     </div>
   </section>
@@ -1280,32 +1294,30 @@ const HERO_IMGS = { wc: IMG.wcHero, waschtisch: IMG.waschHero, armaturen: IMG.ar
 // Wird beim Laden dynamisch aus der DB befüllt.
 // Falls DB keine Daten liefert, bleiben die Original-Texte erhalten.
 let categories = [];
-const CAT_META = {
-  wc:         { title: 'Toilette',    intro: 'Die Toilette ist das meistgenutzte Element im Bad. Was sie kann, hat sich in den letzten Jahren deutlich verändert.' },
-  waschtisch: { title: 'Waschtisch',  intro: 'Wahrscheinlich das prägendste Möbelstück im Bad — und das, was Sie morgens als Erstes berühren.' },
-  armaturen:  { title: 'Armaturen',   intro: 'Hier entscheidet sich, wie das Bad sich anfühlt — jeden Tag, jedes Mal.' },
-  dusche:     { title: 'Dusche',      intro: 'Vom funktionalen Element zum Rückzugsort — wenige Quadratmeter, grosse Wirkung.' },
-};
+const CAT_META = {};
 
-// Baut categories-Array aus den DB-Punkten — beliebige Kategorien werden unterstützt
-function buildCategories(punkte) {
+// Baut categories-Array aus den DB-Punkten + Kategorie-Metadaten
+function buildCategories(punkte, kategorien) {
+  // Kategorie-Meta aus DB befüllen
+  (kategorien || []).forEach(function(k) { CAT_META[k.id] = { titel: k.titel, intro: k.intro || '' }; });
+
   const grouped = {};
   const catOrder = [];
   for (const p of punkte) {
     if (!grouped[p.kategorie]) { grouped[p.kategorie] = []; catOrder.push(p.kategorie); }
     grouped[p.kategorie].push(p);
   }
-  // Bekannte Kategorien zuerst, dann neue in der Reihenfolge wie sie in der DB vorkommen
-  const knownOrder = ['wc','waschtisch','armaturen','dusche'];
-  const order = knownOrder.filter(k => grouped[k]);
+  // Reihenfolge aus kategorien-Tabelle (DB), dann neue
+  const dbOrder = (kategorien || []).map(k => k.id);
+  const order = dbOrder.filter(k => grouped[k]);
   catOrder.forEach(k => { if (order.indexOf(k) === -1) order.push(k); });
 
   let num = 1;
   return order.map(k => {
-    const meta = CAT_META[k] || { title: k.charAt(0).toUpperCase() + k.slice(1), intro: '' };
+    const meta = CAT_META[k] || { titel: k.charAt(0).toUpperCase() + k.slice(1), intro: '' };
     const fallback = FALLBACK_IMGS[k] || [];
     return {
-      id: k, num: String(num++).padStart(2,'0'), title: meta.title, intro: meta.intro,
+      id: k, num: String(num++).padStart(2,'0'), title: meta.titel, intro: meta.intro,
       items: grouped[k].sort((a,b) => a.reihenfolge - b.reihenfolge).map((p, i) => ({
         id: p.id,
         img: p.bild_url || fallback[i] || '/assets/inspiration/bathMain.jpg',
@@ -1942,8 +1954,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     kunde.termin.uhrzeit = k.termin_uhrzeit || '';
     kunde.termin.adresse = k.projekt_adresse || '';
 
-    // Kategorien aus DB-Punkten bauen
-    categories = buildCategories(data.punkte || []);
+    // Kategorien aus DB-Punkten + Metadaten bauen
+    categories = buildCategories(data.punkte || [], data.kategorien || []);
 
     // Bestehende Interessen in State laden
     for (const i of (data.interessen || [])) {
@@ -1988,6 +2000,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (ta) ta.value = text;
       const nb = document.querySelector(`[data-note-toggle="${id}"]`);
       if (nb) nb.classList.add('has-note');
+    }
+
+    // Ansprechperson in Termin-Karte anzeigen
+    var ap = data.ansprechperson;
+    var apEl = document.getElementById('termin-ansprechperson');
+    if (ap && apEl) {
+      var apHtml = '<div class="termin__person">';
+      if (ap.foto_url) {
+        apHtml += '<img class="termin__person-foto" src="' + ap.foto_url + '" alt="' + (ap.name||'') + '" />';
+      }
+      apHtml += '<div class="termin__person-name">' + (ap.name||'') + '</div>';
+      if (ap.email) {
+        apHtml += '<div class="termin__person-email"><a href="mailto:' + ap.email + '">' + ap.email + '</a></div>';
+      }
+      if (ap.telefon) {
+        apHtml += '<div class="termin__person-email"><a href="tel:' + ap.telefon + '">' + ap.telefon + '</a></div>';
+      }
+      apHtml += '</div>';
+      apEl.innerHTML = apHtml;
+    } else if (apEl) {
+      apEl.innerHTML = '<div class="termin__contact">Jäggi Vollmer · <a href="tel:+41616920311">+41 61 692 03 11</a></div>';
     }
 
     // Dokumente-Tab anzeigen wenn vorhanden
