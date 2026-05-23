@@ -813,6 +813,7 @@
           + '<td><span class="status '+statusCls+'">'+escapeHtml(k.status)+'</span></td>'
           + '<td><div class="actions">'
             + '<button data-kaction="link" data-token="'+k.access_token+'">Link</button>'
+            + '<button data-kaction="swipe" data-token="'+k.access_token+'">Swipe</button>'
             + '<button data-kaction="detail" data-id="'+k.id+'">Details</button>'
             + '<button data-kaction="toggle" data-id="'+k.id+'" data-status="'+k.status+'">'+(k.status==='aktiv'?'Deaktivieren':'Aktivieren')+'</button>'
             + '<button class="danger" data-kaction="delete" data-id="'+k.id+'" data-name="'+name+'">Löschen</button>'
@@ -827,6 +828,12 @@
       if (action === 'link') {
         var url = location.origin + '/inspiration.html?t=' + btn.dataset.token;
         try { await navigator.clipboard.writeText(url); showMsg('kundenMsg','Inspiration-Link kopiert.','success'); }
+        catch(e) { showMsg('kundenMsg','Link: '+url,'info'); }
+        return;
+      }
+      if (action === 'swipe') {
+        var url = location.origin + '/swipe.html?t=' + btn.dataset.token;
+        try { await navigator.clipboard.writeText(url); showMsg('kundenMsg','Swipe-Link kopiert.','success'); }
         catch(e) { showMsg('kundenMsg','Link: '+url,'info'); }
         return;
       }
