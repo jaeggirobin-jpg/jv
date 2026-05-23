@@ -863,10 +863,15 @@
     // Punkte-Checkboxen beim Öffnen des Kunden-Tabs laden
     var punkteCache = [];
     async function loadPunkteCheckboxes() {
-      if (punkteCache.length > 0) return;
+      // Immer neu laden, damit Änderungen im Katalog sofort sichtbar sind
       try {
         var data = await apiCall('/list-punkte');
         punkteCache = data.punkte || [];
+        // Kategorien-Reihenfolge aus DB holen falls noch nicht geladen
+        if (!kategorienCache.length) {
+          var kData = await apiCall('/list-kategorien');
+          kategorienCache = kData.kategorien || [];
+        }
         renderPunkteCheckboxes();
       } catch(e) { $('punkteCheckboxes').innerHTML = '<span class="muted">Fehler beim Laden.</span>'; }
     }
@@ -878,12 +883,21 @@
         if (!grouped[p.kategorie]) grouped[p.kategorie] = [];
         grouped[p.kategorie].push(p);
       });
-      var catLabelsLong = { wc:'WC / Toilette', waschtisch:'Waschtisch', armaturen:'Armaturen', dusche:'Dusche' };
+      // Reihenfolge aus kategorienCache (DB-Reihenfolge)
+      var katOrder = kategorienCache.map(function(k) { return k.id; });
+      // Kategorien die im Katalog sind aber nicht in kategorienCache hinten anfügen
+      Object.keys(grouped).forEach(function(k) {
+        if (katOrder.indexOf(k) === -1) katOrder.push(k);
+      });
+      var katTitels = {};
+      kategorienCache.forEach(function(k) { katTitels[k.id] = k.titel; });
+
       var html = '';
-      ['wc','waschtisch','armaturen','dusche'].forEach(function(k) {
+      katOrder.forEach(function(k) {
         if (!grouped[k]) return;
-        html += '<div class="punkte-group"><div class="punkte-group-title">'+catLabelsLong[k]+'</div>';
-        grouped[k].forEach(function(p) {
+        var titel = katTitels[k] || k.charAt(0).toUpperCase() + k.slice(1);
+        html += '<div class="punkte-group"><div class="punkte-group-title">'+escapeHtml(titel)+'</div>';
+        grouped[k].sort(function(a,b) { return a.reihenfolge - b.reihenfolge; }).forEach(function(p) {
           html += '<label class="punkt-cb"><input type="checkbox" name="punkt" value="'+p.id+'" checked /> '+escapeHtml(p.titel)+'</label>';
         });
         html += '</div>';
