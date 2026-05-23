@@ -103,6 +103,94 @@ html, body {
   background: linear-gradient(135deg, #1a1612 0%, #2a2118 40%, #1f1a14 100%);
 }
 
+/* ============== HORIZONTALES CAROUSEL ============== */
+.carousel-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.carousel-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow-x: scroll;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Scrollbar im Carousel ausblenden */
+.carousel-track::-webkit-scrollbar { display: none; }
+.carousel-track {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.carousel-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+}
+
+.carousel-slide__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-color: #1a1a1a;
+}
+
+.carousel-slide__bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Dots-Indikator (Instagram-Style) */
+.carousel-dots {
+  position: absolute;
+  bottom: 180px;
+  left: 0;
+  right: 72px;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.carousel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.carousel-dot.active {
+  background: #fff;
+  transform: scale(1.3);
+}
+
+/* Medium-Name Pill (ueber der Kategorie) */
+.swipe-card__medium-name {
+  display: inline-block;
+  padding: 3px 10px;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 6px;
+}
+
 /* ============== GRADIENT OVERLAY ============== */
 .swipe-card__gradient {
   position: absolute;
@@ -405,6 +493,42 @@ html, body {
   animation: fadeUp 0.8s var(--ease) 0.5s forwards;
 }
 
+/* Favoriten-Info auf der Intro-Karte */
+.intro-card__favorites {
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: fadeUp 0.8s var(--ease) 0.55s forwards;
+}
+
+.intro-card__fav-count {
+  font-size: 14px;
+  color: var(--gold-light);
+  margin-bottom: 12px;
+}
+
+.intro-card__fav-btn {
+  display: inline-block;
+  padding: 10px 24px;
+  background: rgba(191, 133, 59, 0.2);
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.intro-card__fav-btn:active {
+  transform: scale(0.96);
+}
+
+.intro-card__fav-btn:hover {
+  background: rgba(191, 133, 59, 0.35);
+}
+
 .intro-card__scroll-hint {
   display: flex;
   flex-direction: column;
@@ -450,6 +574,131 @@ html, body {
 
 .intro-card__overview-link:hover {
   color: var(--gold-light);
+}
+
+/* ============== SUMMARY-CARD (Zusammenfassung am Ende) ============== */
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  padding: 60px 24px 40px;
+  padding-bottom: calc(40px + env(safe-area-inset-bottom, 0));
+  overflow-y: auto;
+}
+
+.summary-card__bg {
+  background: linear-gradient(160deg, #141210 0%, #1e1a16 50%, #141210 100%);
+}
+
+.summary-card__header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.summary-card__eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.summary-card__title {
+  font-size: clamp(24px, 6vw, 32px);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.summary-card__empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.65;
+  margin-top: 20px;
+}
+
+/* Kategorie-Gruppen */
+.summary-group {
+  margin-bottom: 24px;
+}
+
+.summary-group__title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(191, 133, 59, 0.2);
+}
+
+.summary-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.summary-item__icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--gold);
+  margin-top: 2px;
+}
+
+.summary-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.summary-item__name {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.summary-item__slide-name {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.summary-item__comment {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
+.summary-card__footer {
+  text-align: center;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.summary-card__link {
+  display: inline-block;
+  padding: 12px 28px;
+  background: var(--gold);
+  color: #111;
+  border: none;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.summary-card__link:hover {
+  background: var(--gold-light);
 }
 
 /* ============== BOTTOM SHEET (Kommentar) ============== */
@@ -717,24 +966,55 @@ html, body {
 /* ============================================================
    SUPABASE + KUNDENDATEN
    ============================================================ */
-const SUPABASE_URL = 'https://ywcnccpjhnnspbkcmpng.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3Y25jY3BqaG5uc3Bia2NtcG5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMTg4MTMsImV4cCI6MjA5MTY5NDgxM30.xylQ_9hBQsKNIJJrXU6hTr6T2uSnYq62OPV7HZf-0-Y';
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const token = new URLSearchParams(location.search).get('t') || '';
+var SUPABASE_URL = 'https://ywcnccpjhnnspbkcmpng.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3Y25jY3BqaG5uc3Bia2NtcG5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMTg4MTMsImV4cCI6MjA5MTY5NDgxM30.xylQ_9hBQsKNIJJrXU6hTr6T2uSnYq62OPV7HZf-0-Y';
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var token = new URLSearchParams(location.search).get('t') || '';
 
 /* ============================================================
    STATE
+   Composite Key fuer Likes/Notes: "punkt_id:medium_id" oder "punkt_id:null"
    ============================================================ */
-const state = {
-  liked: new Map(),       // punkt_id -> boolean
-  notes: new Map(),       // punkt_id -> string
-  punkte: [],             // alle Punkte (flach)
+var state = {
+  liked: new Map(),       // compositeKey -> boolean
+  notes: new Map(),       // compositeKey -> string
+  punkte: [],             // alle Punkte (mit medien-Array)
   kunde: null,
   kategorien: {},         // id -> { titel, intro }
   currentIndex: 0,        // aktueller Kartenindex (0 = Intro)
   totalCards: 0,
   _noteTimers: new Map(),
+  // Carousel-Zustand: punkt_id -> aktuell sichtbarer slide-Index
+  carouselIndex: new Map(),
 };
+
+/* Composite Key erstellen */
+function compositeKey(punktId, mediumId) {
+  return punktId + ':' + (mediumId || 'null');
+}
+
+/* Aktuelles Medium fuer einen Punkt ermitteln */
+function getCurrentMedium(punktId) {
+  var punkt = state.punkte.find(function(p) { return p.id === punktId; });
+  if (!punkt || !punkt.medien || punkt.medien.length === 0) return null;
+  var slideIdx = state.carouselIndex.get(punktId) || 0;
+  return punkt.medien[slideIdx] || null;
+}
+
+/* Aktuellen Composite Key fuer einen Punkt ermitteln */
+function getCurrentKey(punktId) {
+  var medium = getCurrentMedium(punktId);
+  return compositeKey(punktId, medium ? medium.id : null);
+}
+
+/* Alle gelikten Eintraege zaehlen */
+function countFavorites() {
+  var count = 0;
+  state.liked.forEach(function(val) {
+    if (val) count++;
+  });
+  return count;
+}
 
 /* ============================================================
    HILFSFUNKTIONEN
@@ -772,14 +1052,26 @@ function getCategoryTitle(kategorieId) {
 function renderCards() {
   var container = document.getElementById('swipe-container');
   var html = '';
+  var favCount = countFavorites();
 
-  // Intro-Karte
+  // === Intro-Karte ===
   var greeting = getGreeting(state.kunde);
   html += '<div class="swipe-card intro-card" data-index="0">' +
     '<div class="swipe-card__bg intro-card__bg"></div>' +
     '<div class="intro-card__eyebrow">Willkommen</div>' +
-    '<div class="intro-card__greeting">' + escapeHtml(greeting) + ',<br>entdecken Sie <em>Ihr Bad.</em></div>' +
-    '<div class="intro-card__sub">Wischen Sie nach oben, um Inspirationen zu entdecken. Tippen Sie auf das Herz, wenn Ihnen etwas gefällt.</div>' +
+    '<div class="intro-card__greeting">' + escapeHtml(greeting) + ',<br>entdecken Sie <em>Ihr Bad.</em></div>';
+
+  // Favoriten-Info
+  html += '<div class="intro-card__favorites" id="intro-favorites">';
+  if (favCount > 0) {
+    html += '<div class="intro-card__fav-count">Sie haben ' + favCount + ' Favorit' + (favCount !== 1 ? 'en' : '') + ' vorgemerkt</div>';
+    html += '<button class="intro-card__fav-btn" id="btn-goto-summary">Auswahl ansehen</button>';
+  } else {
+    html += '<div class="intro-card__fav-count" style="color:var(--text-muted)">Wischen Sie durch und markieren Sie, was Sie interessiert.</div>';
+  }
+  html += '</div>';
+
+  html += '<div class="intro-card__sub" style="margin-bottom:24px"></div>' +
     '<div class="intro-card__scroll-hint">' +
       '<span>Nach oben wischen</span>' +
       '<svg class="intro-card__scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>' +
@@ -787,27 +1079,65 @@ function renderCards() {
     '<a class="intro-card__overview-link" href="/inspiration.html?t=' + encodeURIComponent(token) + '">Zur Übersicht &rarr;</a>' +
   '</div>';
 
-  // Inspirations-Karten
+  // === Inspirations-Karten ===
   for (var i = 0; i < state.punkte.length; i++) {
     var p = state.punkte[i];
     var idx = i + 1; // +1 wegen Intro-Karte
-    var isLiked = state.liked.get(p.id) || false;
-    var hasNote = state.notes.has(p.id) && state.notes.get(p.id).length > 0;
-    var hasBild = !!p.bild_url;
-    var hasVideo = !!p.video_url;
+    var hasCarousel = p.medien && p.medien.length > 0;
     var catTitle = getCategoryTitle(p.kategorie);
+
+    // Like/Note-Status: bei Carousel den aktuell sichtbaren Slide verwenden, initial Slide 0
+    var currentKey;
+    if (hasCarousel) {
+      currentKey = compositeKey(p.id, p.medien[0].id);
+    } else {
+      currentKey = compositeKey(p.id, null);
+    }
+    var isLiked = state.liked.get(currentKey) || false;
+    var hasNote = state.notes.has(currentKey) && state.notes.get(currentKey).length > 0;
 
     html += '<div class="swipe-card" data-index="' + idx + '" data-punkt-id="' + p.id + '">';
 
-    // Hintergrund
-    if (hasVideo) {
-      html += '<div class="swipe-card__bg">' +
-        '<video src="' + escapeHtml(p.video_url) + '" muted loop playsinline preload="metadata" poster="' + escapeHtml(p.bild_url || '') + '"></video>' +
-      '</div>';
-    } else if (hasBild) {
-      html += '<div class="swipe-card__bg" style="background-image:url(\'' + escapeHtml(p.bild_url) + '\')"></div>';
+    if (hasCarousel) {
+      // Horizontales Carousel
+      html += '<div class="carousel-wrapper">';
+      html += '<div class="carousel-track" data-carousel="' + p.id + '">';
+      for (var s = 0; s < p.medien.length; s++) {
+        var m = p.medien[s];
+        html += '<div class="carousel-slide" data-slide-index="' + s + '" data-medium-id="' + m.id + '">';
+        if (m.video_url) {
+          html += '<div class="carousel-slide__bg">' +
+            '<video src="' + escapeHtml(m.video_url) + '" muted loop playsinline preload="metadata" poster="' + escapeHtml(m.bild_url || '') + '"></video>' +
+          '</div>';
+        } else if (m.bild_url) {
+          html += '<div class="carousel-slide__bg" style="background-image:url(\'' + escapeHtml(m.bild_url) + '\')"></div>';
+        } else {
+          html += '<div class="carousel-slide__bg" style="background:linear-gradient(135deg, #1a1612 0%, #2a2118 40%, #1f1a14 100%)"></div>';
+        }
+        html += '</div>';
+      }
+      html += '</div>'; // .carousel-track
+
+      // Dots
+      html += '<div class="carousel-dots" data-dots="' + p.id + '">';
+      for (var d = 0; d < p.medien.length; d++) {
+        html += '<div class="carousel-dot' + (d === 0 ? ' active' : '') + '" data-dot-index="' + d + '"></div>';
+      }
+      html += '</div>';
+      html += '</div>'; // .carousel-wrapper
     } else {
-      html += '<div class="swipe-card__bg swipe-card__bg--placeholder"></div>';
+      // Einzelnes Hintergrundbild/Video (kein Carousel)
+      var hasBild = !!p.bild_url;
+      var hasVideo = !!p.video_url;
+      if (hasVideo) {
+        html += '<div class="swipe-card__bg">' +
+          '<video src="' + escapeHtml(p.video_url) + '" muted loop playsinline preload="metadata" poster="' + escapeHtml(p.bild_url || '') + '"></video>' +
+        '</div>';
+      } else if (hasBild) {
+        html += '<div class="swipe-card__bg" style="background-image:url(\'' + escapeHtml(p.bild_url) + '\')"></div>';
+      } else {
+        html += '<div class="swipe-card__bg swipe-card__bg--placeholder"></div>';
+      }
     }
 
     // Gradient-Overlay
@@ -848,6 +1178,14 @@ function renderCards() {
 
     // Inhalt (unten)
     html += '<div class="swipe-card__content" data-content="' + p.id + '">';
+
+    // Medium-Name Pill (wird bei Carousel dynamisch befuellt)
+    if (hasCarousel && p.medien[0].name) {
+      html += '<div class="swipe-card__medium-name" data-medium-label="' + p.id + '">' + escapeHtml(p.medien[0].name) + '</div>';
+    } else if (hasCarousel) {
+      html += '<div class="swipe-card__medium-name" data-medium-label="' + p.id + '" style="display:none"></div>';
+    }
+
     html += '<div class="swipe-card__category">' + escapeHtml(catTitle) + '</div>';
     html += '<div class="swipe-card__title">' + escapeHtml(p.titel) + '</div>';
     html += '<div class="swipe-card__desc">' + escapeHtml(p.kurzbeschreibung) + '</div>';
@@ -869,8 +1207,125 @@ function renderCards() {
     html += '</div>'; // .swipe-card
   }
 
+  // === Summary-Karte (am Ende) ===
+  var summaryIdx = state.punkte.length + 1;
+  html += renderSummaryCard(summaryIdx);
+
   container.innerHTML = html;
-  state.totalCards = state.punkte.length + 1; // +1 fuer Intro
+  state.totalCards = state.punkte.length + 2; // Intro + Punkte + Summary
+}
+
+/* Summary-Karte HTML generieren */
+function renderSummaryCard(idx) {
+  var html = '<div class="swipe-card summary-card" data-index="' + idx + '" id="summary-card">' +
+    '<div class="swipe-card__bg summary-card__bg"></div>' +
+    '<div class="swipe-card__gradient" style="background:none"></div>' +
+    '<div style="position:relative;z-index:2;flex:1;overflow-y:auto;padding:60px 24px 40px;padding-bottom:calc(40px + env(safe-area-inset-bottom, 0))">';
+
+  html += '<div class="summary-card__header">' +
+    '<div class="summary-card__eyebrow">Zusammenfassung</div>' +
+    '<div class="summary-card__title">Ihre Auswahl</div>' +
+  '</div>';
+
+  // Gelikte Items sammeln und nach Kategorie gruppieren
+  var groups = {}; // kategorie -> [{punktTitel, slideName, comment}]
+  var anyLiked = false;
+
+  state.punkte.forEach(function(p) {
+    var catTitle = getCategoryTitle(p.kategorie);
+    var hasCarousel = p.medien && p.medien.length > 0;
+
+    if (hasCarousel) {
+      // Fuer jeden Slide pruefen
+      p.medien.forEach(function(m) {
+        var key = compositeKey(p.id, m.id);
+        if (state.liked.get(key)) {
+          anyLiked = true;
+          if (!groups[catTitle]) groups[catTitle] = [];
+          var noteKey = key;
+          groups[catTitle].push({
+            punktTitel: p.titel,
+            slideName: m.name || null,
+            comment: state.notes.get(noteKey) || ''
+          });
+        }
+      });
+    } else {
+      var key = compositeKey(p.id, null);
+      if (state.liked.get(key)) {
+        anyLiked = true;
+        if (!groups[catTitle]) groups[catTitle] = [];
+        groups[catTitle].push({
+          punktTitel: p.titel,
+          slideName: null,
+          comment: state.notes.get(key) || ''
+        });
+      }
+    }
+  });
+
+  if (!anyLiked) {
+    html += '<div class="summary-card__empty">Noch keine Favoriten vorgemerkt.<br>Wischen Sie zurück und tippen Sie auf das Herz bei dem, was Ihnen gefällt.</div>';
+  } else {
+    var heartSvg = '<svg class="summary-item__icon" viewBox="0 0 24 24" fill="var(--gold)" stroke="var(--gold)" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+
+    for (var cat in groups) {
+      html += '<div class="summary-group">';
+      html += '<div class="summary-group__title">' + escapeHtml(cat) + '</div>';
+      groups[cat].forEach(function(item) {
+        html += '<div class="summary-item">';
+        html += heartSvg;
+        html += '<div class="summary-item__info">';
+        html += '<div class="summary-item__name">' + escapeHtml(item.punktTitel) + '</div>';
+        if (item.slideName) {
+          html += '<div class="summary-item__slide-name">' + escapeHtml(item.slideName) + '</div>';
+        }
+        if (item.comment) {
+          html += '<div class="summary-item__comment">«' + escapeHtml(item.comment) + '»</div>';
+        }
+        html += '</div></div>';
+      });
+      html += '</div>';
+    }
+  }
+
+  html += '<div class="summary-card__footer">' +
+    '<a class="summary-card__link" href="/inspiration.html?t=' + encodeURIComponent(token) + '">Zur Übersicht</a>' +
+  '</div>';
+
+  html += '</div></div>';
+  return html;
+}
+
+/* Summary-Karte und Intro-Favoriten aktualisieren (ohne komplettes Re-Render) */
+function refreshSummaryAndIntro() {
+  // Summary neu rendern
+  var summaryEl = document.getElementById('summary-card');
+  if (summaryEl) {
+    var idx = summaryEl.dataset.index;
+    var tmp = document.createElement('div');
+    tmp.innerHTML = renderSummaryCard(idx);
+    var newCard = tmp.firstChild;
+    summaryEl.parentNode.replaceChild(newCard, summaryEl);
+
+    // Neuen Summary-Card im Scroll-Observer registrieren
+    var container = document.getElementById('swipe-container');
+    if (window._cardObserver) {
+      window._cardObserver.observe(newCard);
+    }
+  }
+
+  // Intro-Favoriten aktualisieren
+  var favEl = document.getElementById('intro-favorites');
+  if (favEl) {
+    var favCount = countFavorites();
+    if (favCount > 0) {
+      favEl.innerHTML = '<div class="intro-card__fav-count">Sie haben ' + favCount + ' Favorit' + (favCount !== 1 ? 'en' : '') + ' vorgemerkt</div>' +
+        '<button class="intro-card__fav-btn" id="btn-goto-summary">Auswahl ansehen</button>';
+    } else {
+      favEl.innerHTML = '<div class="intro-card__fav-count" style="color:var(--text-muted)">Wischen Sie durch und markieren Sie, was Sie interessiert.</div>';
+    }
+  }
 }
 
 /* ============================================================
@@ -878,8 +1333,9 @@ function renderCards() {
    ============================================================ */
 function updatePosition() {
   var el = document.getElementById('position');
-  // Intro-Karte nicht mitzaehlen in der Anzeige
-  if (state.currentIndex === 0) {
+  // Intro-Karte und Summary-Karte nicht mitzaehlen
+  var lastIdx = state.punkte.length + 1; // Summary-Index
+  if (state.currentIndex === 0 || state.currentIndex === lastIdx) {
     el.style.opacity = '0';
   } else {
     el.style.opacity = '1';
@@ -889,16 +1345,20 @@ function updatePosition() {
 
 /* ============================================================
    LIKE / UNLIKE (Interessiert-Toggle)
+   Verwendet Composite Key (punkt_id:medium_id)
    ============================================================ */
 function toggleLike(punktId, fromDoubleTap) {
-  var wasLiked = state.liked.get(punktId) || false;
+  var key = getCurrentKey(punktId);
+  var medium = getCurrentMedium(punktId);
+  var mediumId = medium ? medium.id : null;
+  var wasLiked = state.liked.get(key) || false;
   var newVal = !wasLiked;
 
   // Bei Double-Tap nur liken, nicht un-liken
   if (fromDoubleTap && wasLiked) return;
 
   // Optimistisch: sofort UI updaten
-  state.liked.set(punktId, newVal);
+  state.liked.set(key, newVal);
   updateHeartUI(punktId, newVal);
 
   // Bounce-Animation
@@ -910,17 +1370,25 @@ function toggleLike(punktId, fromDoubleTap) {
     setTimeout(function() { btn.classList.remove('bounce'); }, 450);
   }
 
+  // Summary und Intro aktualisieren
+  refreshSummaryAndIntro();
+
   // Supabase-Persistenz
   if (token) {
-    sb.rpc('upsert_interesse', {
+    var params = {
       p_token: token,
       p_punkt_id: punktId,
       p_interessiert: newVal
-    }).then(function(res) {
+    };
+    if (mediumId) {
+      params.p_medium_id = mediumId;
+    }
+    sb.rpc('upsert_interesse', params).then(function(res) {
       if (res.error) {
         // Rollback
-        state.liked.set(punktId, wasLiked);
+        state.liked.set(key, wasLiked);
         updateHeartUI(punktId, wasLiked);
+        refreshSummaryAndIntro();
       }
     });
   }
@@ -942,6 +1410,59 @@ function updateHeartUI(punktId, isLiked) {
 }
 
 /* ============================================================
+   CAROUSEL: Slide-Wechsel Handling
+   ============================================================ */
+function setupCarousels() {
+  var container = document.getElementById('swipe-container');
+  var tracks = container.querySelectorAll('.carousel-track');
+
+  tracks.forEach(function(track) {
+    var punktId = track.dataset.carousel;
+    var slides = track.querySelectorAll('.carousel-slide');
+    var dotsContainer = container.querySelector('[data-dots="' + punktId + '"]');
+    var dots = dotsContainer ? dotsContainer.querySelectorAll('.carousel-dot') : [];
+
+    // Scroll-Event zum Aktualisieren der Dots und UI
+    track.addEventListener('scroll', function() {
+      var slideWidth = track.clientWidth;
+      if (slideWidth === 0) return;
+      var newIdx = Math.round(track.scrollLeft / slideWidth);
+
+      var prevIdx = state.carouselIndex.get(punktId) || 0;
+      if (newIdx === prevIdx) return;
+
+      state.carouselIndex.set(punktId, newIdx);
+
+      // Dots aktualisieren
+      dots.forEach(function(dot, i) {
+        dot.classList.toggle('active', i === newIdx);
+      });
+
+      // Medium-Name Label aktualisieren
+      var punkt = state.punkte.find(function(p) { return p.id === punktId; });
+      if (punkt && punkt.medien && punkt.medien[newIdx]) {
+        var medium = punkt.medien[newIdx];
+        var label = container.querySelector('[data-medium-label="' + punktId + '"]');
+        if (label) {
+          if (medium.name) {
+            label.textContent = medium.name;
+            label.style.display = '';
+          } else {
+            label.style.display = 'none';
+          }
+        }
+      }
+
+      // Herz- und Kommentar-Status fuer neuen Slide aktualisieren
+      var key = getCurrentKey(punktId);
+      var isLiked = state.liked.get(key) || false;
+      updateHeartUI(punktId, isLiked);
+      updateCommentDot(punktId);
+    }, { passive: true });
+  });
+}
+
+/* ============================================================
    DOUBLE-TAP ERKENNUNG
    ============================================================ */
 function setupDoubleTap() {
@@ -952,7 +1473,7 @@ function setupDoubleTap() {
 
   container.addEventListener('touchend', function(e) {
     // Nicht auf Buttons oder Content reagieren
-    if (e.target.closest('.action-btn') || e.target.closest('.swipe-card__content') || e.target.closest('.intro-card')) return;
+    if (e.target.closest('.action-btn') || e.target.closest('.swipe-card__content') || e.target.closest('.intro-card') || e.target.closest('.summary-card')) return;
 
     var now = Date.now();
     var touch = e.changedTouches[0];
@@ -977,7 +1498,7 @@ function setupDoubleTap() {
 
   // Desktop: Doppelklick
   container.addEventListener('dblclick', function(e) {
-    if (e.target.closest('.action-btn') || e.target.closest('.swipe-card__content') || e.target.closest('.intro-card')) return;
+    if (e.target.closest('.action-btn') || e.target.closest('.swipe-card__content') || e.target.closest('.intro-card') || e.target.closest('.summary-card')) return;
     var card = e.target.closest('.swipe-card[data-punkt-id]');
     if (card) {
       toggleLike(card.dataset.punktId, true);
@@ -996,13 +1517,16 @@ function showDoubleTapHeart() {
 
 /* ============================================================
    KOMMENTAR (Bottom Sheet)
+   Verwendet Composite Key
    ============================================================ */
 var currentCommentPunktId = null;
+var currentCommentKey = null;
 
 function openCommentSheet(punktId) {
   currentCommentPunktId = punktId;
+  currentCommentKey = getCurrentKey(punktId);
   var ta = document.getElementById('sheet-textarea');
-  ta.value = state.notes.get(punktId) || '';
+  ta.value = state.notes.get(currentCommentKey) || '';
   document.getElementById('bottom-sheet').classList.add('open');
   document.getElementById('sheet-overlay').classList.add('open');
   document.getElementById('sheet-saved').classList.remove('visible');
@@ -1013,6 +1537,7 @@ function closeCommentSheet() {
   document.getElementById('bottom-sheet').classList.remove('open');
   document.getElementById('sheet-overlay').classList.remove('open');
   currentCommentPunktId = null;
+  currentCommentKey = null;
 }
 
 function setupCommentSheet() {
@@ -1021,33 +1546,45 @@ function setupCommentSheet() {
 
   var ta = document.getElementById('sheet-textarea');
   ta.addEventListener('input', function() {
-    if (!currentCommentPunktId) return;
+    if (!currentCommentPunktId || !currentCommentKey) return;
     var text = (ta.value || '').trim();
     var punktId = currentCommentPunktId;
+    var key = currentCommentKey;
+
+    // Medium-ID aus dem Key extrahieren
+    var parts = key.split(':');
+    var mediumId = parts[1] === 'null' ? null : parts[1];
 
     if (text) {
-      state.notes.set(punktId, text);
+      state.notes.set(key, text);
     } else {
-      state.notes.delete(punktId);
+      state.notes.delete(key);
     }
 
     // Kommentar-Dot updaten
     updateCommentDot(punktId);
+
+    // Summary aktualisieren
+    refreshSummaryAndIntro();
 
     // Gespeichert-Anzeige
     document.getElementById('sheet-saved').classList.remove('visible');
 
     // Debounce Supabase-Aufruf
     if (token) {
-      clearTimeout(state._noteTimers.get(punktId));
-      state._noteTimers.set(punktId, setTimeout(function() {
-        sb.rpc('update_kommentar', {
+      clearTimeout(state._noteTimers.get(key));
+      state._noteTimers.set(key, setTimeout(function() {
+        var params = {
           p_token: token,
           p_punkt_id: punktId,
           p_kommentar: text
-        }).then(function() {
-          // Nur anzeigen wenn Sheet noch offen
-          if (currentCommentPunktId === punktId) {
+        };
+        if (mediumId) {
+          params.p_medium_id = mediumId;
+        }
+        sb.rpc('update_kommentar', params).then(function() {
+          // Nur anzeigen wenn Sheet noch offen fuer diesen Key
+          if (currentCommentKey === key) {
             document.getElementById('sheet-saved').classList.add('visible');
             setTimeout(function() {
               document.getElementById('sheet-saved').classList.remove('visible');
@@ -1062,7 +1599,8 @@ function setupCommentSheet() {
 function updateCommentDot(punktId) {
   var btn = document.querySelector('[data-comment="' + punktId + '"]');
   if (!btn) return;
-  var hasNote = state.notes.has(punktId) && state.notes.get(punktId).length > 0;
+  var key = getCurrentKey(punktId);
+  var hasNote = state.notes.has(key) && state.notes.get(key).length > 0;
   btn.classList.toggle('has-comment', hasNote);
 }
 
@@ -1105,7 +1643,6 @@ function setupContentToggle() {
 function setupScrollTracking() {
   var container = document.getElementById('swipe-container');
   var cards = container.querySelectorAll('.swipe-card');
-  var cardHeight = window.innerHeight;
 
   // IntersectionObserver fuer aktive Karte
   var observer = new IntersectionObserver(function(entries) {
@@ -1120,9 +1657,12 @@ function setupScrollTracking() {
     threshold: [0.5]
   });
 
+  // Global speichern fuer spaeteres Re-Observing (Summary-Update)
+  window._cardObserver = observer;
+
   cards.forEach(function(card) { observer.observe(card); });
 
-  // Parallax-Effekt auf Hintergrundbilder
+  // Parallax-Effekt auf Hintergrundbilder (nur fuer Karten ohne Carousel)
   var ticking = false;
   container.addEventListener('scroll', function() {
     if (!ticking) {
@@ -1130,6 +1670,8 @@ function setupScrollTracking() {
         var scrollTop = container.scrollTop;
         var vh = window.innerHeight;
         cards.forEach(function(card) {
+          // Kein Parallax auf Carousel-Karten (hat eigenen Scroll)
+          if (card.querySelector('.carousel-wrapper')) return;
           var bg = card.querySelector('.swipe-card__bg');
           if (!bg) return;
           var cardTop = card.offsetTop;
@@ -1147,27 +1689,75 @@ function setupScrollTracking() {
 
 /* ============================================================
    VIDEO AUTOPLAY / PAUSE (IntersectionObserver)
+   Videos in Carousel: nur abspielen wenn BEIDE sichtbar sind
+   (vertikale Karte sichtbar UND horizontaler Slide sichtbar)
    ============================================================ */
 function setupVideoObserver() {
   var container = document.getElementById('swipe-container');
-  var videos = container.querySelectorAll('.swipe-card__bg video');
-  if (videos.length === 0) return;
 
-  var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      var video = entry.target;
-      if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-        video.play().catch(function() { /* Autoplay blockiert */ });
-      } else {
-        video.pause();
-      }
+  // Einfache Videos (nicht im Carousel)
+  var simpleVideos = container.querySelectorAll('.swipe-card__bg video');
+  if (simpleVideos.length > 0) {
+    var simpleObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var video = entry.target;
+        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+          video.play().catch(function() {});
+        } else {
+          video.pause();
+        }
+      });
+    }, {
+      root: container,
+      threshold: [0.5]
     });
-  }, {
-    root: container,
-    threshold: [0.5]
-  });
+    simpleVideos.forEach(function(v) { simpleObserver.observe(v); });
+  }
 
-  videos.forEach(function(v) { observer.observe(v); });
+  // Carousel-Videos: zwei Ebenen pruefen
+  var carouselCards = container.querySelectorAll('.swipe-card[data-punkt-id]');
+  carouselCards.forEach(function(card) {
+    var track = card.querySelector('.carousel-track');
+    if (!track) return;
+
+    var punktId = card.dataset.punktId;
+    var visibleCard = false;
+
+    // Vertikale Sichtbarkeit der Karte beobachten
+    var cardObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        visibleCard = entry.isIntersecting && entry.intersectionRatio > 0.5;
+        updateCarouselVideos(track, visibleCard);
+      });
+    }, {
+      root: container,
+      threshold: [0.5]
+    });
+    cardObserver.observe(card);
+
+    // Horizontalen Scroll beobachten, um Videos zu steuern
+    track.addEventListener('scroll', function() {
+      updateCarouselVideos(track, visibleCard);
+    }, { passive: true });
+  });
+}
+
+/* Carousel-Videos aktualisieren: nur sichtbaren Slide abspielen */
+function updateCarouselVideos(track, cardVisible) {
+  var slides = track.querySelectorAll('.carousel-slide');
+  var slideWidth = track.clientWidth;
+  if (slideWidth === 0) return;
+  var activeIdx = Math.round(track.scrollLeft / slideWidth);
+
+  slides.forEach(function(slide, i) {
+    var video = slide.querySelector('.carousel-slide__bg video');
+    if (!video) return;
+    if (cardVisible && i === activeIdx) {
+      video.play().catch(function() {});
+    } else {
+      video.pause();
+    }
+  });
 }
 
 /* ============================================================
@@ -1193,6 +1783,16 @@ function setupEvents() {
     var share = e.target.closest('[data-share]');
     if (share) {
       shareLink();
+      return;
+    }
+
+    // "Auswahl ansehen" Button auf Intro-Karte
+    var gotoSummary = e.target.closest('#btn-goto-summary');
+    if (gotoSummary) {
+      var summaryCard = document.getElementById('summary-card');
+      if (summaryCard) {
+        summaryCard.scrollIntoView({ behavior: 'smooth' });
+      }
       return;
     }
   });
@@ -1260,10 +1860,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
     state.punkte = punkte;
 
-    // Bestehende Interessen laden
+    // Bestehende Interessen laden (mit medium_id Support)
     (data.interessen || []).forEach(function(i) {
-      if (i.interessiert) state.liked.set(i.punkt_id, true);
-      if (i.kommentar) state.notes.set(i.punkt_id, i.kommentar);
+      var key = compositeKey(i.punkt_id, i.medium_id || null);
+      if (i.interessiert) state.liked.set(key, true);
+      if (i.kommentar) state.notes.set(key, i.kommentar);
     });
 
     // Rendern
@@ -1278,6 +1879,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Setup
     updatePosition();
     setupScrollTracking();
+    setupCarousels();
     setupVideoObserver();
     setupDoubleTap();
     setupCommentSheet();
