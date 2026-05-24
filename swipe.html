@@ -1088,7 +1088,7 @@ function renderCards() {
     if (contactParts.length) html += '<div style="font-size:11px;color:var(--text-muted)">' + contactParts.join(' · ') + '</div>';
     html += '</div></div>';
   } else {
-    html += '<div style="font-size:10px;color:#666;margin:8px 0">AP: ' + JSON.stringify(state.ansprechperson) + '</div>';
+    html += '<div style="font-size:14px;color:#ff0000;margin:12px 0;padding:8px;background:rgba(255,0,0,0.1);border-radius:4px">DEBUG AP: ' + JSON.stringify(state.ansprechperson) + '</div>';
   }
 
   html += '<div class="intro-card__sub" style="margin-bottom:24px"></div>' +
