@@ -1060,9 +1060,24 @@ function renderCards() {
   var greeting = getGreeting(state.kunde);
   html += '<div class="swipe-card intro-card" data-index="0">' +
     '<div class="swipe-card__bg intro-card__bg"></div>' +
-    '<div style="font-size:12px;color:#ff0000;position:absolute;top:60px;left:10px;right:10px;z-index:99;background:rgba(0,0,0,0.8);padding:6px;border-radius:4px">DEBUG AP=' + JSON.stringify(state.ansprechperson) + ' KUNDE=' + JSON.stringify(state.kunde) + '</div>' +
     '<div class="intro-card__eyebrow">Willkommen</div>' +
     '<div class="intro-card__greeting">' + escapeHtml(greeting) + ',<br>entdecken Sie <em>Ihr Bad.</em></div>';
+
+  // Ansprechperson — direkt unter der Begrüssung
+  var ap = state.ansprechperson;
+  if (ap && ap.name) {
+    html += '<div style="display:flex;align-items:center;gap:10px;margin:12px auto 16px;background:rgba(255,255,255,0.08);border-radius:40px;padding:8px 18px 8px 8px;max-width:320px">';
+    if (ap.foto_url) {
+      html += '<img src="' + escapeHtml(ap.foto_url) + '" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);flex-shrink:0" />';
+    }
+    html += '<div style="text-align:left;min-width:0">';
+    html += '<div style="font-size:13px;color:#fff;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escapeHtml(ap.name) + '</div>';
+    var contactParts = [];
+    if (ap.telefon) contactParts.push('<a href="tel:' + escapeHtml(ap.telefon) + '" style="color:var(--gold);text-decoration:none">' + escapeHtml(ap.telefon) + '</a>');
+    if (ap.email) contactParts.push('<a href="mailto:' + escapeHtml(ap.email) + '" style="color:var(--gold);text-decoration:none">' + escapeHtml(ap.email) + '</a>');
+    if (contactParts.length) html += '<div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + contactParts.join(' · ') + '</div>';
+    html += '</div></div>';
+  }
 
   // Favoriten-Info
   html += '<div class="intro-card__favorites" id="intro-favorites">';
@@ -1073,24 +1088,6 @@ function renderCards() {
     html += '<div class="intro-card__fav-count" style="color:var(--text-muted)">Wischen Sie durch und markieren Sie, was Sie interessiert.</div>';
   }
   html += '</div>';
-
-  // Ansprechperson anzeigen — immer Block rendern für Debug
-  var ap = state.ansprechperson;
-  if (ap && ap.name) {
-    html += '<div style="display:flex;align-items:center;gap:10px;margin:16px 0 4px;background:rgba(255,255,255,0.06);border-radius:12px;padding:10px 16px">';
-    if (ap.foto_url) {
-      html += '<img src="' + escapeHtml(ap.foto_url) + '" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);flex-shrink:0" />';
-    }
-    html += '<div style="text-align:left">';
-    html += '<div style="font-size:13px;color:#fff;font-weight:500">' + escapeHtml(ap.name) + '</div>';
-    var contactParts = [];
-    if (ap.email) contactParts.push('<a href="mailto:' + escapeHtml(ap.email) + '" style="color:var(--gold);text-decoration:none">' + escapeHtml(ap.email) + '</a>');
-    if (ap.telefon) contactParts.push('<a href="tel:' + escapeHtml(ap.telefon) + '" style="color:var(--gold);text-decoration:none">' + escapeHtml(ap.telefon) + '</a>');
-    if (contactParts.length) html += '<div style="font-size:11px;color:var(--text-muted)">' + contactParts.join(' · ') + '</div>';
-    html += '</div></div>';
-  } else {
-    html += '<div style="font-size:14px;color:#ff0000;margin:12px 0;padding:8px;background:rgba(255,0,0,0.1);border-radius:4px">DEBUG AP: ' + JSON.stringify(state.ansprechperson) + '</div>';
-  }
 
   html += '<div class="intro-card__sub" style="margin-bottom:24px"></div>' +
     '<div class="intro-card__scroll-hint">' +
