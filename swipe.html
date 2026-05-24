@@ -1106,13 +1106,18 @@ function renderCards() {
     '<div class="intro-card__eyebrow">Willkommen</div>' +
     '<div class="intro-card__greeting">' + escapeHtml(greeting) + ',<br>entdecken Sie <em>Ihr Bad.</em></div>';
 
-  // Termin anzeigen
+  // Termin anzeigen (auch ohne Datum zeigen wir die Uhrzeit wenn vorhanden)
   var termin = formatTermin(state.kunde);
   if (termin) {
-    html += '<div style="margin:16px 0 4px;font-size:14px;color:var(--text-muted);letter-spacing:0.02em">' +
+    html += '<div style="margin:16px 0 4px;text-align:center">' +
       '<div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Unser Termin</div>' +
-      '<div style="color:#fff;font-weight:500">' + escapeHtml(termin.datum) + '</div>' +
-      '<div>' + escapeHtml(termin.zeit) + '</div>' +
+      '<div style="color:#fff;font-weight:500;font-size:15px">' + escapeHtml(termin.datum) + '</div>' +
+      '<div style="color:var(--text-muted);font-size:14px">' + escapeHtml(termin.zeit) + '</div>' +
+    '</div>';
+  } else if (state.kunde && state.kunde.termin_uhrzeit) {
+    html += '<div style="margin:16px 0 4px;text-align:center">' +
+      '<div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Unser Termin</div>' +
+      '<div style="color:var(--text-muted);font-size:14px">' + escapeHtml((state.kunde.termin_uhrzeit || '').slice(0,5)) + ' Uhr</div>' +
     '</div>';
   }
 
