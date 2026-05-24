@@ -1063,10 +1063,10 @@ function renderCards() {
     '<div class="intro-card__eyebrow">Willkommen</div>' +
     '<div class="intro-card__greeting">' + escapeHtml(greeting) + ',<br>entdecken Sie <em>Ihr Bad.</em></div>';
 
-  // Ansprechperson — direkt unter der Begrüssung
+  // Ansprechperson — position:absolute unten in der Intro-Karte
   var ap = state.ansprechperson;
   if (ap && ap.name) {
-    html += '<div style="display:flex;align-items:center;gap:10px;margin:12px auto 16px;background:rgba(255,255,255,0.08);border-radius:40px;padding:8px 18px 8px 8px;max-width:320px">';
+    html += '<div style="position:absolute;bottom:100px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.1);border-radius:40px;padding:8px 18px 8px 8px;z-index:5;max-width:90%;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">';
     if (ap.foto_url) {
       html += '<img src="' + escapeHtml(ap.foto_url) + '" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);flex-shrink:0" />';
     }
