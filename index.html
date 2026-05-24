@@ -305,8 +305,10 @@
       label { font-size: 0.82rem; }
       input[type="text"], input[type="password"], input[type="file"],
       input[type="email"], input[type="tel"], input[type="date"],
-      input[type="time"], textarea, select {
+      input[type="time"], input[type="number"], textarea, select {
         font-size: 16px;
+        max-width: 100%;
+        box-sizing: border-box;
       }
       button.primary { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; }
       #login { max-width: 100%; margin: 2rem auto; padding: 0 0.9rem; }
@@ -440,11 +442,11 @@
           <div class="form-row">
             <div>
               <label for="k-datum">Termin Datum</label>
-              <input type="date" id="k-datum" />
+              <input type="date" id="k-datum" style="width:100%;max-width:100%;box-sizing:border-box" />
             </div>
             <div>
               <label for="k-uhrzeit">Termin Uhrzeit</label>
-              <input type="time" id="k-uhrzeit" value="14:00" />
+              <input type="time" id="k-uhrzeit" value="14:00" style="width:100%;max-width:100%;box-sizing:border-box" />
             </div>
           </div>
           <label for="k-ansprechperson">Ansprechperson</label>
@@ -837,7 +839,7 @@
         var statusCls = k.status==='aktiv' ? 'active' : 'inactive';
         // Statistiken
         var besuchInfo = k.besuche
-          ? k.besuche + '× · ' + fmtDate(k.letzter_besuch)
+          ? k.besuche + '× · ' + fmtDate(k.letzter_besuch) + ' <a href="#" data-kaction="historie" data-id="'+k.id+'" style="font-size:0.72rem;color:#BF853B">alle</a>'
           : '<span class="muted">—</span>';
         var markiertInfo = k.markierte_punkte
           ? k.markierte_punkte + ' Punkte' + (k.kommentare ? ', ' + k.kommentare + ' Notizen' : '')
@@ -873,6 +875,11 @@
         var url = location.origin + '/swipe.html?t=' + btn.dataset.token;
         try { await navigator.clipboard.writeText(url); showMsg('kundenMsg','Swipe-Link kopiert.','success'); }
         catch(e) { showMsg('kundenMsg','Link: '+url,'info'); }
+        return;
+      }
+      if (action === 'historie') {
+        ev.preventDefault();
+        openHistorie(btn.dataset.id);
         return;
       }
       if (action === 'detail') {
@@ -1105,6 +1112,46 @@
           });
         });
 
+      } catch(e) {
+        $('detailContent').innerHTML = '<div class="msg error">Fehler: '+escapeHtml(e.message)+'</div>';
+      }
+    }
+
+    async function openHistorie(id) {
+      $('detailContent').innerHTML = '<div class="muted">Lade Historie…</div>';
+      $('detailPanel').classList.add('open');
+      $('detailOverlay').classList.add('open');
+      try {
+        var data = await apiCall('/get-kunde-interessen?id=' + id);
+        var k = data.kunde;
+        var ap = {frau:'Frau ',herr:'Herr ',familie:'Familie '};
+        var name = (ap[k.anrede_typ]||'') + (k.vorname?k.vorname+' ':'')+k.nachname;
+        var log = data.log || [];
+        var aktionLabels = {
+          'seite_geoeffnet': 'Seite geöffnet',
+          'punkt_markiert': 'Punkt markiert',
+          'punkt_demarkiert': 'Punkt demarkiert',
+          'kommentar_hinzu': 'Kommentar hinzugefügt',
+        };
+        var html = '<h3>Besuchshistorie</h3>';
+        html += '<p style="font-size:0.85rem;color:#929A9D;margin-bottom:1rem">'+escapeHtml(name)+' · '+log.length+' Einträge</p>';
+        if (!log.length) {
+          html += '<p class="muted">Noch keine Aktivität.</p>';
+        } else {
+          log.forEach(function(l) {
+            var label = aktionLabels[l.aktion] || l.aktion;
+            var details = '';
+            if (l.details && l.details.punkt_id) {
+              var punkt = (data.interessen || []).find(function(i) { return i.punkt_id === l.details.punkt_id; });
+              if (punkt && punkt.inspiration_punkte) details = ' — ' + punkt.inspiration_punkte.titel;
+            }
+            html += '<div class="log-entry" style="padding:0.4rem 0;border-bottom:1px solid #f0f0f0">'
+              + '<div style="font-size:0.82rem;color:#4B575D"><strong>'+escapeHtml(label)+'</strong>'+escapeHtml(details)+'</div>'
+              + '<div style="font-size:0.72rem;color:#929A9D">'+fmtDate(l.timestamp)+'</div>'
+              + '</div>';
+          });
+        }
+        $('detailContent').innerHTML = html;
       } catch(e) {
         $('detailContent').innerHTML = '<div class="msg error">Fehler: '+escapeHtml(e.message)+'</div>';
       }
