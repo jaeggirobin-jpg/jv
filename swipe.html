@@ -1067,6 +1067,16 @@ function getGreeting(k) {
   return (anredeMap[k.anrede_typ] || '') + ' ' + k.nachname;
 }
 
+function formatTermin(k) {
+  if (!k || !k.termin_datum) return null;
+  var d = new Date(k.termin_datum + 'T' + (k.termin_uhrzeit || '12:00'));
+  var wt = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][d.getDay()];
+  var mon = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][d.getMonth()];
+  var datum = wt + ', ' + d.getDate() + '. ' + mon + ' ' + d.getFullYear();
+  var zeit = (k.termin_uhrzeit || '').slice(0, 5) + ' Uhr';
+  return { datum: datum, zeit: zeit };
+}
+
 function showToast(text) {
   var el = document.getElementById('toast');
   el.textContent = text;
@@ -1094,8 +1104,19 @@ function renderCards() {
   html += '<div class="swipe-card intro-card" data-index="0">' +
     '<div class="swipe-card__bg intro-card__bg"></div>' +
     '<div class="intro-card__eyebrow">Willkommen</div>' +
-    '<div class="intro-card__greeting">' + escapeHtml(greeting) + ',<br>entdecken Sie <em>Ihr Bad.</em></div>' +
-    '<div class="spinning-faucet spinning-faucet--intro"><img src="/assets/inspiration/faucetBrass.png" alt="" draggable="false" /></div>';
+    '<div class="intro-card__greeting">' + escapeHtml(greeting) + ',<br>entdecken Sie <em>Ihr Bad.</em></div>';
+
+  // Termin anzeigen
+  var termin = formatTermin(state.kunde);
+  if (termin) {
+    html += '<div style="margin:16px 0 4px;font-size:14px;color:var(--text-muted);letter-spacing:0.02em">' +
+      '<div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Unser Termin</div>' +
+      '<div style="color:#fff;font-weight:500">' + escapeHtml(termin.datum) + '</div>' +
+      '<div>' + escapeHtml(termin.zeit) + '</div>' +
+    '</div>';
+  }
+
+  html += '<div class="spinning-faucet spinning-faucet--intro"><img src="/assets/inspiration/faucetBrass.png" alt="" draggable="false" /></div>';
 
   // Favoriten-Info
   html += '<div class="intro-card__favorites" id="intro-favorites">';
@@ -1326,19 +1347,18 @@ function renderSummaryCard(idx) {
   }
   html += '</div>'; // .summary-card__list
 
-  // Ansprechperson auf der Summary-Karte
+  // Ansprechperson auf der Summary-Karte — prominent
   var ap = state.ansprechperson;
   if (ap && ap.name) {
-    html += '<div style="display:flex;align-items:center;gap:10px;margin:24px auto 0;background:rgba(255,255,255,0.08);border-radius:40px;padding:8px 18px 8px 8px;max-width:320px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">';
+    html += '<div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin:28px auto 8px;background:rgba(255,255,255,0.06);border-radius:16px;padding:20px 24px;max-width:320px;border:1px solid rgba(191,133,59,0.25)">';
     if (ap.foto_url) {
-      html += '<img src="' + escapeHtml(ap.foto_url) + '" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);flex-shrink:0" />';
+      html += '<img src="' + escapeHtml(ap.foto_url) + '" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid var(--gold)" />';
     }
-    html += '<div style="text-align:left;min-width:0">';
-    html += '<div style="font-size:13px;color:#fff;font-weight:500">' + escapeHtml(ap.name) + '</div>';
-    var cParts = [];
-    if (ap.telefon) cParts.push('<a href="tel:' + escapeHtml(ap.telefon) + '" style="color:var(--gold);text-decoration:none">' + escapeHtml(ap.telefon) + '</a>');
-    if (ap.email) cParts.push('<a href="mailto:' + escapeHtml(ap.email) + '" style="color:var(--gold);text-decoration:none">' + escapeHtml(ap.email) + '</a>');
-    if (cParts.length) html += '<div style="font-size:11px;color:var(--text-muted)">' + cParts.join(' · ') + '</div>';
+    html += '<div style="text-align:center">';
+    html += '<div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:4px">Ihr Ansprechpartner</div>';
+    html += '<div style="font-size:17px;color:#fff;font-weight:500;margin-bottom:6px">' + escapeHtml(ap.name) + '</div>';
+    if (ap.telefon) html += '<div style="margin-bottom:4px"><a href="tel:' + escapeHtml(ap.telefon) + '" style="color:var(--gold);text-decoration:none;font-size:14px">' + escapeHtml(ap.telefon) + '</a></div>';
+    if (ap.email) html += '<div><a href="mailto:' + escapeHtml(ap.email) + '" style="color:var(--text-muted);text-decoration:none;font-size:13px">' + escapeHtml(ap.email) + '</a></div>';
     html += '</div></div>';
   }
 
