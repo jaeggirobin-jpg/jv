@@ -1060,6 +1060,7 @@ function renderCards() {
   var greeting = getGreeting(state.kunde);
   html += '<div class="swipe-card intro-card" data-index="0">' +
     '<div class="swipe-card__bg intro-card__bg"></div>' +
+    '<div style="font-size:12px;color:#ff0000;position:absolute;top:60px;left:10px;right:10px;z-index:99;background:rgba(0,0,0,0.8);padding:6px;border-radius:4px">DEBUG AP=' + JSON.stringify(state.ansprechperson) + ' KUNDE=' + JSON.stringify(state.kunde) + '</div>' +
     '<div class="intro-card__eyebrow">Willkommen</div>' +
     '<div class="intro-card__greeting">' + escapeHtml(greeting) + ',<br>entdecken Sie <em>Ihr Bad.</em></div>';
 
