@@ -612,7 +612,13 @@ html, body {
   align-items: stretch;
   padding: 60px 24px 40px;
   padding-bottom: calc(40px + env(safe-area-inset-bottom, 0));
+  overflow: hidden;
+}
+.summary-card__list {
+  flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
 }
 
 .summary-card__bg {
@@ -1294,6 +1300,7 @@ function renderSummaryCard(idx) {
     }
   });
 
+  html += '<div class="summary-card__list">';
   if (!anyLiked) {
     html += '<div class="summary-card__empty">Noch keine Favoriten vorgemerkt.<br>Wischen Sie zurück und tippen Sie auf das Herz bei dem, was Ihnen gefällt.</div>';
   } else {
@@ -1318,6 +1325,7 @@ function renderSummaryCard(idx) {
       html += '</div>';
     }
   }
+  html += '</div>'; // .summary-card__list
 
   // Ansprechperson auf der Summary-Karte
   var ap = state.ansprechperson;
