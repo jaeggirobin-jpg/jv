@@ -473,6 +473,11 @@ html, body {
 }
 
 .intro-card {
+  overflow: hidden;
+}
+.intro-card__content {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -480,6 +485,8 @@ html, body {
   text-align: center;
   padding: 40px 32px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 2;
 }
 
 .intro-card__bg {
@@ -1103,6 +1110,7 @@ function renderCards() {
   var greeting = getGreeting(state.kunde);
   html += '<div class="swipe-card intro-card" data-index="0">' +
     '<div class="swipe-card__bg intro-card__bg"></div>' +
+    '<div class="intro-card__content">' +
     '<div class="intro-card__eyebrow">Willkommen</div>' +
     '<div class="intro-card__greeting">' + escapeHtml(greeting) + ',<br>entdecken Sie <em>Ihr Bad.</em></div>';
 
@@ -1138,6 +1146,7 @@ function renderCards() {
       '<span>Nach oben wischen</span>' +
       '<svg class="intro-card__scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>' +
     '</div>' +
+  '</div>' + // intro-card__content
   '</div>';
 
   // === Inspirations-Karten ===
