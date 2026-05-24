@@ -1850,7 +1850,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   try {
     var res = await sb.rpc('get_inspiration_data', { p_token: token });
     if (res.error) throw res.error;
-    var data = res.data;
+    var data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
 
     // Kundendaten
     state.kunde = data.kunde;
