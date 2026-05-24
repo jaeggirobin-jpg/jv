@@ -467,14 +467,9 @@ html, body {
   to { transform: rotateY(360deg); }
 }
 .spinning-faucet--intro {
-  top: 15%;
-  right: 10%;
-}
-.spinning-faucet--summary {
-  top: 20%;
-  left: 10%;
-  width: 60px;
-  height: 90px;
+  position: relative;
+  top: auto; right: auto;
+  margin: 16px auto 8px;
 }
 
 .intro-card {
@@ -1092,25 +1087,9 @@ function renderCards() {
   var greeting = getGreeting(state.kunde);
   html += '<div class="swipe-card intro-card" data-index="0">' +
     '<div class="swipe-card__bg intro-card__bg"></div>' +
-    '<div class="spinning-faucet spinning-faucet--intro"><img src="/assets/inspiration/faucetBrass.png" alt="" draggable="false" /></div>' +
     '<div class="intro-card__eyebrow">Willkommen</div>' +
-    '<div class="intro-card__greeting">' + escapeHtml(greeting) + ',<br>entdecken Sie <em>Ihr Bad.</em></div>';
-
-  // Ansprechperson — position:absolute unten in der Intro-Karte
-  var ap = state.ansprechperson;
-  if (ap && ap.name) {
-    html += '<div style="position:absolute;bottom:100px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.1);border-radius:40px;padding:8px 18px 8px 8px;z-index:5;max-width:90%;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">';
-    if (ap.foto_url) {
-      html += '<img src="' + escapeHtml(ap.foto_url) + '" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);flex-shrink:0" />';
-    }
-    html += '<div style="text-align:left;min-width:0">';
-    html += '<div style="font-size:13px;color:#fff;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escapeHtml(ap.name) + '</div>';
-    var contactParts = [];
-    if (ap.telefon) contactParts.push('<a href="tel:' + escapeHtml(ap.telefon) + '" style="color:var(--gold);text-decoration:none">' + escapeHtml(ap.telefon) + '</a>');
-    if (ap.email) contactParts.push('<a href="mailto:' + escapeHtml(ap.email) + '" style="color:var(--gold);text-decoration:none">' + escapeHtml(ap.email) + '</a>');
-    if (contactParts.length) html += '<div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + contactParts.join(' · ') + '</div>';
-    html += '</div></div>';
-  }
+    '<div class="intro-card__greeting">' + escapeHtml(greeting) + ',<br>entdecken Sie <em>Ihr Bad.</em></div>' +
+    '<div class="spinning-faucet spinning-faucet--intro"><img src="/assets/inspiration/faucetBrass.png" alt="" draggable="false" /></div>';
 
   // Favoriten-Info
   html += '<div class="intro-card__favorites" id="intro-favorites">';
@@ -1270,7 +1249,6 @@ function renderCards() {
 function renderSummaryCard(idx) {
   var html = '<div class="swipe-card summary-card" data-index="' + idx + '" id="summary-card">' +
     '<div class="swipe-card__bg summary-card__bg"></div>' +
-    '<div class="spinning-faucet spinning-faucet--summary"><img src="/assets/inspiration/faucetBrass.png" alt="" draggable="false" /></div>' +
     '<div class="swipe-card__gradient" style="background:none"></div>' +
     '<div style="position:relative;z-index:2;flex:1;overflow-y:auto;padding:60px 24px 40px;padding-bottom:calc(40px + env(safe-area-inset-bottom, 0))">';
 
@@ -1339,6 +1317,22 @@ function renderSummaryCard(idx) {
       });
       html += '</div>';
     }
+  }
+
+  // Ansprechperson auf der Summary-Karte
+  var ap = state.ansprechperson;
+  if (ap && ap.name) {
+    html += '<div style="display:flex;align-items:center;gap:10px;margin:24px auto 0;background:rgba(255,255,255,0.08);border-radius:40px;padding:8px 18px 8px 8px;max-width:320px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">';
+    if (ap.foto_url) {
+      html += '<img src="' + escapeHtml(ap.foto_url) + '" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);flex-shrink:0" />';
+    }
+    html += '<div style="text-align:left;min-width:0">';
+    html += '<div style="font-size:13px;color:#fff;font-weight:500">' + escapeHtml(ap.name) + '</div>';
+    var cParts = [];
+    if (ap.telefon) cParts.push('<a href="tel:' + escapeHtml(ap.telefon) + '" style="color:var(--gold);text-decoration:none">' + escapeHtml(ap.telefon) + '</a>');
+    if (ap.email) cParts.push('<a href="mailto:' + escapeHtml(ap.email) + '" style="color:var(--gold);text-decoration:none">' + escapeHtml(ap.email) + '</a>');
+    if (cParts.length) html += '<div style="font-size:11px;color:var(--text-muted)">' + cParts.join(' · ') + '</div>';
+    html += '</div></div>';
   }
 
   html += '<div class="summary-card__footer">' +
