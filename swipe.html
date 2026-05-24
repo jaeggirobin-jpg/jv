@@ -980,6 +980,7 @@ var state = {
   notes: new Map(),       // compositeKey -> string
   punkte: [],             // alle Punkte (mit medien-Array)
   kunde: null,
+  ansprechperson: null,   // { name, email, telefon, foto_url }
   kategorien: {},         // id -> { titel, intro }
   currentIndex: 0,        // aktueller Kartenindex (0 = Intro)
   totalCards: 0,
@@ -1070,6 +1071,19 @@ function renderCards() {
     html += '<div class="intro-card__fav-count" style="color:var(--text-muted)">Wischen Sie durch und markieren Sie, was Sie interessiert.</div>';
   }
   html += '</div>';
+
+  // Ansprechperson anzeigen
+  if (state.ansprechperson) {
+    var ap = state.ansprechperson;
+    html += '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin:20px 0 8px">';
+    if (ap.foto_url) {
+      html += '<img src="' + escapeHtml(ap.foto_url) + '" alt="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)" />';
+    }
+    html += '<div style="font-size:15px;color:#fff;font-weight:500">' + escapeHtml(ap.name || '') + '</div>';
+    if (ap.email) html += '<div style="font-size:12px;color:var(--text-muted)"><a href="mailto:' + escapeHtml(ap.email) + '" style="color:var(--gold);text-decoration:none">' + escapeHtml(ap.email) + '</a></div>';
+    if (ap.telefon) html += '<div style="font-size:12px;color:var(--text-muted)"><a href="tel:' + escapeHtml(ap.telefon) + '" style="color:var(--gold);text-decoration:none">' + escapeHtml(ap.telefon) + '</a></div>';
+    html += '</div>';
+  }
 
   html += '<div class="intro-card__sub" style="margin-bottom:24px"></div>' +
     '<div class="intro-card__scroll-hint">' +
@@ -1840,6 +1854,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Kundendaten
     state.kunde = data.kunde;
+    state.ansprechperson = data.ansprechperson || null;
 
     // Kategorien-Meta
     (data.kategorien || []).forEach(function(k) {
