@@ -51,10 +51,11 @@
     }
     input[type="text"], input[type="password"], input[type="file"],
     input[type="email"], input[type="tel"], input[type="date"],
-    input[type="time"], textarea, select {
-      width: 100%; padding: 0.55rem 0.7rem; border: 1px solid #929A9D;
+    input[type="time"], input[type="number"], textarea, select {
+      width: 100%; max-width: 100%; padding: 0.55rem 0.7rem; border: 1px solid #929A9D;
       border-radius: 4px; font-size: 0.95rem; font-family: inherit;
       background: #fff; color: #4B575D;
+      box-sizing: border-box;
     }
     select { appearance: auto; }
     textarea { min-height: 60px; resize: vertical; }
@@ -314,6 +315,22 @@
       .tabs button { padding: 0.7rem 0.8rem; font-size: 0.88rem; }
       .kat-grid { grid-template-columns: 1fr; }
       .detail-panel { width: 100%; max-width: 100%; right: -100%; }
+
+      /* Kunden-Tabelle → Kacheln auf Mobile */
+      #kundenTable thead { display: none; }
+      #kundenTable, #kundenTable tbody { display: block; width: 100%; }
+      #kundenTable tr {
+        display: block; border: 1px solid #e5e5e5; border-radius: 6px;
+        margin-bottom: 0.8rem; padding: 0.8rem; background: #fff;
+      }
+      #kundenTable tr:hover td { background: transparent; }
+      #kundenTable td {
+        display: block; padding: 0.2rem 0; border-bottom: none;
+        font-size: 0.88rem;
+      }
+      #kundenTable td:last-child { margin-top: 0.5rem; }
+      #kundenTable td .actions { flex-wrap: wrap; }
+      #kundenTable td .actions button { flex: 1 1 auto; text-align: center; padding: 0.45rem 0.5rem; }
     }
   </style>
 </head>
@@ -652,6 +669,7 @@
       $('app').classList.remove('hidden');
       loadKunden();
       loadPunkteCheckboxes();
+      loadAnsprechpersonenDropdown();
     }
     function showLogin() {
       $('app').classList.add('hidden');
@@ -916,14 +934,33 @@
       katOrder.forEach(function(k) {
         if (!grouped[k]) return;
         var titel = katTitels[k] || k.charAt(0).toUpperCase() + k.slice(1);
-        html += '<div class="punkte-group"><div class="punkte-group-title">'+escapeHtml(titel)+'</div>';
+        html += '<div class="punkte-group">'
+          + '<div class="punkte-group-title" style="display:flex;justify-content:space-between;align-items:center">'
+          + escapeHtml(titel)
+          + '<span style="display:flex;gap:0.4rem">'
+          + '<a href="#" class="kat-toggle-all" data-kat-toggle="'+escapeHtml(k)+'" data-action="none" style="font-size:0.7rem;font-weight:400;text-transform:none;letter-spacing:0;color:#963030;text-decoration:none">Alle abwählen</a>'
+          + '<a href="#" class="kat-toggle-all" data-kat-toggle="'+escapeHtml(k)+'" data-action="all" style="font-size:0.7rem;font-weight:400;text-transform:none;letter-spacing:0;color:#2d7a2d;text-decoration:none">Alle wählen</a>'
+          + '</span></div>';
         grouped[k].sort(function(a,b) { return a.reihenfolge - b.reihenfolge; }).forEach(function(p) {
-          html += '<label class="punkt-cb"><input type="checkbox" name="punkt" value="'+p.id+'" checked /> '+escapeHtml(p.titel)+'</label>';
+          html += '<label class="punkt-cb"><input type="checkbox" name="punkt" value="'+p.id+'" data-punkt-kat="'+escapeHtml(k)+'" checked /> '+escapeHtml(p.titel)+'</label>';
         });
         html += '</div>';
       });
       container.innerHTML = html;
     }
+
+    // Kategorie komplett wählen/abwählen
+    $('punkteCheckboxes').addEventListener('click', function(ev) {
+      var link = ev.target.closest('.kat-toggle-all');
+      if (!link) return;
+      ev.preventDefault();
+      var kat = link.dataset.katToggle;
+      var action = link.dataset.action;
+      var checked = action === 'all';
+      document.querySelectorAll('#punkteCheckboxes input[data-punkt-kat="'+kat+'"]').forEach(function(cb) {
+        cb.checked = checked;
+      });
+    });
 
     // Gibt die ausgewählten Punkte zurück:
     // alle angehakt → null (= alles sichtbar), sonst Array der angehakten IDs
@@ -1399,6 +1436,13 @@
     // ============================================================
     // ANSPRECHPERSONEN
     // ============================================================
+    async function loadAnsprechpersonenDropdown() {
+      try {
+        var data = await apiCall('/list-ansprechpersonen');
+        updateAnsprechDropdown(data.ansprechpersonen || []);
+      } catch(e) { /* still */ }
+    }
+
     async function loadAnsprechpersonen() {
       try {
         var data = await apiCall('/list-ansprechpersonen');
