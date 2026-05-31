@@ -188,7 +188,7 @@
 
     /* ======= Kunden-Detail-Panel ======= */
     .detail-panel {
-      position: fixed; top: 0; right: -460px; width: 440px; max-width: 90vw;
+      position: fixed; top: 0; right: -520px; width: 500px; max-width: 90vw;
       height: 100vh; background: #fff; box-shadow: -4px 0 20px rgba(0,0,0,0.12);
       z-index: 100; transition: right 0.3s ease; overflow-y: auto; padding: 1.5rem;
       pointer-events: none;
@@ -207,6 +207,19 @@
     .detail-panel .interest-item .int-cat { font-size: 0.7rem; color: #BF853B; text-transform: uppercase; }
     .detail-panel .interest-item .int-comment { font-size: 0.82rem; color: #929A9D; margin-top: 0.2rem; font-style: italic; }
     .detail-panel .log-entry { font-size: 0.78rem; color: #929A9D; padding: 0.25rem 0; border-bottom: 1px dashed #f0f0f0; }
+
+    /* Detail-Panel Sektionen */
+    .detail-section { margin-bottom: 1.5rem; }
+    .detail-section h3 { margin-top: 0; }
+    .detail-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 0.8rem; }
+    .detail-link-buttons { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+    .detail-link-buttons button {
+      flex: 1; min-width: 140px;
+      border: 1px solid #BF853B; background: #fff; color: #BF853B;
+      padding: 0.5rem 0.6rem; border-radius: 4px; cursor: pointer;
+      font-size: 0.82rem; font-weight: 600; text-align: center;
+    }
+    .detail-link-buttons button:hover { background: #BF853B; color: #fff; }
 
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; display: none; }
     .overlay.open { display: block; }
@@ -253,7 +266,7 @@
     }
     .kat-header-edit textarea { min-height: 40px; }
 
-    /* Drag & Drop für Katalog-Karten */
+    /* Drag & Drop fuer Katalog-Karten */
     .kat-card { transition: box-shadow 0.2s, transform 0.15s; position: relative; }
     .kat-card > .drag-handle { position: absolute; top: 6px; left: 6px; z-index: 1; background: rgba(255,255,255,0.85); border-radius: 3px; }
     .kat-card.dragging { opacity: 0.5; transform: scale(0.97); }
@@ -281,6 +294,7 @@
     }
     .detail-doc .doc-name { color: #4B575D; }
     .detail-doc .doc-meta { color: #929A9D; font-size: 0.75rem; }
+    .detail-doc .doc-actions { display: flex; gap: 0.3rem; align-items: center; }
 
     /* ======= Responsive ======= */
     @media (max-width: 900px) {
@@ -292,6 +306,7 @@
       table { font-size: 0.82rem; }
       th, td { padding: 0.55rem 0.45rem; }
       .form-row { grid-template-columns: 1fr; }
+      .detail-form-row { grid-template-columns: 1fr; }
     }
     @media (max-width: 640px) {
       header { padding: 0.7rem 0.9rem; }
@@ -318,7 +333,7 @@
       .kat-grid { grid-template-columns: 1fr; }
       .detail-panel { width: 100%; max-width: 100%; right: -100%; }
 
-      /* Kunden-Tabelle → Kacheln auf Mobile */
+      /* Kunden-Tabelle -> Kacheln auf Mobile */
       #kundenTable thead { display: none; }
       #kundenTable, #kundenTable tbody { display: block; width: 100%; }
       #kundenTable tr {
@@ -341,7 +356,7 @@
   <!-- Login -->
   <div id="login">
     <div class="card">
-      <div class="login-logo"><img src="/logo.png" alt="Jäggi Vollmer" /></div>
+      <div class="login-logo"><img src="/logo.png" alt="Jaeggi Vollmer" /></div>
       <h2>Admin</h2>
       <label for="pwd">Passwort</label>
       <input type="password" id="pwd" autocomplete="off" />
@@ -354,7 +369,7 @@
   <div id="app" class="hidden">
     <header>
       <div class="logo">
-        <img src="/logo.png" alt="Jäggi Vollmer" />
+        <img src="/logo.png" alt="Jaeggi Vollmer" />
         <span class="label">Admin</span>
       </div>
       <button id="logoutBtn">Abmelden</button>
@@ -363,42 +378,7 @@
     <main>
       <div class="tabs">
         <button class="active" data-tab="kunden">Kunden</button>
-        <button data-tab="dokumente">Dokumente</button>
         <button data-tab="katalog">Katalog</button>
-      </div>
-
-      <!-- ============ Tab: Dokumente (bestehend) ============ -->
-      <div class="tab-panel" id="tab-dokumente">
-        <div class="card">
-          <h2>Visualisierung hochladen</h2>
-          <label for="doc-kunde">Kunde *</label>
-          <select id="doc-kunde">
-            <option value="">— Kunde auswählen —</option>
-          </select>
-          <label for="note">Bezeichnung</label>
-          <input type="text" id="note" placeholder="z.B. Visualisierung Bad OG" />
-          <label for="pdfFile">PDF-Datei *</label>
-          <input type="file" id="pdfFile" accept="application/pdf" />
-          <div id="createMsg"></div>
-          <button class="primary" id="createBtn">Hochladen</button>
-        </div>
-        <div class="card">
-          <h2>Alle Dokumente</h2>
-          <div id="listMsg"></div>
-          <div class="table-wrap">
-            <table id="linksTable">
-              <thead>
-                <tr>
-                  <th>Bezeichnung</th><th>Notiz</th><th>Erstellt</th>
-                  <th>Letzter Aufruf</th><th>Aufrufe</th><th>Status</th><th>Aktionen</th>
-                </tr>
-              </thead>
-              <tbody id="linksBody">
-                <tr><td colspan="7" class="muted">Lade…</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
       </div>
 
       <!-- ============ Tab: Kunden ============ -->
@@ -422,7 +402,7 @@
           <div class="form-row">
             <div>
               <label for="k-nachname">Nachname *</label>
-              <input type="text" id="k-nachname" placeholder="Müller" autocomplete="off" />
+              <input type="text" id="k-nachname" placeholder="Mueller" autocomplete="off" />
             </div>
             <div>
               <label for="k-adresse">Projekt-Adresse</label>
@@ -451,15 +431,15 @@
           </div>
           <label for="k-ansprechperson">Ansprechperson</label>
           <select id="k-ansprechperson">
-            <option value="">— Keine —</option>
+            <option value="">-- Keine --</option>
           </select>
 
           <label for="k-notizen">Admin-Notizen (intern)</label>
-          <textarea id="k-notizen" placeholder="Nur für dich sichtbar"></textarea>
+          <textarea id="k-notizen" placeholder="Nur fuer dich sichtbar"></textarea>
 
           <label style="margin-top:1.2rem">Sichtbare Inspiration-Punkte</label>
-          <p class="muted" style="margin:0 0 0.6rem">Standardmässig alles sichtbar. Haken entfernen = Kunde sieht diesen Punkt nicht.</p>
-          <div id="punkteCheckboxes" class="muted">Lade Katalog…</div>
+          <p class="muted" style="margin:0 0 0.6rem">Standardmaessig alles sichtbar. Haken entfernen = Kunde sieht diesen Punkt nicht.</p>
+          <div id="punkteCheckboxes" class="muted">Lade Katalog...</div>
 
           <div id="kundeCreateMsg"></div>
           <button class="primary" id="kundeCreateBtn">Kunde anlegen</button>
@@ -477,7 +457,7 @@
                 </tr>
               </thead>
               <tbody id="kundenBody">
-                <tr><td colspan="5" class="muted">Lade…</td></tr>
+                <tr><td colspan="7" class="muted">Lade...</td></tr>
               </tbody>
             </table>
           </div>
@@ -490,11 +470,11 @@
         <div class="card">
           <h2>Ansprechpersonen</h2>
           <p class="muted" style="margin-top:-0.5rem">Projektleiter/Berater, die beim Kunden in der Termin-Karte erscheinen.</p>
-          <div id="ansprechBody" class="muted">Lade…</div>
+          <div id="ansprechBody" class="muted">Lade...</div>
           <div class="form-row" style="margin-top:0.8rem">
             <div>
               <label for="ap-name">Name *</label>
-              <input type="text" id="ap-name" placeholder="Robin Jäggi" autocomplete="off" />
+              <input type="text" id="ap-name" placeholder="Robin Jaeggi" autocomplete="off" />
             </div>
             <div>
               <label for="ap-email">E-Mail</label>
@@ -504,14 +484,14 @@
           <label for="ap-telefon">Telefon</label>
           <input type="tel" id="ap-telefon" placeholder="+41 79 ..." autocomplete="off" style="max-width:300px" />
           <div id="apMsg"></div>
-          <button class="primary" id="apCreateBtn">Hinzufügen</button>
+          <button class="primary" id="apCreateBtn">Hinzufuegen</button>
         </div>
 
         <!-- Kategorien -->
         <div class="card">
           <h2>Kategorien</h2>
-          <p class="muted" style="margin-top:-0.5rem">Titel und Intro-Texte bearbeiten. Reihenfolge per Drag & Drop ändern.</p>
-          <div id="kategorienBody" class="muted">Lade…</div>
+          <p class="muted" style="margin-top:-0.5rem">Titel und Intro-Texte bearbeiten. Reihenfolge per Drag & Drop aendern.</p>
+          <div id="kategorienBody" class="muted">Lade...</div>
         </div>
 
         <div class="card">
@@ -527,7 +507,7 @@
           </div>
         </div>
         <div class="card">
-          <h2>Neuen Punkt hinzufügen</h2>
+          <h2>Neuen Punkt hinzufuegen</h2>
           <div class="form-row">
             <div>
               <label for="np-kategorie">Kategorie *</label>
@@ -544,7 +524,7 @@
           <div class="form-row">
             <div>
               <label for="np-vorteil">Vorteil</label>
-              <input type="text" id="np-vorteil" placeholder="Was spricht dafür?" />
+              <input type="text" id="np-vorteil" placeholder="Was spricht dafuer?" />
             </div>
             <div>
               <label for="np-bedenken">Zu bedenken</label>
@@ -552,14 +532,14 @@
             </div>
           </div>
           <div id="npMsg"></div>
-          <button class="primary" id="npCreateBtn">Punkt hinzufügen</button>
+          <button class="primary" id="npCreateBtn">Punkt hinzufuegen</button>
         </div>
         <div class="card">
-          <h2>Katalog-Übersicht</h2>
-          <p class="muted" style="margin-top:-0.5rem">Bilder, Videos und Texte verwalten. Änderungen sind sofort für Kunden sichtbar.</p>
+          <h2>Katalog-Uebersicht</h2>
+          <p class="muted" style="margin-top:-0.5rem">Bilder, Videos und Texte verwalten. Aenderungen sind sofort fuer Kunden sichtbar.</p>
           <div id="katalogMsg"></div>
           <div class="kat-grid" id="katalogGrid">
-            <div class="muted">Lade…</div>
+            <div class="muted">Lade...</div>
           </div>
         </div>
       </div>
@@ -573,17 +553,17 @@
     <div id="detailContent"></div>
   </div>
 
-  <!-- Versteckter File-Input für Medien-Upload -->
+  <!-- Versteckter File-Input fuer Medien-Upload -->
   <input type="file" id="mediaUpload" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" style="display:none" />
 
   <script>
-    const STORAGE_KEY = 'jv_admin_pwd';
-    const API = '/.netlify/functions';
-    const $ = (id) => document.getElementById(id);
+    var STORAGE_KEY = 'jv_admin_pwd';
+    var API = '/.netlify/functions';
+    var $ = function(id) { return document.getElementById(id); };
 
     function showMsg(elId, text, type) {
-      const el = $(elId);
-      if (el) el.innerHTML = text ? `<div class="msg ${type}">${text}</div>` : '';
+      var el = $(elId);
+      if (el) el.innerHTML = text ? '<div class="msg ' + type + '">' + text + '</div>' : '';
     }
     function getPwd() { return sessionStorage.getItem(STORAGE_KEY) || ''; }
     function setPwd(p) { sessionStorage.setItem(STORAGE_KEY, p); }
@@ -615,7 +595,7 @@
     }
 
     function fmtDate(iso) {
-      if (!iso) return '—';
+      if (!iso) return '--';
       var d = new Date(iso);
       return d.toLocaleString('de-CH', {
         day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
@@ -623,7 +603,7 @@
     }
 
     function fmtDateShort(iso) {
-      if (!iso) return '—';
+      if (!iso) return '--';
       var d = new Date(iso);
       return d.toLocaleDateString('de-CH', { day:'2-digit', month:'2-digit', year:'numeric' });
     }
@@ -642,7 +622,7 @@
     }
 
     // ============================================================
-    // LOGIN — inline onclick, kann von nichts blockiert werden
+    // LOGIN
     // ============================================================
     function tryLogin(pwd) {
       setPwd(pwd);
@@ -657,7 +637,7 @@
     function doLogin() {
       var pwd = $('pwd') ? $('pwd').value : '';
       if (!pwd) { showMsg('loginMsg', 'Passwort eingeben.', 'error'); return; }
-      showMsg('loginMsg', 'Prüfe…', 'info');
+      showMsg('loginMsg', 'Pruefe...', 'info');
       tryLogin(pwd).then(function(ok) {
         if (ok) { showMsg('loginMsg','',''); showApp(); }
         else { showMsg('loginMsg', 'Passwort falsch.', 'error'); }
@@ -688,7 +668,7 @@
     }
 
     // ============================================================
-    // TABS
+    // TABS (nur noch Kunden + Katalog)
     // ============================================================
     document.querySelector('.tabs').addEventListener('click', function(ev) {
       var btn = ev.target.closest('button[data-tab]');
@@ -699,122 +679,15 @@
       btn.classList.add('active');
       $('tab-' + tab).classList.add('active');
       if (tab === 'kunden') { loadKunden(); loadPunkteCheckboxes(); }
-      if (tab === 'dokumente') { loadLinks(); loadDocKundenDropdown(); }
       if (tab === 'katalog') loadKatalog();
     });
 
     // ============================================================
-    // DOKUMENTE (bestehende Logik)
+    // DOKUMENTE-Hilfsfunktionen (werden im Detail-Panel benutzt)
     // ============================================================
     function buildShareUrl(token) {
       return location.origin + '/view.html?t=' + token;
     }
-
-    async function loadLinks() {
-      showMsg('listMsg','','');
-      try {
-        var data = await apiCall('/list-links');
-        renderLinks(data.links || []);
-      } catch (e) {
-        if (e.status===401) { clearPwd(); showLogin(); return; }
-        showMsg('listMsg', 'Fehler: ' + e.message, 'error');
-      }
-    }
-
-    function renderLinks(links) {
-      var body = $('linksBody');
-      if (!links.length) {
-        body.innerHTML = '<tr><td colspan="7" class="muted">Noch keine Links.</td></tr>';
-        return;
-      }
-      body.innerHTML = links.map(function(l) {
-        return '<tr data-id="'+l.id+'">'
-          + '<td><strong>'+escapeHtml(l.customer_name)+'</strong><br><span class="token-short">'+l.token.slice(0,8)+'…</span></td>'
-          + '<td>'+escapeHtml(l.note||'')+'</td>'
-          + '<td>'+fmtDate(l.created_at)+'</td>'
-          + '<td>'+fmtDate(l.last_viewed_at)+'</td>'
-          + '<td>'+(l.view_count||0)+'</td>'
-          + '<td><span class="status '+(l.is_active?'active':'inactive')+'">'+(l.is_active?'Aktiv':'Inaktiv')+'</span></td>'
-          + '<td><div class="actions">'
-            + '<button data-action="copy" data-token="'+l.token+'">Link kopieren</button>'
-            + '<button data-action="toggle" data-id="'+l.id+'" data-active="'+(l.is_active?'1':'0')+'">'+(l.is_active?'Deaktivieren':'Aktivieren')+'</button>'
-            + '<button class="danger" data-action="delete" data-id="'+l.id+'" data-name="'+escapeHtml(l.customer_name)+'">Löschen</button>'
-          + '</div></td></tr>';
-      }).join('');
-    }
-
-    $('linksBody').addEventListener('click', async function(ev) {
-      var btn = ev.target.closest('button[data-action]');
-      if (!btn) return;
-      var action = btn.dataset.action;
-      if (action === 'copy') {
-        var url = buildShareUrl(btn.dataset.token);
-        try { await navigator.clipboard.writeText(url); showMsg('listMsg','Link kopiert.','success'); }
-        catch(e) { showMsg('listMsg','Link: '+url,'info'); }
-        return;
-      }
-      if (action === 'toggle') {
-        btn.disabled = true;
-        try {
-          await apiCall('/toggle-link', { method:'POST', body: JSON.stringify({ id:btn.dataset.id, is_active: btn.dataset.active!=='1' }) });
-          await loadLinks();
-        } catch(e) { showMsg('listMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
-        return;
-      }
-      if (action === 'delete') {
-        if (!confirm('Link wirklich löschen?')) return;
-        btn.disabled = true;
-        try {
-          await apiCall('/delete-link', { method:'POST', body: JSON.stringify({ id:btn.dataset.id }) });
-          await loadLinks(); showMsg('listMsg','Gelöscht.','success');
-        } catch(e) { showMsg('listMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
-      }
-    });
-
-    // Kunden-Dropdown im Dokumente-Tab laden
-    async function loadDocKundenDropdown() {
-      try {
-        var data = await apiCall('/list-kunden');
-        var sel = $('doc-kunde');
-        var val = sel.value;
-        sel.innerHTML = '<option value="">— Kunde auswählen —</option>';
-        (data.kunden || []).forEach(function(k) {
-          if (k.status !== 'aktiv') return;
-          var name = (k.anrede_typ==='familie'?'Familie ':'') + (k.vorname?k.vorname+' ':'')+k.nachname;
-          var opt = document.createElement('option');
-          opt.value = k.access_token;
-          opt.textContent = name + (k.projekt_adresse ? ' — '+k.projekt_adresse : '');
-          sel.appendChild(opt);
-        });
-        if (val) sel.value = val;
-      } catch(e) { /* still */ }
-    }
-
-    $('createBtn').addEventListener('click', async function() {
-      var kundeToken = $('doc-kunde').value;
-      var note = $('note').value.trim();
-      var file = $('pdfFile').files[0];
-      showMsg('createMsg','','');
-      if (!kundeToken) { showMsg('createMsg','Bitte Kunde auswählen.','error'); return; }
-      if (!file) { showMsg('createMsg','PDF-Datei auswählen.','error'); return; }
-      var btn = $('createBtn');
-      btn.disabled = true; btn.textContent = 'Lädt hoch…';
-      try {
-        var base64 = await fileToBase64(file);
-        var payload = {
-          customer_name: note || 'Dokument',
-          note: note,
-          file_name: file.name,
-          file_base64: base64,
-          token: kundeToken,
-        };
-        await apiCall('/create-link', { method:'POST', body: JSON.stringify(payload) });
-        showMsg('createMsg', 'Dokument hochgeladen und mit Kunde verknüpft.', 'success');
-        $('note').value=''; $('pdfFile').value='';
-        await loadLinks();
-      } catch(e) { showMsg('createMsg','Fehler: '+e.message,'error'); }
-      finally { btn.disabled=false; btn.textContent='Hochladen'; }
-    });
 
     // ============================================================
     // KUNDEN
@@ -824,7 +697,10 @@
       try {
         var data = await apiCall('/list-kunden');
         renderKunden(data.kunden || []);
-      } catch(e) { showMsg('kundenMsg','Fehler: '+e.message,'error'); }
+      } catch(e) {
+        if (e.status === 401) { clearPwd(); showLogin(); return; }
+        showMsg('kundenMsg','Fehler: '+e.message,'error');
+      }
     }
 
     function renderKunden(kunden) {
@@ -837,26 +713,25 @@
         var anredePrefix = {frau:'Frau ',herr:'Herr ',familie:'Familie '};
         var name = (anredePrefix[k.anrede_typ]||'') + escapeHtml((k.anrede_typ!=='familie'&&k.vorname?k.vorname+' ':'')+k.nachname);
         var statusCls = k.status==='aktiv' ? 'active' : 'inactive';
-        // Statistiken
         var besuchInfo = k.besuche
-          ? k.besuche + '× · ' + fmtDate(k.letzter_besuch) + ' <a href="#" data-kaction="historie" data-id="'+k.id+'" style="font-size:0.72rem;color:#BF853B">alle</a>'
-          : '<span class="muted">—</span>';
+          ? k.besuche + ' Besuche'
+          : '<span class="muted">--</span>';
         var markiertInfo = k.markierte_punkte
           ? k.markierte_punkte + ' Punkte' + (k.kommentare ? ', ' + k.kommentare + ' Notizen' : '')
-          : '<span class="muted">—</span>';
+          : '<span class="muted">--</span>';
         return '<tr>'
-          + '<td><strong>'+name+'</strong><br><span class="token-short">'+k.access_token.slice(0,8)+'…</span></td>'
+          + '<td><strong>'+name+'</strong><br><span class="token-short">'+k.access_token.slice(0,8)+'...</span></td>'
           + '<td>'+escapeHtml(k.projekt_adresse||'')+'</td>'
-          + '<td>'+(k.termin_datum ? fmtDateShort(k.termin_datum) + (k.termin_uhrzeit ? ' '+k.termin_uhrzeit.slice(0,5) : '') : '—')+'</td>'
+          + '<td>'+(k.termin_datum ? fmtDateShort(k.termin_datum) + (k.termin_uhrzeit ? ' '+k.termin_uhrzeit.slice(0,5) : '') : '--')+'</td>'
           + '<td>'+besuchInfo+'</td>'
           + '<td>'+markiertInfo+'</td>'
           + '<td><span class="status '+statusCls+'">'+escapeHtml(k.status)+'</span></td>'
           + '<td><div class="actions">'
+            + '<button data-kaction="detail" data-id="'+k.id+'">Details</button>'
             + '<button data-kaction="link" data-token="'+k.access_token+'">Link</button>'
             + '<button data-kaction="swipe" data-token="'+k.access_token+'">Swipe</button>'
-            + '<button data-kaction="detail" data-id="'+k.id+'">Details</button>'
             + '<button data-kaction="toggle" data-id="'+k.id+'" data-status="'+k.status+'">'+(k.status==='aktiv'?'Deaktivieren':'Aktivieren')+'</button>'
-            + '<button class="danger" data-kaction="delete" data-id="'+k.id+'" data-name="'+name+'">Löschen</button>'
+            + '<button class="danger" data-kaction="delete" data-id="'+k.id+'" data-name="'+name+'">Loeschen</button>'
           + '</div></td></tr>';
       }).join('');
     }
@@ -877,11 +752,6 @@
         catch(e) { showMsg('kundenMsg','Link: '+url,'info'); }
         return;
       }
-      if (action === 'historie') {
-        ev.preventDefault();
-        openHistorie(btn.dataset.id);
-        return;
-      }
       if (action === 'detail') {
         openKundeDetail(btn.dataset.id);
         return;
@@ -896,23 +766,21 @@
         return;
       }
       if (action === 'delete') {
-        if (!confirm('Kunde wirklich löschen? Alle Interessen und Logs werden entfernt.')) return;
+        if (!confirm('Kunde wirklich loeschen? Alle Interessen und Logs werden entfernt.')) return;
         btn.disabled = true;
         try {
           await apiCall('/delete-kunde', { method:'POST', body: JSON.stringify({ id:btn.dataset.id }) });
-          await loadKunden(); showMsg('kundenMsg','Gelöscht.','success');
+          await loadKunden(); showMsg('kundenMsg','Geloescht.','success');
         } catch(e) { showMsg('kundenMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
       }
     });
 
-    // Punkte-Checkboxen beim Öffnen des Kunden-Tabs laden
+    // Punkte-Checkboxen laden
     var punkteCache = [];
     async function loadPunkteCheckboxes() {
-      // Immer neu laden, damit Änderungen im Katalog sofort sichtbar sind
       try {
         var data = await apiCall('/list-punkte');
         punkteCache = data.punkte || [];
-        // Kategorien-Reihenfolge aus DB holen falls noch nicht geladen
         if (!kategorienCache.length) {
           var kData = await apiCall('/list-kategorien');
           kategorienCache = kData.kategorien || [];
@@ -923,14 +791,18 @@
 
     function renderPunkteCheckboxes() {
       var container = $('punkteCheckboxes');
+      renderPunkteCheckboxesInto(container, null);
+    }
+
+    // Universelle Punkte-Checkbox-Renderer
+    // container: DOM-Element, selectedIds: null = alle, Array = nur diese
+    function renderPunkteCheckboxesInto(container, selectedIds) {
       var grouped = {};
       punkteCache.forEach(function(p) {
         if (!grouped[p.kategorie]) grouped[p.kategorie] = [];
         grouped[p.kategorie].push(p);
       });
-      // Reihenfolge aus kategorienCache (DB-Reihenfolge)
       var katOrder = kategorienCache.map(function(k) { return k.id; });
-      // Kategorien die im Katalog sind aber nicht in kategorienCache hinten anfügen
       Object.keys(grouped).forEach(function(k) {
         if (katOrder.indexOf(k) === -1) katOrder.push(k);
       });
@@ -945,18 +817,34 @@
           + '<div class="punkte-group-title" style="display:flex;justify-content:space-between;align-items:center">'
           + escapeHtml(titel)
           + '<span style="display:flex;gap:0.4rem">'
-          + '<a href="#" class="kat-toggle-all" data-kat-toggle="'+escapeHtml(k)+'" data-action="none" style="font-size:0.7rem;font-weight:400;text-transform:none;letter-spacing:0;color:#963030;text-decoration:none">Alle abwählen</a>'
-          + '<a href="#" class="kat-toggle-all" data-kat-toggle="'+escapeHtml(k)+'" data-action="all" style="font-size:0.7rem;font-weight:400;text-transform:none;letter-spacing:0;color:#2d7a2d;text-decoration:none">Alle wählen</a>'
+          + '<a href="#" class="kat-toggle-all" data-kat-toggle="'+escapeHtml(k)+'" data-action="none" style="font-size:0.7rem;font-weight:400;text-transform:none;letter-spacing:0;color:#963030;text-decoration:none">Alle abwaehlen</a>'
+          + '<a href="#" class="kat-toggle-all" data-kat-toggle="'+escapeHtml(k)+'" data-action="all" style="font-size:0.7rem;font-weight:400;text-transform:none;letter-spacing:0;color:#2d7a2d;text-decoration:none">Alle waehlen</a>'
           + '</span></div>';
         grouped[k].sort(function(a,b) { return a.reihenfolge - b.reihenfolge; }).forEach(function(p) {
-          html += '<label class="punkt-cb"><input type="checkbox" name="punkt" value="'+p.id+'" data-punkt-kat="'+escapeHtml(k)+'" checked /> '+escapeHtml(p.titel)+'</label>';
+          var isChecked = selectedIds === null || (Array.isArray(selectedIds) && selectedIds.indexOf(p.id) !== -1);
+          html += '<label class="punkt-cb"><input type="checkbox" name="punkt" value="'+p.id+'" data-punkt-kat="'+escapeHtml(k)+'"' + (isChecked ? ' checked' : '') + ' /> '+escapeHtml(p.titel)+'</label>';
         });
         html += '</div>';
       });
       container.innerHTML = html;
     }
 
-    // Kategorie komplett wählen/abwählen
+    // Kategorie komplett waehlen/abwaehlen (delegiert auf Container)
+    function setupPunkteToggle(container) {
+      container.addEventListener('click', function(ev) {
+        var link = ev.target.closest('.kat-toggle-all');
+        if (!link) return;
+        ev.preventDefault();
+        var kat = link.dataset.katToggle;
+        var action = link.dataset.action;
+        var checked = action === 'all';
+        container.querySelectorAll('input[data-punkt-kat="'+kat+'"]').forEach(function(cb) {
+          cb.checked = checked;
+        });
+      });
+    }
+
+    // Toggle fuer das Hauptformular
     $('punkteCheckboxes').addEventListener('click', function(ev) {
       var link = ev.target.closest('.kat-toggle-all');
       if (!link) return;
@@ -969,13 +857,16 @@
       });
     });
 
-    // Gibt die ausgewählten Punkte zurück:
-    // alle angehakt → null (= alles sichtbar), sonst Array der angehakten IDs
-    function getSelectedPunkte() {
-      var all = document.querySelectorAll('#punkteCheckboxes input[name="punkt"]');
-      var checked = document.querySelectorAll('#punkteCheckboxes input[name="punkt"]:checked');
+    // Ausgewaehlte Punkte aus einem Container lesen
+    function getSelectedPunkteFrom(container) {
+      var all = container.querySelectorAll('input[name="punkt"]');
+      var checked = container.querySelectorAll('input[name="punkt"]:checked');
       if (checked.length === all.length) return null;
       return Array.from(checked).map(function(cb) { return cb.value; });
+    }
+
+    function getSelectedPunkte() {
+      return getSelectedPunkteFrom($('punkteCheckboxes'));
     }
 
     $('kundeCreateBtn').addEventListener('click', async function() {
@@ -1007,15 +898,20 @@
         $('k-notizen').value='';
         document.querySelectorAll('#punkteCheckboxes input:checked').forEach(function(c) { c.checked=false; });
         await loadKunden();
-        loadDocKundenDropdown();
       } catch(e) { showMsg('kundeCreateMsg','Fehler: '+e.message,'error'); }
       finally { btn.disabled=false; }
     });
 
-    // Kunden-Detail-Panel
+    // ============================================================
+    // KUNDEN-DETAIL-PANEL (erweitert mit allen Sektionen)
+    // ============================================================
+    var detailKundeId = null;
     var detailKundeToken = null;
+    var ansprechpersonenList = [];
+
     async function openKundeDetail(id) {
-      $('detailContent').innerHTML = '<div class="muted">Lade…</div>';
+      detailKundeId = id;
+      $('detailContent').innerHTML = '<div class="muted">Lade...</div>';
       $('detailPanel').classList.add('open');
       $('detailOverlay').classList.add('open');
       try {
@@ -1024,37 +920,107 @@
         detailKundeToken = k.access_token;
         var ap = {frau:'Frau ',herr:'Herr ',familie:'Familie '};
         var name = (ap[k.anrede_typ]||'') + escapeHtml((k.anrede_typ!=='familie'&&k.vorname?k.vorname+' ':'')+k.nachname);
-        var html = '<h3>'+name+'</h3>';
-        html += '<p style="font-size:0.85rem;color:#929A9D;margin-bottom:0.5rem">';
-        html += escapeHtml(k.projekt_adresse||'') + (k.termin_datum ? '<br>Termin: '+fmtDateShort(k.termin_datum) : '') + '</p>';
-        html += '<p style="font-size:0.82rem;margin-bottom:0.3rem"><strong>Token:</strong> <span class="token-short">'+k.access_token+'</span></p>';
-        var inspoUrl = location.origin + '/inspiration.html?t=' + k.access_token;
-        html += '<div class="actions" style="margin:0.6rem 0 1rem"><button data-kaction="link" data-token="'+k.access_token+'">Inspiration-Link kopieren</button></div>';
-        if (k.admin_notizen) html += '<p style="font-size:0.82rem;color:#929A9D;font-style:italic;margin-bottom:1rem">'+escapeHtml(k.admin_notizen)+'</p>';
 
-        // PDF-Upload
-        html += '<h3 style="margin-top:1.5rem">Visualisierungen / Pläne</h3>';
+        var html = '';
+
+        // ---- Sektion 1: Kundendaten (editierbar) ----
+        html += '<div class="detail-section">';
+        html += '<h3>Kundendaten</h3>';
+        html += '<div class="detail-form-row">';
+        html += '<div><label for="dk-anrede">Anrede</label>';
+        html += '<select id="dk-anrede">'
+          + '<option value="frau"' + (k.anrede_typ==='frau'?' selected':'') + '>Frau</option>'
+          + '<option value="herr"' + (k.anrede_typ==='herr'?' selected':'') + '>Herr</option>'
+          + '<option value="familie"' + (k.anrede_typ==='familie'?' selected':'') + '>Familie</option>'
+          + '</select></div>';
+        html += '<div><label for="dk-vorname">Vorname</label>';
+        html += '<input type="text" id="dk-vorname" value="'+escapeHtml(k.vorname||'')+'" autocomplete="off" /></div>';
+        html += '</div>';
+        html += '<div class="detail-form-row">';
+        html += '<div><label for="dk-nachname">Nachname</label>';
+        html += '<input type="text" id="dk-nachname" value="'+escapeHtml(k.nachname||'')+'" autocomplete="off" /></div>';
+        html += '<div><label for="dk-adresse">Projekt-Adresse</label>';
+        html += '<input type="text" id="dk-adresse" value="'+escapeHtml(k.projekt_adresse||'')+'" autocomplete="off" /></div>';
+        html += '</div>';
+        html += '<div class="detail-form-row">';
+        html += '<div><label for="dk-email">E-Mail</label>';
+        html += '<input type="email" id="dk-email" value="'+escapeHtml(k.email||'')+'" autocomplete="new-password" /></div>';
+        html += '<div><label for="dk-telefon">Telefon</label>';
+        html += '<input type="tel" id="dk-telefon" value="'+escapeHtml(k.telefon||'')+'" autocomplete="off" /></div>';
+        html += '</div>';
+        html += '<div class="detail-form-row">';
+        html += '<div><label for="dk-datum">Termin Datum</label>';
+        html += '<input type="date" id="dk-datum" value="'+(k.termin_datum||'')+'" style="width:100%;max-width:100%;box-sizing:border-box" /></div>';
+        html += '<div><label for="dk-uhrzeit">Termin Uhrzeit</label>';
+        html += '<input type="time" id="dk-uhrzeit" value="'+(k.termin_uhrzeit||'')+'" style="width:100%;max-width:100%;box-sizing:border-box" /></div>';
+        html += '</div>';
+        html += '<label for="dk-ansprechperson">Ansprechperson</label>';
+        html += '<select id="dk-ansprechperson"><option value="">-- Keine --</option></select>';
+        html += '<label for="dk-notizen">Admin-Notizen (intern)</label>';
+        html += '<textarea id="dk-notizen" autocomplete="off">'+escapeHtml(k.admin_notizen||'')+'</textarea>';
+        // Status-Toggle
+        var statusActive = k.status === 'aktiv';
+        html += '<div style="display:flex;align-items:center;gap:0.8rem;margin-top:0.8rem">';
+        html += '<span style="font-size:0.85rem;font-weight:500">Status:</span>';
+        html += '<span class="status '+(statusActive?'active':'inactive')+'">'+escapeHtml(k.status)+'</span>';
+        html += '<button class="actions" style="display:inline" id="dk-toggle-status" data-status="'+k.status+'">'+(statusActive?'Deaktivieren':'Aktivieren')+'</button>';
+        html += '</div>';
+        html += '<div id="detailKundeMsg"></div>';
+        html += '<button class="primary" id="dk-save" style="margin-top:0.8rem">Speichern</button>';
+        html += '</div>';
+
+        // ---- Sektion 2: Links ----
+        html += '<div class="detail-section">';
+        html += '<h3>Links</h3>';
+        html += '<div class="detail-link-buttons">';
+        html += '<button id="dk-copy-inspo" data-token="'+k.access_token+'">Inspiration-Link kopieren</button>';
+        html += '<button id="dk-copy-swipe" data-token="'+k.access_token+'">Swipe-Link kopieren</button>';
+        html += '</div>';
+        html += '<p style="font-size:0.82rem;margin:0.3rem 0"><strong>Token:</strong> <span class="token-short">'+k.access_token+'</span></p>';
+        html += '<div id="detailLinkMsg"></div>';
+        html += '</div>';
+
+        // ---- Sektion 3: Sichtbare Punkte ----
+        html += '<div class="detail-section">';
+        html += '<h3>Sichtbare Punkte</h3>';
+        html += '<p class="muted" style="margin:0 0 0.6rem">Haken entfernen = Kunde sieht diesen Punkt nicht.</p>';
+        html += '<div id="detailPunkteCheckboxes" class="muted">Lade...</div>';
+        html += '<div id="detailPunkteMsg"></div>';
+        html += '<button class="primary" id="dk-save-punkte" style="font-size:0.85rem;padding:0.5rem 1rem">Punkte speichern</button>';
+        html += '</div>';
+
+        // ---- Sektion 4: Dokumente ----
+        html += '<div class="detail-section">';
+        html += '<h3>Dokumente</h3>';
         var docs = data.dokumente || [];
         if (docs.length) {
           docs.forEach(function(d) {
-            html += '<div class="detail-doc"><div><span class="doc-name">'+escapeHtml(d.note||d.customer_name||'Dokument')+'</span><br><span class="doc-meta">'+fmtDate(d.created_at)+' · '+d.view_count+' Aufrufe</span></div>'
-              + '<span class="status '+(d.is_active?'active':'inactive')+'">'+(d.is_active?'Aktiv':'Inaktiv')+'</span></div>';
+            html += '<div class="detail-doc">';
+            html += '<div><span class="doc-name">'+escapeHtml(d.note||d.customer_name||'Dokument')+'</span><br><span class="doc-meta">'+fmtDate(d.created_at)+' &middot; '+d.view_count+' Aufrufe</span></div>';
+            html += '<div class="doc-actions">';
+            html += '<span class="status '+(d.is_active?'active':'inactive')+'">'+(d.is_active?'Aktiv':'Inaktiv')+'</span>';
+            html += '<button style="border:1px solid #929A9D;background:#fff;color:#4B575D;padding:0.2rem 0.4rem;border-radius:3px;cursor:pointer;font-size:0.72rem;margin-left:0.3rem" data-doc-toggle="'+d.id+'" data-doc-active="'+(d.is_active?'1':'0')+'">'+(d.is_active?'Deakt.':'Aktiv.')+'</button>';
+            html += '<button class="danger" style="border:1px solid #929A9D;background:#fff;color:#963030;padding:0.2rem 0.4rem;border-radius:3px;cursor:pointer;font-size:0.72rem;margin-left:0.2rem" data-doc-delete="'+d.id+'">X</button>';
+            html += '</div>';
+            html += '</div>';
           });
         } else {
           html += '<p class="muted">Noch keine Dokumente.</p>';
         }
         html += '<div style="margin-top:0.7rem">';
         html += '<label for="detail-doc-note" style="font-size:0.8rem">Bezeichnung</label>';
-        html += '<input type="text" id="detail-doc-note" placeholder="z.B. Visualisierung Bad OG" style="margin-bottom:0.4rem;font-size:0.85rem" />';
+        html += '<input type="text" id="detail-doc-note" placeholder="z.B. Visualisierung Bad OG" style="margin-bottom:0.4rem;font-size:0.85rem" autocomplete="off" />';
         html += '<input type="file" id="detail-doc-file" accept="application/pdf" style="font-size:0.85rem" />';
         html += '<button class="primary" id="detail-doc-upload" style="font-size:0.85rem;padding:0.5rem 1rem;margin-top:0.5rem">PDF hochladen</button>';
         html += '<div id="detailDocMsg"></div>';
         html += '</div>';
+        html += '</div>';
 
-        // Interessen
+        // ---- Sektion 5: Interessen ----
         var interessen = data.interessen || [];
         var marked = interessen.filter(function(i) { return i.interessiert; });
-        html += '<h3 style="margin-top:1.5rem">Interessen ('+marked.length+' markiert)</h3>';
+        html += '<div class="detail-section">';
+        html += '<h3>Interessen ('+marked.length+' markiert)</h3>';
         if (!marked.length) {
           html += '<p class="muted">Noch nichts markiert.</p>';
         } else {
@@ -1063,28 +1029,146 @@
             html += '<div class="interest-item">';
             html += '<div class="int-cat">'+escapeHtml(punkt.kategorie||'')+'</div>';
             html += '<div class="int-title">'+escapeHtml(punkt.titel||i.punkt_id)+'</div>';
-            if (i.kommentar) html += '<div class="int-comment">«'+escapeHtml(i.kommentar)+'»</div>';
+            if (i.kommentar) html += '<div class="int-comment">&laquo;'+escapeHtml(i.kommentar)+'&raquo;</div>';
             html += '</div>';
           });
         }
+        html += '</div>';
 
-        // Aktivitätslog
+        // ---- Sektion 6: Aktivitaet (zusammengeklappt) ----
         var log = data.log || [];
+        html += '<div class="detail-section">';
+        html += '<h3>Aktivitaet</h3>';
         if (log.length) {
-          html += '<h3 style="margin-top:1.5rem">Letzte Aktivität</h3>';
-          log.slice(0,20).forEach(function(l) {
-            html += '<div class="log-entry">'+fmtDate(l.timestamp)+' — '+escapeHtml(l.aktion)+'</div>';
+          html += '<button id="dk-show-log" style="border:1px solid #929A9D;background:#fff;color:#4B575D;padding:0.35rem 0.7rem;border-radius:3px;cursor:pointer;font-size:0.8rem">Historie anzeigen ('+log.length+' Eintraege)</button>';
+          html += '<div id="dk-log-entries" class="hidden" style="margin-top:0.6rem">';
+          var aktionLabels = {
+            'seite_geoeffnet': 'Seite geoeffnet',
+            'punkt_markiert': 'Punkt markiert',
+            'punkt_demarkiert': 'Punkt demarkiert',
+            'kommentar_hinzu': 'Kommentar hinzugefuegt',
+          };
+          log.forEach(function(l) {
+            var label = aktionLabels[l.aktion] || l.aktion;
+            var details = '';
+            if (l.details && l.details.punkt_id) {
+              var punkt = interessen.find(function(i) { return i.punkt_id === l.details.punkt_id; });
+              if (punkt && punkt.inspiration_punkte) details = ' -- ' + punkt.inspiration_punkte.titel;
+            }
+            html += '<div class="log-entry" style="padding:0.4rem 0;border-bottom:1px solid #f0f0f0">'
+              + '<div style="font-size:0.82rem;color:#4B575D"><strong>'+escapeHtml(label)+'</strong>'+escapeHtml(details)+'</div>'
+              + '<div style="font-size:0.72rem;color:#929A9D">'+fmtDate(l.timestamp)+'</div>'
+              + '</div>';
           });
+          html += '</div>';
+        } else {
+          html += '<p class="muted">Noch keine Aktivitaet.</p>';
         }
+        html += '</div>';
 
         $('detailContent').innerHTML = html;
 
-        // PDF-Upload-Handler im Detail-Panel
+        // --- Event-Handler fuer Detail-Panel aufsetzen ---
+
+        // Ansprechpersonen-Dropdown befuellen
+        var apSel = $('dk-ansprechperson');
+        if (apSel && ansprechpersonenList.length) {
+          ansprechpersonenList.forEach(function(a) {
+            if (!a.aktiv) return;
+            var opt = document.createElement('option');
+            opt.value = a.id;
+            opt.textContent = a.name;
+            apSel.appendChild(opt);
+          });
+          if (k.ansprechperson_id) apSel.value = k.ansprechperson_id;
+        }
+
+        // Sichtbare Punkte laden
+        var detPunkteContainer = $('detailPunkteCheckboxes');
+        if (detPunkteContainer && punkteCache.length) {
+          renderPunkteCheckboxesInto(detPunkteContainer, k.sichtbare_punkte);
+          setupPunkteToggle(detPunkteContainer);
+        }
+
+        // Kundendaten speichern
+        $('dk-save').addEventListener('click', async function() {
+          this.disabled = true;
+          showMsg('detailKundeMsg','','');
+          try {
+            await apiCall('/update-kunde', { method:'POST', body: JSON.stringify({
+              id: id,
+              anrede_typ: $('dk-anrede').value,
+              vorname: $('dk-vorname').value.trim(),
+              nachname: $('dk-nachname').value.trim(),
+              email: $('dk-email').value.trim(),
+              telefon: $('dk-telefon').value.trim(),
+              projekt_adresse: $('dk-adresse').value.trim(),
+              termin_datum: $('dk-datum').value || null,
+              termin_uhrzeit: $('dk-uhrzeit').value || null,
+              admin_notizen: $('dk-notizen').value.trim(),
+              ansprechperson_id: $('dk-ansprechperson').value || null,
+            }) });
+            showMsg('detailKundeMsg','Gespeichert.','success');
+            await loadKunden();
+          } catch(e) { showMsg('detailKundeMsg','Fehler: '+e.message,'error'); }
+          finally { this.disabled = false; }
+        });
+
+        // Status-Toggle
+        var toggleBtn = $('dk-toggle-status');
+        if (toggleBtn) {
+          toggleBtn.addEventListener('click', async function() {
+            var newStatus = this.dataset.status === 'aktiv' ? 'deaktiviert' : 'aktiv';
+            this.disabled = true;
+            try {
+              await apiCall('/update-kunde', { method:'POST', body: JSON.stringify({ id: id, status: newStatus }) });
+              await loadKunden();
+              openKundeDetail(id);
+            } catch(e) { showMsg('detailKundeMsg','Fehler: '+e.message,'error'); this.disabled = false; }
+          });
+        }
+
+        // Link kopieren - Inspiration
+        $('dk-copy-inspo').addEventListener('click', function() {
+          var url = location.origin + '/inspiration.html?t=' + this.dataset.token;
+          navigator.clipboard.writeText(url).then(function() {
+            showMsg('detailLinkMsg','Inspiration-Link kopiert.','success');
+          }).catch(function() {
+            showMsg('detailLinkMsg','Link: '+url,'info');
+          });
+        });
+
+        // Link kopieren - Swipe
+        $('dk-copy-swipe').addEventListener('click', function() {
+          var url = location.origin + '/swipe.html?t=' + this.dataset.token;
+          navigator.clipboard.writeText(url).then(function() {
+            showMsg('detailLinkMsg','Swipe-Link kopiert.','success');
+          }).catch(function() {
+            showMsg('detailLinkMsg','Link: '+url,'info');
+          });
+        });
+
+        // Punkte speichern
+        $('dk-save-punkte').addEventListener('click', async function() {
+          this.disabled = true;
+          showMsg('detailPunkteMsg','','');
+          try {
+            var selected = getSelectedPunkteFrom($('detailPunkteCheckboxes'));
+            await apiCall('/update-kunde', { method:'POST', body: JSON.stringify({
+              id: id,
+              sichtbare_punkte: selected,
+            }) });
+            showMsg('detailPunkteMsg','Punkte gespeichert.','success');
+          } catch(e) { showMsg('detailPunkteMsg','Fehler: '+e.message,'error'); }
+          finally { this.disabled = false; }
+        });
+
+        // Dokument-Upload
         $('detail-doc-upload').addEventListener('click', async function() {
           var file = $('detail-doc-file').files[0];
           var label = $('detail-doc-note').value.trim() || 'Dokument';
-          if (!file) { showMsg('detailDocMsg','Bitte PDF auswählen.','error'); return; }
-          this.disabled = true; this.textContent = 'Lädt hoch…';
+          if (!file) { showMsg('detailDocMsg','Bitte PDF auswaehlen.','error'); return; }
+          this.disabled = true; this.textContent = 'Laedt hoch...';
           showMsg('detailDocMsg','','');
           try {
             var base64 = await fileToBase64(file);
@@ -1096,62 +1180,51 @@
               token: detailKundeToken,
             }) });
             showMsg('detailDocMsg','Hochgeladen!','success');
-            // Panel neu laden um neues Dokument zu zeigen
             setTimeout(function() { openKundeDetail(id); }, 600);
           } catch(e) { showMsg('detailDocMsg','Fehler: '+e.message,'error'); this.disabled=false; this.textContent='PDF hochladen'; }
         });
 
-        // Link kopieren im Detail
-        $('detailContent').addEventListener('click', function(ev) {
-          var btn = ev.target.closest('button[data-kaction="link"]');
-          if (!btn) return;
-          var url = location.origin + '/inspiration.html?t=' + btn.dataset.token;
-          navigator.clipboard.writeText(url).then(function() {
-            btn.textContent = 'Kopiert!';
-            setTimeout(function() { btn.textContent = 'Inspiration-Link kopieren'; }, 1500);
-          });
+        // Dokument-Aktionen (Toggle / Loeschen) via Event-Delegation
+        $('detailContent').addEventListener('click', async function(ev) {
+          // Dokument-Status-Toggle
+          var toggleDocBtn = ev.target.closest('button[data-doc-toggle]');
+          if (toggleDocBtn) {
+            toggleDocBtn.disabled = true;
+            try {
+              await apiCall('/toggle-link', { method:'POST', body: JSON.stringify({ id: toggleDocBtn.dataset.docToggle, is_active: toggleDocBtn.dataset.docActive !== '1' }) });
+              openKundeDetail(id);
+            } catch(e) { showMsg('detailDocMsg','Fehler: '+e.message,'error'); toggleDocBtn.disabled = false; }
+            return;
+          }
+          // Dokument loeschen
+          var delDocBtn = ev.target.closest('button[data-doc-delete]');
+          if (delDocBtn) {
+            if (!confirm('Dokument wirklich loeschen?')) return;
+            delDocBtn.disabled = true;
+            try {
+              await apiCall('/delete-link', { method:'POST', body: JSON.stringify({ id: delDocBtn.dataset.docDelete }) });
+              showMsg('detailDocMsg','Geloescht.','success');
+              openKundeDetail(id);
+            } catch(e) { showMsg('detailDocMsg','Fehler: '+e.message,'error'); delDocBtn.disabled = false; }
+            return;
+          }
         });
 
-      } catch(e) {
-        $('detailContent').innerHTML = '<div class="msg error">Fehler: '+escapeHtml(e.message)+'</div>';
-      }
-    }
-
-    async function openHistorie(id) {
-      $('detailContent').innerHTML = '<div class="muted">Lade Historie…</div>';
-      $('detailPanel').classList.add('open');
-      $('detailOverlay').classList.add('open');
-      try {
-        var data = await apiCall('/get-kunde-interessen?id=' + id);
-        var k = data.kunde;
-        var ap = {frau:'Frau ',herr:'Herr ',familie:'Familie '};
-        var name = (ap[k.anrede_typ]||'') + (k.vorname?k.vorname+' ':'')+k.nachname;
-        var log = data.log || [];
-        var aktionLabels = {
-          'seite_geoeffnet': 'Seite geöffnet',
-          'punkt_markiert': 'Punkt markiert',
-          'punkt_demarkiert': 'Punkt demarkiert',
-          'kommentar_hinzu': 'Kommentar hinzugefügt',
-        };
-        var html = '<h3>Besuchshistorie</h3>';
-        html += '<p style="font-size:0.85rem;color:#929A9D;margin-bottom:1rem">'+escapeHtml(name)+' · '+log.length+' Einträge</p>';
-        if (!log.length) {
-          html += '<p class="muted">Noch keine Aktivität.</p>';
-        } else {
-          log.forEach(function(l) {
-            var label = aktionLabels[l.aktion] || l.aktion;
-            var details = '';
-            if (l.details && l.details.punkt_id) {
-              var punkt = (data.interessen || []).find(function(i) { return i.punkt_id === l.details.punkt_id; });
-              if (punkt && punkt.inspiration_punkte) details = ' — ' + punkt.inspiration_punkte.titel;
+        // Aktivitaets-Log aufklappen
+        var showLogBtn = $('dk-show-log');
+        if (showLogBtn) {
+          showLogBtn.addEventListener('click', function() {
+            var entries = $('dk-log-entries');
+            if (entries.classList.contains('hidden')) {
+              entries.classList.remove('hidden');
+              this.textContent = 'Historie ausblenden';
+            } else {
+              entries.classList.add('hidden');
+              this.textContent = 'Historie anzeigen ('+log.length+' Eintraege)';
             }
-            html += '<div class="log-entry" style="padding:0.4rem 0;border-bottom:1px solid #f0f0f0">'
-              + '<div style="font-size:0.82rem;color:#4B575D"><strong>'+escapeHtml(label)+'</strong>'+escapeHtml(details)+'</div>'
-              + '<div style="font-size:0.72rem;color:#929A9D">'+fmtDate(l.timestamp)+'</div>'
-              + '</div>';
           });
         }
-        $('detailContent').innerHTML = html;
+
       } catch(e) {
         $('detailContent').innerHTML = '<div class="msg error">Fehler: '+escapeHtml(e.message)+'</div>';
       }
@@ -1160,6 +1233,7 @@
     function closeDetail() {
       $('detailPanel').classList.remove('open');
       $('detailOverlay').classList.remove('open');
+      detailKundeId = null;
     }
     $('detailClose').addEventListener('click', closeDetail);
     $('detailOverlay').addEventListener('click', closeDetail);
@@ -1183,7 +1257,6 @@
       } catch(e) { showMsg('katalogMsg','Fehler: '+e.message,'error'); }
     }
 
-    // Datalist mit existierenden Kategorien befüllen
     function updateKatVorschlaege() {
       var kats = [];
       katalogPunkte.forEach(function(p) {
@@ -1210,7 +1283,7 @@
           + '<div class="drag-handle" title="Verschieben"></div>'
           + imgHtml
           + '<div class="kat-body">'
-            + '<div class="kat-cat">'+(katLabels[p.kategorie]||p.kategorie)+' · '+p.reihenfolge+videoTag+'</div>'
+            + '<div class="kat-cat">'+(katLabels[p.kategorie]||p.kategorie)+' &middot; '+p.reihenfolge+videoTag+'</div>'
             + '<h3>'+escapeHtml(p.titel)+'</h3>'
             + '<p>'+escapeHtml(p.kurzbeschreibung||'')+'</p>'
             + (p.vorteil ? '<p style="font-size:0.78rem;color:#2d7a2d"><strong>+</strong> '+escapeHtml(p.vorteil)+'</p>' : '')
@@ -1228,8 +1301,8 @@
     // Hero-Hintergrundbild hochladen
     $('heroBgUpload').addEventListener('click', async function() {
       var file = $('heroBgFile').files[0];
-      if (!file) { showMsg('heroBgMsg','Bitte Bild auswählen.','error'); return; }
-      this.disabled = true; this.textContent = 'Lädt hoch…';
+      if (!file) { showMsg('heroBgMsg','Bitte Bild auswaehlen.','error'); return; }
+      this.disabled = true; this.textContent = 'Laedt hoch...';
       showMsg('heroBgMsg','','');
       try {
         var base64 = await fileToBase64(file);
@@ -1257,7 +1330,7 @@
           vorteil: $('np-vorteil').value.trim(),
           zu_bedenken: $('np-bedenken').value.trim(),
         }) });
-        showMsg('npMsg','Punkt hinzugefügt.','success');
+        showMsg('npMsg','Punkt hinzugefuegt.','success');
         $('np-titel').value=''; $('np-kurz').value=''; $('np-vorteil').value=''; $('np-bedenken').value='';
         punkteCache = [];
         await loadKatalog();
@@ -1266,7 +1339,7 @@
       finally { this.disabled=false; }
     });
 
-    // Medien-Upload
+    // Medien-Upload (versteckter File-Input)
     var mediaUploadTarget = null;
     var mediaUploadType = null;
     var currentEditPunktId = null;
@@ -1294,7 +1367,7 @@
 
       if (action === 'delete') {
         var punkt = katalogPunkte.find(function(x) { return x.id === id; });
-        if (!confirm('«'+(punkt?punkt.titel:id)+'» wirklich entfernen?')) return;
+        if (!confirm((punkt?punkt.titel:id)+' wirklich entfernen?')) return;
         btn.disabled = true;
         try {
           await apiCall('/delete-punkt', { method:'POST', body: JSON.stringify({ id: id }) });
@@ -1311,7 +1384,7 @@
       if (!file || !mediaUploadTarget) return;
 
       if (mediaUploadType === 'med-bild' || mediaUploadType === 'med-video') {
-        showMsg('medMsg', 'Lädt hoch…', 'info');
+        showMsg('medMsg', 'Laedt hoch...', 'info');
         try {
           var base64 = await fileToBase64(file);
           await apiCall('/upload-punkt-medium-file', { method:'POST', body: JSON.stringify({
@@ -1324,7 +1397,7 @@
           if (currentEditPunktId) loadPunktMedien(currentEditPunktId);
         } catch(e) { showMsg('medMsg', 'Fehler: '+e.message, 'error'); }
       } else if (mediaUploadType === 'ap-foto') {
-        showMsg('apMsg', 'Lädt Foto hoch…', 'info');
+        showMsg('apMsg', 'Laedt Foto hoch...', 'info');
         try {
           var base64 = await fileToBase64(file);
           await apiCall('/upload-ansprechperson-foto', { method:'POST', body: JSON.stringify({
@@ -1336,7 +1409,7 @@
           await loadAnsprechpersonen();
         } catch(e) { showMsg('apMsg', 'Fehler: '+e.message, 'error'); }
       } else {
-        showMsg('katalogMsg', 'Lädt hoch…', 'info');
+        showMsg('katalogMsg', 'Laedt hoch...', 'info');
         try {
           var base64 = await fileToBase64(file);
           await apiCall('/upload-inspiration-media', { method:'POST', body: JSON.stringify({
@@ -1353,7 +1426,7 @@
       mediaUploadType = null;
     });
 
-    // Inline-Text-Editor
+    // Inline-Text-Editor (Katalog-Punkt bearbeiten)
     function openTextEditor(id) {
       var p = katalogPunkte.find(function(x) { return x.id === id; });
       if (!p) return;
@@ -1369,16 +1442,15 @@
         + '<button class="primary" id="edSave">Speichern</button>'
         + '<h3 style="margin-top:1.5rem">Slides / Varianten</h3>'
         + '<p class="muted" style="margin:-0.3rem 0 0.5rem">Mehrere Bilder oder Videos pro Punkt (z.B. verschiedene Farben). Erscheinen als horizontale Carousel im Swipe-Modus.</p>'
-        + '<div id="medienList" class="medien-list"><span class="muted">Lade…</span></div>'
+        + '<div id="medienList" class="medien-list"><span class="muted">Lade...</span></div>'
         + '<div style="display:flex;gap:0.5rem;align-items:end;margin-top:0.5rem">'
         + '<div style="flex:1"><label style="font-size:0.78rem">Name (z.B. Farbe)</label><input type="text" id="med-name" placeholder="Naturstein grau" style="font-size:0.85rem" autocomplete="off" /></div>'
-        + '<button class="primary" id="medAddBtn" style="margin:0;font-size:0.8rem;padding:0.4rem 0.8rem">Slide hinzufügen</button>'
+        + '<button class="primary" id="medAddBtn" style="margin:0;font-size:0.8rem;padding:0.4rem 0.8rem">Slide hinzufuegen</button>'
         + '</div>'
         + '<div id="medMsg"></div>';
       $('detailPanel').classList.add('open');
       $('detailOverlay').classList.add('open');
 
-      // Medien für diesen Punkt laden und anzeigen
       loadPunktMedien(id);
 
       $('medAddBtn').addEventListener('click', async function() {
@@ -1413,9 +1485,6 @@
     }
 
     // ============================================================
-    // INIT
-    // ============================================================
-    // ============================================================
     // PUNKT-MEDIEN (Slides)
     // ============================================================
     async function loadPunktMedien(punktId) {
@@ -1425,13 +1494,13 @@
         var data = await apiCall('/list-punkt-medien?punkt_id=' + punktId);
         var medien = data.medien || [];
         if (!medien.length) {
-          el.innerHTML = '<span class="muted">Noch keine Slides. Füge oben welche hinzu.</span>';
+          el.innerHTML = '<span class="muted">Noch keine Slides. Fuege oben welche hinzu.</span>';
           return;
         }
         el.innerHTML = medien.map(function(m) {
           var thumb = m.bild_url
             ? '<img src="'+escapeHtml(m.bild_url)+'" />'
-            : '<div class="medien-placeholder">'+(m.video_url?'Video':'—')+'</div>';
+            : '<div class="medien-placeholder">'+(m.video_url?'Video':'--')+'</div>';
           return '<div class="medien-item" data-med-id="'+m.id+'">'
             + thumb
             + '<div class="medien-info"><input type="text" value="'+escapeHtml(m.name||'')+'" placeholder="Name/Farbe" data-med-name="'+m.id+'" /></div>'
@@ -1443,7 +1512,6 @@
             + '</div></div>';
         }).join('');
 
-        // Event-Delegation für Medien-Aktionen
         el.onclick = async function(ev) {
           var btn = ev.target.closest('button[data-medaction]');
           if (!btn) return;
@@ -1486,15 +1554,17 @@
     async function loadAnsprechpersonenDropdown() {
       try {
         var data = await apiCall('/list-ansprechpersonen');
-        updateAnsprechDropdown(data.ansprechpersonen || []);
+        ansprechpersonenList = data.ansprechpersonen || [];
+        updateAnsprechDropdown(ansprechpersonenList);
       } catch(e) { /* still */ }
     }
 
     async function loadAnsprechpersonen() {
       try {
         var data = await apiCall('/list-ansprechpersonen');
-        renderAnsprechpersonen(data.ansprechpersonen || []);
-        updateAnsprechDropdown(data.ansprechpersonen || []);
+        ansprechpersonenList = data.ansprechpersonen || [];
+        renderAnsprechpersonen(ansprechpersonenList);
+        updateAnsprechDropdown(ansprechpersonenList);
       } catch(e) { $('ansprechBody').innerHTML = '<span class="muted">Fehler.</span>'; }
     }
 
@@ -1507,7 +1577,7 @@
           : '<div class="ap-placeholder">?</div>';
         return '<div class="ap-item" data-ap-id="'+a.id+'">'
           + foto
-          + '<div class="ap-info"><strong>'+escapeHtml(a.name)+'</strong><br><span class="muted">'+escapeHtml(a.email||'')+' · '+escapeHtml(a.telefon||'')+'</span></div>'
+          + '<div class="ap-info"><strong>'+escapeHtml(a.name)+'</strong><br><span class="muted">'+escapeHtml(a.email||'')+' &middot; '+escapeHtml(a.telefon||'')+'</span></div>'
           + '<div class="actions">'
             + '<button data-apaction="foto" data-id="'+a.id+'">Foto</button>'
             + '<button class="danger" data-apaction="delete" data-id="'+a.id+'">Entfernen</button>'
@@ -1515,12 +1585,12 @@
       }).join('');
     }
 
-    // Dropdown im Kunden-Formular befüllen
+    // Dropdown im Kunden-Formular befuellen
     function updateAnsprechDropdown(list) {
       var sel = $('k-ansprechperson');
       if (!sel) return;
       var val = sel.value;
-      sel.innerHTML = '<option value="">— Keine —</option>';
+      sel.innerHTML = '<option value="">-- Keine --</option>';
       list.forEach(function(a) {
         if (!a.aktiv) return;
         var opt = document.createElement('option');
@@ -1540,7 +1610,7 @@
           await apiCall('/create-ansprechperson', { method:'POST', body: JSON.stringify({
             name: name, email: $('ap-email').value.trim(), telefon: $('ap-telefon').value.trim()
           }) });
-          showMsg('apMsg','Hinzugefügt.','success');
+          showMsg('apMsg','Hinzugefuegt.','success');
           $('ap-name').value=''; $('ap-email').value=''; $('ap-telefon').value='';
           await loadAnsprechpersonen();
         } catch(e) { showMsg('apMsg','Fehler: '+e.message,'error'); }
@@ -1600,7 +1670,6 @@
           + '</div></div>';
       }).join('');
 
-      // Save-Handler
       el.querySelectorAll('button[data-kat-save]').forEach(function(btn) {
         btn.addEventListener('click', async function() {
           var katId = this.dataset.katSave;
@@ -1620,7 +1689,7 @@
     }
 
     // ============================================================
-    // DRAG & DROP FÜR KATALOG-PUNKTE
+    // DRAG & DROP FUER KATALOG-PUNKTE
     // ============================================================
     var dragItem = null;
     var dragKat = null;
@@ -1663,7 +1732,6 @@
         if (target.dataset.punktKat !== dragKat) return;
         target.classList.remove('drag-over');
 
-        // Neue Reihenfolge berechnen: alle Karten der gleichen Kategorie
         var cards = Array.from(grid.querySelectorAll('.kat-card[data-punkt-kat="'+dragKat+'"]'));
         var ids = cards.map(function(c) { return c.dataset.punktId; });
         var fromIdx = ids.indexOf(dragItem);
@@ -1671,7 +1739,6 @@
         ids.splice(fromIdx, 1);
         ids.splice(toIdx, 0, dragItem);
 
-        // Updates senden
         var updates = ids.map(function(id, i) { return { id: id, reihenfolge: i + 1 }; });
         try {
           await apiCall('/update-punkte-order', { method:'POST', body: JSON.stringify({ updates: updates }) });
@@ -1681,7 +1748,7 @@
     }
 
     // ============================================================
-    // DRAG & DROP FÜR KATEGORIEN
+    // DRAG & DROP FUER KATEGORIEN
     // ============================================================
     function setupKatDragDrop() {
       var container = $('kategorienBody');
@@ -1725,7 +1792,6 @@
         ids.splice(fromIdx, 1);
         ids.splice(toIdx, 0, dragKatItem);
 
-        // Alle Kategorien mit neuer Reihenfolge updaten
         try {
           for (var i = 0; i < ids.length; i++) {
             await apiCall('/update-kategorie', { method:'POST', body: JSON.stringify({
@@ -1738,10 +1804,8 @@
     }
 
     // ============================================================
-    // KATALOG loadKatalog erweitert
+    // INIT - Auto-Login falls Passwort im sessionStorage
     // ============================================================
-
-    // Auto-Login falls Passwort im sessionStorage
     if (getPwd()) {
       tryLogin(getPwd()).then(function(ok) {
         if (ok) showApp();
