@@ -8,6 +8,12 @@
   to = "/.netlify/functions/:splat"
   status = 200
 
+# Cache-Header für HTML-Dateien (nie cachen, sofort neue Version)
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-store"
+
 # Sicherheits-Header für den Kunden-Viewer
 [[headers]]
   for = "/view.html"
@@ -15,7 +21,13 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "no-referrer"
-    Cache-Control = "no-store"
+
+# Sicherheits-Header für die Inspiration-Seite
+[[headers]]
+  for = "/inspiration.html"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
 
 # PDFs sollen nie indexiert werden
 [[headers]]

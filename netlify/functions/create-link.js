@@ -86,8 +86,13 @@ exports.handler = async (event) => {
     return respond(413, { error: 'Datei zu gross (max. 25 MB)' });
   }
 
-  // Token generieren (16 Bytes → 32 Hex-Zeichen)
-  const token = crypto.randomBytes(16).toString('hex');
+  // Falls ein Kunden-Token mitgegeben wird (z.B. aus der kunden-Tabelle),
+  // diesen verwenden statt einen neuen zu generieren. So funktioniert
+  // der gleiche Token für Inspiration UND Dokumente.
+  const existingToken = (payload.token || '').trim();
+  const token = (existingToken && /^[a-f0-9]{32}$/.test(existingToken))
+    ? existingToken
+    : crypto.randomBytes(16).toString('hex');
   const filePath = `${token}/${fileName}`;
 
   // Supabase-Client serverseitig mit Service-Role-Key

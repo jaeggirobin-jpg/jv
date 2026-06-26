@@ -4,13 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>JV Docs – Admin</title>
+  <title>JV Admin</title>
   <style>
-    /* Farben: #BF853B (gold), #4B575D (dunkel), #929A9D (grau) */
     * { box-sizing: border-box; }
     html, body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       background: #f5f5f5;
       color: #4B575D;
@@ -25,636 +23,1797 @@
       justify-content: space-between;
       border-bottom: 3px solid #BF853B;
     }
-    header .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.9rem;
-    }
-    header .logo img {
-      height: 48px;
-      width: auto;
-      display: block;
-    }
+    header .logo { display: flex; align-items: center; gap: 0.9rem; }
+    header .logo img { height: 48px; width: auto; display: block; }
     header .logo .label {
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: #929A9D;
-      border-left: 1px solid #d0d0d0;
-      padding-left: 0.9rem;
+      font-size: 0.95rem; font-weight: 500; color: #929A9D;
+      border-left: 1px solid #d0d0d0; padding-left: 0.9rem;
     }
     header button {
-      background: transparent;
-      border: 1px solid #929A9D;
-      color: #4B575D;
-      padding: 0.4rem 0.8rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.85rem;
+      background: transparent; border: 1px solid #929A9D; color: #4B575D;
+      padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem;
     }
     header button:hover { background: #BF853B; border-color: #BF853B; color: #fff; }
-    #login .login-logo {
-      text-align: center;
-      margin-bottom: 1.2rem;
-    }
-    #login .login-logo img {
-      max-width: 240px;
-      width: 80%;
-      height: auto;
-    }
-    main {
-      max-width: 1100px;
-      margin: 2rem auto;
-      padding: 0 1.5rem;
-    }
+    #login .login-logo { text-align: center; margin-bottom: 1.2rem; }
+    #login .login-logo img { max-width: 240px; width: 80%; height: auto; }
+    main { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
     .card {
-      background: #fff;
-      border-radius: 6px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      background: #fff; border-radius: 6px; padding: 1.5rem;
+      margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     .card h2 {
-      margin: 0 0 1rem 0;
-      font-size: 1.05rem;
-      color: #4B575D;
-      border-bottom: 2px solid #BF853B;
-      padding-bottom: 0.5rem;
+      margin: 0 0 1rem 0; font-size: 1.05rem; color: #4B575D;
+      border-bottom: 2px solid #BF853B; padding-bottom: 0.5rem;
     }
     label {
-      display: block;
-      font-size: 0.85rem;
-      margin: 0.75rem 0 0.25rem;
-      color: #4B575D;
-      font-weight: 500;
+      display: block; font-size: 0.85rem; margin: 0.75rem 0 0.25rem;
+      color: #4B575D; font-weight: 500;
     }
-    input[type="text"], input[type="password"], input[type="file"], textarea {
-      width: 100%;
-      padding: 0.55rem 0.7rem;
-      border: 1px solid #929A9D;
-      border-radius: 4px;
-      font-size: 0.95rem;
-      font-family: inherit;
-      background: #fff;
-      color: #4B575D;
+    input[type="text"], input[type="password"], input[type="file"],
+    input[type="email"], input[type="tel"], input[type="date"],
+    input[type="time"], input[type="number"], textarea, select {
+      width: 100%; max-width: 100%; padding: 0.55rem 0.7rem; border: 1px solid #929A9D;
+      border-radius: 4px; font-size: 0.95rem; font-family: inherit;
+      background: #fff; color: #4B575D;
+      box-sizing: border-box;
     }
+    select { appearance: auto; }
     textarea { min-height: 60px; resize: vertical; }
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: #BF853B;
+    input:focus, textarea:focus, select:focus {
+      outline: none; border-color: #BF853B;
       box-shadow: 0 0 0 2px rgba(191,133,59,0.2);
     }
     button.primary {
-      background: #BF853B;
-      color: #fff;
-      border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      font-weight: 500;
-      margin-top: 1rem;
+      background: #BF853B; color: #fff; border: none;
+      padding: 0.6rem 1.2rem; border-radius: 4px; cursor: pointer;
+      font-size: 0.95rem; font-weight: 500; margin-top: 1rem;
     }
     button.primary:hover { background: #a8722e; }
     button.primary:disabled { background: #929A9D; cursor: not-allowed; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.88rem;
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
     th, td {
-      padding: 0.7rem 0.6rem;
-      text-align: left;
-      border-bottom: 1px solid #e5e5e5;
-      vertical-align: middle;
+      padding: 0.7rem 0.6rem; text-align: left;
+      border-bottom: 1px solid #e5e5e5; vertical-align: middle;
     }
     th {
-      background: #f5f5f5;
-      color: #4B575D;
-      font-weight: 600;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
+      background: #f5f5f5; color: #4B575D; font-weight: 600;
+      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em;
     }
     tr:hover td { background: #fafafa; }
     .status {
-      display: inline-block;
-      padding: 0.2rem 0.6rem;
-      border-radius: 10px;
-      font-size: 0.75rem;
-      font-weight: 600;
+      display: inline-block; padding: 0.2rem 0.6rem; border-radius: 10px;
+      font-size: 0.75rem; font-weight: 600;
     }
     .status.active { background: #e6f4e6; color: #2d7a2d; }
     .status.inactive { background: #f5e6e6; color: #963030; }
     .actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
     .actions button {
-      border: 1px solid #929A9D;
-      background: #fff;
-      color: #4B575D;
-      padding: 0.3rem 0.6rem;
-      border-radius: 3px;
-      cursor: pointer;
-      font-size: 0.78rem;
+      border: 1px solid #929A9D; background: #fff; color: #4B575D;
+      padding: 0.3rem 0.6rem; border-radius: 3px; cursor: pointer; font-size: 0.78rem;
     }
     .actions button:hover { background: #4B575D; color: #fff; border-color: #4B575D; }
     .actions button.danger:hover { background: #963030; border-color: #963030; }
-
-    #login {
-      max-width: 380px;
-      margin: 5rem auto;
-    }
-    .msg {
-      padding: 0.7rem 1rem;
-      border-radius: 4px;
-      margin: 0.5rem 0;
-      font-size: 0.9rem;
-    }
+    #login { max-width: 380px; margin: 5rem auto; }
+    .msg { padding: 0.7rem 1rem; border-radius: 4px; margin: 0.5rem 0; font-size: 0.9rem; }
     .msg.error { background: #f5e6e6; color: #963030; border-left: 3px solid #963030; }
     .msg.success { background: #e6f4e6; color: #2d7a2d; border-left: 3px solid #2d7a2d; }
     .msg.info { background: #eef2f5; color: #4B575D; border-left: 3px solid #929A9D; }
     .muted { color: #929A9D; font-size: 0.8rem; }
     .hidden { display: none !important; }
     .token-short { font-family: monospace; font-size: 0.8rem; color: #929A9D; }
-
-    /* Container für die Tabelle, damit sie auf mittleren Screens
-       horizontal scrollen kann, ohne das Layout zu sprengen */
     .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-    /* ===========================================================
-       Responsive – Tablet (≤ 900 px)
-       =========================================================== */
+    /* ======= Tabs ======= */
+    .tabs {
+      display: flex; gap: 0; margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e5e5e5;
+      background: #fff;
+      border-radius: 6px 6px 0 0;
+      padding: 0 0.5rem;
+      overflow-x: hidden;
+    }
+    .tabs button {
+      background: none; border: none; border-bottom: 3px solid transparent;
+      margin-bottom: -2px; padding: 0.8rem 1.2rem;
+      font-size: 0.95rem; font-weight: 600; color: #929A9D;
+      cursor: pointer; transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .tabs button:hover { color: #4B575D; }
+    .tabs button.active { color: #BF853B; border-bottom-color: #BF853B; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ======= Formular-Zeile (2 Spalten) ======= */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.2rem; }
+
+    /* ======= Katalog-Grid ======= */
+    .kat-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+    .kat-card {
+      background: #fff; border: 1px solid #e5e5e5; border-radius: 6px;
+      overflow: hidden;
+    }
+    .kat-card .kat-img {
+      width: 100%; height: 160px; object-fit: cover; display: block;
+      background: #eee;
+    }
+    .kat-card .kat-placeholder {
+      width: 100%; height: 160px; display: flex; align-items: center;
+      justify-content: center; background: #eee; color: #929A9D;
+      font-size: 0.85rem;
+    }
+    .kat-card .kat-body { padding: 0.9rem; }
+    .kat-card .kat-body h3 {
+      margin: 0 0 0.4rem 0; font-size: 0.95rem; color: #4B575D;
+    }
+    .kat-card .kat-body .kat-cat {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
+      color: #BF853B; font-weight: 600; margin-bottom: 0.3rem;
+    }
+    .kat-card .kat-body p {
+      font-size: 0.82rem; color: #929A9D; margin: 0.3rem 0;
+      line-height: 1.4;
+    }
+    .kat-card .kat-actions {
+      padding: 0 0.9rem 0.9rem; display: flex; gap: 0.4rem; flex-wrap: wrap;
+    }
+    .kat-card .kat-actions button {
+      font-size: 0.75rem; padding: 0.3rem 0.55rem; border: 1px solid #929A9D;
+      border-radius: 3px; background: #fff; color: #4B575D; cursor: pointer;
+    }
+    .kat-card .kat-actions button:hover { background: #4B575D; color: #fff; border-color: #4B575D; }
+
+    /* Medien-Slides im Bearbeiten-Panel */
+    .medien-list { margin: 0.8rem 0; }
+    .medien-item {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0;
+    }
+    .medien-item img {
+      width: 50px; height: 50px; border-radius: 4px; object-fit: cover;
+    }
+    .medien-item .medien-placeholder {
+      width: 50px; height: 50px; border-radius: 4px; background: #eee;
+      display: flex; align-items: center; justify-content: center;
+      color: #929A9D; font-size: 0.65rem;
+    }
+    .medien-item .medien-info { flex: 1; font-size: 0.82rem; }
+    .medien-item .medien-info input {
+      width: 100%; font-size: 0.82rem; padding: 0.25rem 0.4rem;
+      border: 1px solid #e5e5e5; border-radius: 3px;
+    }
+
+    /* ======= Kunden-Detail-Panel ======= */
+    .detail-panel {
+      position: fixed; top: 0; right: -520px; width: 500px; max-width: 90vw;
+      height: 100vh; background: #fff; box-shadow: -4px 0 20px rgba(0,0,0,0.12);
+      z-index: 100; transition: right 0.3s ease; overflow-y: auto; padding: 1.5rem;
+      pointer-events: none;
+    }
+    .detail-panel.open { right: 0; pointer-events: auto; }
+    .detail-panel .detail-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #929A9D;
+    }
+    .detail-panel .detail-close:hover { color: #4B575D; }
+    .detail-panel h3 { margin: 0 0 1rem 0; color: #4B575D; font-size: 1.1rem; border-bottom: 2px solid #BF853B; padding-bottom: 0.5rem; }
+    .detail-panel .interest-item {
+      padding: 0.6rem 0; border-bottom: 1px solid #f0f0f0;
+    }
+    .detail-panel .interest-item .int-title { font-weight: 600; font-size: 0.88rem; }
+    .detail-panel .interest-item .int-cat { font-size: 0.7rem; color: #BF853B; text-transform: uppercase; }
+    .detail-panel .interest-item .int-comment { font-size: 0.82rem; color: #929A9D; margin-top: 0.2rem; font-style: italic; }
+    .detail-panel .log-entry { font-size: 0.78rem; color: #929A9D; padding: 0.25rem 0; border-bottom: 1px dashed #f0f0f0; }
+
+    /* Detail-Panel Sektionen */
+    .detail-section { margin-bottom: 1.5rem; }
+    .detail-section h3 { margin-top: 0; }
+    .detail-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 0.8rem; }
+    .detail-link-buttons { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+    .detail-link-buttons button {
+      flex: 1; min-width: 140px;
+      border: 1px solid #BF853B; background: #fff; color: #BF853B;
+      padding: 0.5rem 0.6rem; border-radius: 4px; cursor: pointer;
+      font-size: 0.82rem; font-weight: 600; text-align: center;
+    }
+    .detail-link-buttons button:hover { background: #BF853B; color: #fff; }
+
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; display: none; }
+    .overlay.open { display: block; }
+
+    /* Ansprechpersonen-Liste */
+    .ap-item {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 0.6rem 0; border-bottom: 1px solid #f0f0f0;
+    }
+    .ap-item img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #BF853B; }
+    .ap-item .ap-placeholder { width: 44px; height: 44px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; color: #929A9D; font-size: 0.75rem; }
+    .ap-item .ap-info { flex: 1; }
+    .ap-item .ap-info strong { font-size: 0.9rem; }
+    .ap-item .ap-info .muted { font-size: 0.78rem; }
+
+    /* Drag-Handle (6 Punkte) */
+    .drag-handle {
+      display: inline-flex; flex-direction: column; gap: 2px;
+      cursor: grab; padding: 4px 6px; color: #929A9D; flex-shrink: 0;
+    }
+    .drag-handle::before, .drag-handle::after {
+      content: ''; display: block;
+      width: 12px; height: 2px;
+      background: radial-gradient(circle, #929A9D 1.5px, transparent 1.5px);
+      background-size: 6px 2px;
+    }
+    .drag-handle:active { cursor: grabbing; color: #BF853B; }
+    .drag-handle:active::before, .drag-handle:active::after {
+      background: radial-gradient(circle, #BF853B 1.5px, transparent 1.5px);
+      background-size: 6px 2px;
+    }
+
+    /* Kategorie-Inline-Editor */
+    .kat-header-edit {
+      background: #f9f7f4; border: 1px solid #e5e5e5; border-radius: 6px;
+      padding: 0.9rem; margin-bottom: 0.8rem;
+      cursor: grab; transition: box-shadow 0.2s, opacity 0.15s;
+    }
+    .kat-header-edit.dragging { opacity: 0.5; }
+    .kat-header-edit.drag-over { box-shadow: 0 0 0 2px #BF853B; }
+    .kat-header-edit h3 { margin: 0 0 0.5rem; font-size: 0.95rem; color: #BF853B; }
+    .kat-header-edit input, .kat-header-edit textarea {
+      width: 100%; margin-bottom: 0.4rem;
+    }
+    .kat-header-edit textarea { min-height: 40px; }
+
+    /* Drag & Drop fuer Katalog-Karten */
+    .kat-card { transition: box-shadow 0.2s, transform 0.15s; position: relative; }
+    .kat-card > .drag-handle { position: absolute; top: 6px; left: 6px; z-index: 1; background: rgba(255,255,255,0.85); border-radius: 3px; }
+    .kat-card.dragging { opacity: 0.5; transform: scale(0.97); }
+    .kat-card.drag-over { box-shadow: 0 0 0 2px #BF853B; }
+
+    /* Punkte-Checkboxen-Gruppe */
+    .punkte-group { margin-bottom: 0.8rem; }
+    .punkte-group-title {
+      font-size: 0.78rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.04em; color: #BF853B; margin: 0.6rem 0 0.3rem;
+    }
+    .punkte-group label.punkt-cb {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.85rem; font-weight: 400; margin: 0.2rem 0;
+      cursor: pointer; color: #4B575D;
+    }
+    .punkte-group input[type="checkbox"] {
+      width: auto; accent-color: #BF853B; margin: 0;
+    }
+
+    /* Dokumente im Detail-Panel */
+    .detail-doc {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0; font-size: 0.82rem;
+    }
+    .detail-doc .doc-name { color: #4B575D; }
+    .detail-doc .doc-meta { color: #929A9D; font-size: 0.75rem; }
+    .detail-doc .doc-actions { display: flex; gap: 0.3rem; align-items: center; }
+
+    /* ======= Responsive ======= */
     @media (max-width: 900px) {
       header { padding: 0.8rem 1rem; }
       header .logo img { height: 40px; }
-      header .logo .label {
-        font-size: 0.8rem;
-        padding-left: 0.7rem;
-      }
+      header .logo .label { font-size: 0.8rem; padding-left: 0.7rem; }
       main { margin: 1.25rem auto; padding: 0 1rem; }
       .card { padding: 1.1rem; }
       table { font-size: 0.82rem; }
       th, td { padding: 0.55rem 0.45rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .detail-form-row { grid-template-columns: 1fr; }
     }
-
-    /* ===========================================================
-       Responsive – Handy (≤ 640 px)
-       Tabelle wird zu gestapelten Karten, Header kompakter
-       =========================================================== */
     @media (max-width: 640px) {
-      header {
-        padding: 0.7rem 0.9rem;
-      }
+      header { padding: 0.7rem 0.9rem; }
       header .logo { gap: 0.6rem; }
       header .logo img { height: 34px; }
-      header .logo .label {
-        /* Label auf kleinen Handys ausblenden — Logo spricht für sich */
-        display: none;
-      }
-      header button {
-        padding: 0.35rem 0.7rem;
-        font-size: 0.8rem;
-      }
+      header .logo .label { display: none; }
+      header button { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
       main { margin: 0.9rem auto; padding: 0 0.75rem; }
       .card { padding: 0.95rem; border-radius: 5px; }
       .card h2 { font-size: 1rem; }
       label { font-size: 0.82rem; }
-      input[type="text"], input[type="password"], input[type="file"], textarea {
-        font-size: 16px; /* verhindert iOS-Zoom beim Fokus */
-      }
-      button.primary {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
-      }
-
-      /* Login-Ansicht auf Handy-Breite ausfüllen */
-      #login {
+      input[type="text"], input[type="password"], input[type="file"],
+      input[type="email"], input[type="tel"], input[type="date"],
+      input[type="time"], input[type="number"], textarea, select {
+        font-size: 16px;
         max-width: 100%;
-        margin: 2rem auto;
-        padding: 0 0.9rem;
+        box-sizing: border-box;
       }
+      button.primary { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; }
+      #login { max-width: 100%; margin: 2rem auto; padding: 0 0.9rem; }
       #login .login-logo img { max-width: 220px; }
+      .tabs { padding: 0 0.3rem; }
+      .tabs button { padding: 0.7rem 0.8rem; font-size: 0.88rem; }
+      .kat-grid { grid-template-columns: 1fr; }
+      .detail-panel { width: 100%; max-width: 100%; right: -100%; }
 
-      /* Tabelle → Karten-Layout.
-         Kopfzeile ausblenden, jede Zeile wird ein Block mit
-         Label (via data-label) + Wert pro Zelle. */
-      #linksTable thead { display: none; }
-      #linksTable, #linksTable tbody { display: block; width: 100%; }
-      #linksTable tr {
-        display: block;
-        width: 100%;
-        border: 1px solid #e5e5e5;
-        border-radius: 6px;
-        margin-bottom: 0.9rem;
-        padding: 0.35rem 0.85rem;
-        background: #fff;
+      /* Kunden-Tabelle -> Kacheln auf Mobile */
+      #kundenTable thead { display: none; }
+      #kundenTable, #kundenTable tbody { display: block; width: 100%; }
+      #kundenTable tr {
+        display: block; border: 1px solid #e5e5e5; border-radius: 6px;
+        margin-bottom: 0.8rem; padding: 0.8rem; background: #fff;
       }
-      #linksTable tr:hover td { background: transparent; }
-      #linksTable td {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 1rem;
-        padding: 0.55rem 0;
-        border-bottom: 1px dashed #eee;
-        font-size: 0.9rem;
-        text-align: right;
+      #kundenTable tr:hover td { background: transparent; }
+      #kundenTable td {
+        display: block; padding: 0.2rem 0; border-bottom: none;
+        font-size: 0.88rem;
       }
-      #linksTable td:last-child { border-bottom: none; }
-      #linksTable td::before {
-        content: attr(data-label);
-        font-weight: 600;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        color: #929A9D;
-        flex-shrink: 0;
-        padding-top: 0.1rem;
-        text-align: left;
-      }
-      /* Aktionen links ausrichten und umbrechen lassen */
-      #linksTable td.actions-cell { flex-direction: column; align-items: stretch; text-align: left; }
-      #linksTable td.actions-cell::before { margin-bottom: 0.4rem; }
-      #linksTable td.actions-cell .actions { justify-content: flex-start; }
-      #linksTable td.actions-cell .actions button {
-        flex: 1 1 auto;
-        min-width: 0;
-        padding: 0.45rem 0.6rem;
-        font-size: 0.82rem;
-      }
-      /* Mehrzeilige Zellen (Adresse mit Token) links ausrichten */
-      #linksTable td.cell-address { flex-direction: column; align-items: flex-start; text-align: left; }
-      #linksTable td.cell-address::before { margin-bottom: 0.25rem; }
-    }
-
-    /* ===========================================================
-       Responsive – sehr schmale Handys (≤ 380 px)
-       =========================================================== */
-    @media (max-width: 380px) {
-      header .logo img { height: 28px; }
-      .card { padding: 0.8rem; }
-      #linksTable td.actions-cell .actions { flex-direction: column; }
+      #kundenTable td:last-child { margin-top: 0.5rem; }
+      #kundenTable td .actions { flex-wrap: wrap; }
+      #kundenTable td .actions button { flex: 1 1 auto; text-align: center; padding: 0.45rem 0.5rem; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Login-Ansicht -->
+  <!-- Login -->
   <div id="login">
     <div class="card">
-      <div class="login-logo">
-        <img src="/logo.png" alt="Jäggi Vollmer" />
-      </div>
-      <h2>Dokumenten-Admin</h2>
+      <div class="login-logo"><img src="/logo.png" alt="Jaeggi Vollmer" /></div>
+      <h2>Admin</h2>
       <label for="pwd">Passwort</label>
-      <input type="password" id="pwd" autocomplete="current-password" />
+      <input type="password" id="pwd" autocomplete="off" />
       <div id="loginMsg"></div>
-      <button class="primary" id="loginBtn">Anmelden</button>
+      <button class="primary" id="loginBtn" type="button" onclick="doLogin()">Anmelden</button>
     </div>
   </div>
 
-  <!-- Admin-Ansicht -->
+  <!-- App -->
   <div id="app" class="hidden">
     <header>
       <div class="logo">
-        <img src="/logo.png" alt="Jäggi Vollmer" />
-        <span class="label">Dokumenten-Admin</span>
+        <img src="/logo.png" alt="Jaeggi Vollmer" />
+        <span class="label">Admin</span>
       </div>
       <button id="logoutBtn">Abmelden</button>
     </header>
+
     <main>
-      <!-- Neuer Link -->
-      <div class="card">
-        <h2>Neuen Link erstellen</h2>
-        <label for="address">Adresse *</label>
-        <input type="text" id="address" placeholder="z.B. Musterstrasse 12, 4057 Basel" />
-
-        <label for="note">Notiz (optional)</label>
-        <textarea id="note" placeholder="z.B. Visualisierung Bad OG"></textarea>
-
-        <label for="pdfFile">PDF-Datei *</label>
-        <input type="file" id="pdfFile" accept="application/pdf" />
-
-        <div id="createMsg"></div>
-        <button class="primary" id="createBtn">Link erstellen</button>
+      <div class="tabs">
+        <button class="active" data-tab="kunden">Kunden</button>
+        <button data-tab="katalog">Katalog</button>
       </div>
 
-      <!-- Liste -->
-      <div class="card">
-        <h2>Alle Links</h2>
-        <div id="listMsg"></div>
-        <div class="table-wrap">
-          <table id="linksTable">
-            <thead>
-              <tr>
-                <th>Adresse</th>
-                <th>Notiz</th>
-                <th>Erstellt</th>
-                <th>Letzter Aufruf</th>
-                <th>Aufrufe</th>
-                <th>Status</th>
-                <th>Aktionen</th>
-              </tr>
-            </thead>
-            <tbody id="linksBody">
-              <tr><td colspan="7" class="muted">Lade…</td></tr>
-            </tbody>
-          </table>
+      <!-- ============ Tab: Kunden ============ -->
+      <div class="tab-panel active" id="tab-kunden">
+        <div class="card">
+          <h2>Neuen Kunden anlegen</h2>
+          <div class="form-row">
+            <div>
+              <label for="k-anrede">Anrede *</label>
+              <select id="k-anrede">
+                <option value="frau">Frau</option>
+                <option value="herr">Herr</option>
+                <option value="familie">Familie</option>
+              </select>
+            </div>
+            <div>
+              <label for="k-vorname">Vorname</label>
+              <input type="text" id="k-vorname" placeholder="Lisa" autocomplete="off" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="k-nachname">Nachname *</label>
+              <input type="text" id="k-nachname" placeholder="Mueller" autocomplete="off" />
+            </div>
+            <div>
+              <label for="k-adresse">Projekt-Adresse</label>
+              <input type="text" id="k-adresse" placeholder="Hauptstrasse 5, 4051 Basel" autocomplete="off" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="k-email">E-Mail</label>
+              <input type="email" id="k-email" placeholder="lisa@example.com" autocomplete="new-password" />
+            </div>
+            <div>
+              <label for="k-telefon">Telefon</label>
+              <input type="tel" id="k-telefon" placeholder="+41 79 ..." autocomplete="off" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="k-datum">Termin Datum</label>
+              <input type="date" id="k-datum" style="width:100%;max-width:100%;box-sizing:border-box" />
+            </div>
+            <div>
+              <label for="k-uhrzeit">Termin Uhrzeit</label>
+              <input type="time" id="k-uhrzeit" value="14:00" style="width:100%;max-width:100%;box-sizing:border-box" />
+            </div>
+          </div>
+          <label for="k-ansprechperson">Ansprechperson</label>
+          <select id="k-ansprechperson">
+            <option value="">-- Keine --</option>
+          </select>
+
+          <label for="k-notizen">Admin-Notizen (intern)</label>
+          <textarea id="k-notizen" placeholder="Nur fuer dich sichtbar"></textarea>
+
+          <label style="margin-top:1.2rem">Sichtbare Inspiration-Punkte</label>
+          <p class="muted" style="margin:0 0 0.6rem">Standardmaessig alles sichtbar. Haken entfernen = Kunde sieht diesen Punkt nicht.</p>
+          <div id="punkteCheckboxes" class="muted">Lade Katalog...</div>
+
+          <div id="kundeCreateMsg"></div>
+          <button class="primary" id="kundeCreateBtn">Kunde anlegen</button>
+        </div>
+        <div class="card">
+          <h2>Alle Kunden</h2>
+          <div id="kundenMsg"></div>
+          <div class="table-wrap">
+            <table id="kundenTable">
+              <thead>
+                <tr>
+                  <th>Name</th><th>Adresse</th><th>Termin</th>
+                  <th>Besuche</th><th>Markiert</th>
+                  <th>Status</th><th>Aktionen</th>
+                </tr>
+              </thead>
+              <tbody id="kundenBody">
+                <tr><td colspan="7" class="muted">Lade...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Tab: Katalog ============ -->
+      <div class="tab-panel" id="tab-katalog">
+        <!-- Ansprechpersonen -->
+        <div class="card">
+          <h2>Ansprechpersonen</h2>
+          <p class="muted" style="margin-top:-0.5rem">Projektleiter/Berater, die beim Kunden in der Termin-Karte erscheinen.</p>
+          <div id="ansprechBody" class="muted">Lade...</div>
+          <div class="form-row" style="margin-top:0.8rem">
+            <div>
+              <label for="ap-name">Name *</label>
+              <input type="text" id="ap-name" placeholder="Robin Jaeggi" autocomplete="off" />
+            </div>
+            <div>
+              <label for="ap-email">E-Mail</label>
+              <input type="email" id="ap-email" placeholder="robin@jaeggivollmer.ch" autocomplete="off" />
+            </div>
+          </div>
+          <label for="ap-telefon">Telefon</label>
+          <input type="tel" id="ap-telefon" placeholder="+41 79 ..." autocomplete="off" style="max-width:300px" />
+          <div id="apMsg"></div>
+          <button class="primary" id="apCreateBtn">Hinzufuegen</button>
+        </div>
+
+        <!-- Kategorien -->
+        <div class="card">
+          <h2>Kategorien</h2>
+          <p class="muted" style="margin-top:-0.5rem">Titel und Intro-Texte bearbeiten. Reihenfolge per Drag & Drop aendern.</p>
+          <div id="kategorienBody" class="muted">Lade...</div>
+        </div>
+
+        <div class="card">
+          <h2>Hero-Hintergrundbild</h2>
+          <p class="muted" style="margin-top:-0.5rem">Das grosse Bild auf der Startseite der Inspiration. Empfohlen: Querformat, mind. 1920px breit, max. 5 MB.</p>
+          <div style="display:flex;align-items:center;gap:1rem;margin-top:0.8rem;flex-wrap:wrap">
+            <img id="heroBgPreview" src="/assets/inspiration/heroBg.jpg" style="height:80px;border-radius:4px;border:1px solid #e5e5e5;object-fit:cover" alt="Vorschau" />
+            <div>
+              <input type="file" id="heroBgFile" accept="image/jpeg,image/png,image/webp" style="font-size:0.85rem" />
+              <button class="primary" id="heroBgUpload" style="margin-top:0.5rem;font-size:0.85rem;padding:0.45rem 1rem">Hintergrund ersetzen</button>
+              <div id="heroBgMsg"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Neuen Punkt hinzufuegen</h2>
+          <div class="form-row">
+            <div>
+              <label for="np-kategorie">Kategorie *</label>
+              <input type="text" id="np-kategorie" list="kat-vorschlaege" placeholder="z.B. dusche, boden, spiegel" />
+              <datalist id="kat-vorschlaege"></datalist>
+            </div>
+            <div>
+              <label for="np-titel">Titel *</label>
+              <input type="text" id="np-titel" placeholder="z.B. Regenbrause" />
+            </div>
+          </div>
+          <label for="np-kurz">Kurzbeschreibung</label>
+          <input type="text" id="np-kurz" placeholder="Ein Satz, was es ist" />
+          <div class="form-row">
+            <div>
+              <label for="np-vorteil">Vorteil</label>
+              <input type="text" id="np-vorteil" placeholder="Was spricht dafuer?" />
+            </div>
+            <div>
+              <label for="np-bedenken">Zu bedenken</label>
+              <input type="text" id="np-bedenken" placeholder="Was muss man wissen?" />
+            </div>
+          </div>
+          <div id="npMsg"></div>
+          <button class="primary" id="npCreateBtn">Punkt hinzufuegen</button>
+        </div>
+        <div class="card">
+          <h2>Katalog-Uebersicht</h2>
+          <p class="muted" style="margin-top:-0.5rem">Bilder, Videos und Texte verwalten. Aenderungen sind sofort fuer Kunden sichtbar.</p>
+          <div id="katalogMsg"></div>
+          <div class="kat-grid" id="katalogGrid">
+            <div class="muted">Lade...</div>
+          </div>
         </div>
       </div>
     </main>
   </div>
 
+  <!-- Kunden-Detail (Slide-in Panel) -->
+  <div class="overlay" id="detailOverlay"></div>
+  <div class="detail-panel" id="detailPanel">
+    <button class="detail-close" id="detailClose">&times;</button>
+    <div id="detailContent"></div>
+  </div>
+
+  <!-- Versteckter File-Input fuer Medien-Upload -->
+  <input type="file" id="mediaUpload" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" style="display:none" />
+
   <script>
-    // Einfacher Admin-Client. Passwort wird im sessionStorage gehalten
-    // und als Bearer-Token an alle Function-Calls mitgegeben.
-
-    const STORAGE_KEY = 'jv_admin_pwd';
-    const API = '/.netlify/functions';
-
-    const $ = (id) => document.getElementById(id);
+    var STORAGE_KEY = 'jv_admin_pwd';
+    var API = '/.netlify/functions';
+    var $ = function(id) { return document.getElementById(id); };
 
     function showMsg(elId, text, type) {
-      const el = $(elId);
-      el.innerHTML = text ? `<div class="msg ${type}">${text}</div>` : '';
+      var el = $(elId);
+      if (el) el.innerHTML = text ? '<div class="msg ' + type + '">' + text + '</div>' : '';
     }
+    function getPwd() { return sessionStorage.getItem(STORAGE_KEY) || ''; }
+    function setPwd(p) { sessionStorage.setItem(STORAGE_KEY, p); }
+    function clearPwd() { sessionStorage.removeItem(STORAGE_KEY); }
 
-    function getPwd() {
-      return sessionStorage.getItem(STORAGE_KEY) || '';
-    }
-
-    function setPwd(p) {
-      sessionStorage.setItem(STORAGE_KEY, p);
-    }
-
-    function clearPwd() {
-      sessionStorage.removeItem(STORAGE_KEY);
-    }
-
-    async function apiCall(path, options = {}) {
-      const headers = Object.assign({}, options.headers || {}, {
-        'Authorization': 'Bearer ' + getPwd(),
-      });
-      if (options.body && !(options.body instanceof FormData)) {
-        headers['Content-Type'] = 'application/json';
-      }
-      const res = await fetch(API + path, Object.assign({}, options, { headers }));
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        const err = new Error(data.error || 'Fehler ' + res.status);
-        err.status = res.status;
-        throw err;
-      }
-      return data;
-    }
-
-    // Login-Flow: wir testen das Passwort über list-links
-    async function tryLogin(pwd) {
-      setPwd(pwd);
-      try {
-        await apiCall('/list-links');
-        return true;
-      } catch (e) {
-        if (e.status === 401) {
-          clearPwd();
-          return false;
-        }
-        // Andere Fehler (Netz, Server) bedeuten nicht «falsches Passwort»
-        return true;
-      }
-    }
-
-    function showApp() {
-      $('login').classList.add('hidden');
-      $('app').classList.remove('hidden');
-      loadLinks();
-    }
-
-    function showLogin() {
-      $('app').classList.add('hidden');
-      $('login').classList.remove('hidden');
-      $('pwd').focus();
-    }
-
-    // Datum schweizerisch formatieren
-    function fmtDate(iso) {
-      if (!iso) return '—';
-      const d = new Date(iso);
-      return d.toLocaleString('de-CH', {
-        day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit',
+    function apiCall(path, options) {
+      options = options || {};
+      var h = { 'Authorization': 'Bearer ' + getPwd() };
+      if (options.body && typeof options.body === 'string') h['Content-Type'] = 'application/json';
+      return fetch(API + path, {
+        method: options.method || 'GET',
+        headers: h,
+        body: options.body || undefined
+      }).then(function(res) {
+        return res.json().catch(function() { return {}; }).then(function(data) {
+          if (!res.ok) {
+            var err = new Error(data.error || 'Fehler ' + res.status);
+            err.status = res.status;
+            throw err;
+          }
+          return data;
+        });
       });
     }
 
     function escapeHtml(s) {
       if (!s) return '';
-      return String(s)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    function buildShareUrl(token) {
-      return `${location.origin}/view.html?t=${token}`;
+    function fmtDate(iso) {
+      if (!iso) return '--';
+      var d = new Date(iso);
+      return d.toLocaleString('de-CH', {
+        day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
+      });
     }
 
-    async function loadLinks() {
-      showMsg('listMsg', '', '');
-      try {
-        const data = await apiCall('/list-links');
-        renderLinks(data.links || []);
-      } catch (e) {
-        if (e.status === 401) { clearPwd(); showLogin(); return; }
-        showMsg('listMsg', 'Fehler beim Laden: ' + e.message, 'error');
-      }
+    function fmtDateShort(iso) {
+      if (!iso) return '--';
+      var d = new Date(iso);
+      return d.toLocaleDateString('de-CH', { day:'2-digit', month:'2-digit', year:'numeric' });
     }
 
-    function renderLinks(links) {
-      const body = $('linksBody');
-      if (!links.length) {
-        body.innerHTML = '<tr><td colspan="7" class="muted">Noch keine Links vorhanden.</td></tr>';
-        return;
-      }
-      // data-label wird in der Mobile-Darstellung (Card-Layout) als
-      // Label vor jedem Wert angezeigt.
-      body.innerHTML = links.map((l) => `
-        <tr data-id="${l.id}">
-          <td class="cell-address" data-label="Adresse">
-            <div>
-              <strong>${escapeHtml(l.customer_name)}</strong><br>
-              <span class="token-short">${l.token.slice(0, 8)}…</span>
-            </div>
-          </td>
-          <td data-label="Notiz">${escapeHtml(l.note || '')}</td>
-          <td data-label="Erstellt">${fmtDate(l.created_at)}</td>
-          <td data-label="Letzter Aufruf">${fmtDate(l.last_viewed_at)}</td>
-          <td data-label="Aufrufe">${l.view_count || 0}</td>
-          <td data-label="Status">
-            <span class="status ${l.is_active ? 'active' : 'inactive'}">
-              ${l.is_active ? 'Aktiv' : 'Inaktiv'}
-            </span>
-          </td>
-          <td class="actions-cell" data-label="Aktionen">
-            <div class="actions">
-              <button data-action="copy" data-token="${l.token}">Link kopieren</button>
-              <button data-action="toggle" data-id="${l.id}" data-active="${l.is_active ? '1' : '0'}">
-                ${l.is_active ? 'Deaktivieren' : 'Aktivieren'}
-              </button>
-              <button class="danger" data-action="delete" data-id="${l.id}" data-name="${escapeHtml(l.customer_name)}">Löschen</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
-      // Hinweis: Das DB-Feld heisst weiterhin `customer_name`,
-      // enthält aber neu die Adresse — kein Schema-Migrationsbedarf.
-    }
-
-    // Event-Delegation für die Tabellen-Buttons
-    $('linksBody').addEventListener('click', async (ev) => {
-      const btn = ev.target.closest('button[data-action]');
-      if (!btn) return;
-      const action = btn.dataset.action;
-
-      if (action === 'copy') {
-        const url = buildShareUrl(btn.dataset.token);
-        try {
-          await navigator.clipboard.writeText(url);
-          showMsg('listMsg', 'Link in Zwischenablage kopiert.', 'success');
-        } catch (e) {
-          showMsg('listMsg', 'Kopieren fehlgeschlagen. Link: ' + url, 'info');
-        }
-        return;
-      }
-
-      if (action === 'toggle') {
-        const id = btn.dataset.id;
-        const currentlyActive = btn.dataset.active === '1';
-        btn.disabled = true;
-        try {
-          await apiCall('/toggle-link', {
-            method: 'POST',
-            body: JSON.stringify({ id, is_active: !currentlyActive }),
-          });
-          await loadLinks();
-        } catch (e) {
-          showMsg('listMsg', 'Fehler: ' + e.message, 'error');
-          btn.disabled = false;
-        }
-        return;
-      }
-
-      if (action === 'delete') {
-        const id = btn.dataset.id;
-        const name = btn.dataset.name;
-        if (!confirm(`Link für «${name}» wirklich löschen? Die Datei wird ebenfalls entfernt.`)) return;
-        btn.disabled = true;
-        try {
-          await apiCall('/delete-link', {
-            method: 'POST',
-            body: JSON.stringify({ id }),
-          });
-          await loadLinks();
-          showMsg('listMsg', 'Link gelöscht.', 'success');
-        } catch (e) {
-          showMsg('listMsg', 'Fehler: ' + e.message, 'error');
-          btn.disabled = false;
-        }
-      }
-    });
-
-    // Datei als Base64 einlesen
     function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const result = reader.result || '';
-          const comma = result.indexOf(',');
+      return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function() {
+          var result = reader.result || '';
+          var comma = result.indexOf(',');
           resolve(comma >= 0 ? result.slice(comma + 1) : result);
         };
-        reader.onerror = () => reject(new Error('Datei konnte nicht gelesen werden'));
+        reader.onerror = function() { reject(new Error('Datei konnte nicht gelesen werden')); };
         reader.readAsDataURL(file);
       });
     }
 
-    // Neuen Link erstellen
-    $('createBtn').addEventListener('click', async () => {
-      const address = $('address').value.trim();
-      const note = $('note').value.trim();
-      const file = $('pdfFile').files[0];
+    // ============================================================
+    // LOGIN
+    // ============================================================
+    function tryLogin(pwd) {
+      setPwd(pwd);
+      return apiCall('/list-links').then(function() {
+        return true;
+      }).catch(function(e) {
+        if (e.status === 401) { clearPwd(); return false; }
+        return true;
+      });
+    }
 
-      showMsg('createMsg', '', '');
+    function doLogin() {
+      var pwd = $('pwd') ? $('pwd').value : '';
+      if (!pwd) { showMsg('loginMsg', 'Passwort eingeben.', 'error'); return; }
+      showMsg('loginMsg', 'Pruefe...', 'info');
+      tryLogin(pwd).then(function(ok) {
+        if (ok) { showMsg('loginMsg','',''); showApp(); }
+        else { showMsg('loginMsg', 'Passwort falsch.', 'error'); }
+      }).catch(function(e) {
+        showMsg('loginMsg', 'Fehler: ' + e.message, 'error');
+      });
+    }
 
-      if (!address) { showMsg('createMsg', 'Adresse fehlt.', 'error'); return; }
-      if (!file) { showMsg('createMsg', 'Bitte eine PDF-Datei auswählen.', 'error'); return; }
-      if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-        showMsg('createMsg', 'Nur PDF-Dateien erlaubt.', 'error'); return;
-      }
+    function showApp() {
+      $('login').classList.add('hidden');
+      $('app').classList.remove('hidden');
+      loadKunden();
+      loadPunkteCheckboxes();
+      loadAnsprechpersonenDropdown();
+    }
+    function showLogin() {
+      $('app').classList.add('hidden');
+      $('login').classList.remove('hidden');
+      if ($('pwd')) $('pwd').focus();
+    }
 
-      const btn = $('createBtn');
-      btn.disabled = true;
-      btn.textContent = 'Lädt hoch…';
+    // Enter-Taste im Passwortfeld
+    if ($('pwd')) {
+      $('pwd').onkeydown = function(e) { if (e.key === 'Enter') doLogin(); };
+    }
+    if ($('logoutBtn')) {
+      $('logoutBtn').onclick = function() { clearPwd(); showLogin(); };
+    }
 
+    // ============================================================
+    // TABS (nur noch Kunden + Katalog)
+    // ============================================================
+    document.querySelector('.tabs').addEventListener('click', function(ev) {
+      var btn = ev.target.closest('button[data-tab]');
+      if (!btn) return;
+      var tab = btn.dataset.tab;
+      document.querySelectorAll('.tabs button').forEach(function(b) { b.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      $('tab-' + tab).classList.add('active');
+      if (tab === 'kunden') { loadKunden(); loadPunkteCheckboxes(); }
+      if (tab === 'katalog') loadKatalog();
+    });
+
+    // ============================================================
+    // DOKUMENTE-Hilfsfunktionen (werden im Detail-Panel benutzt)
+    // ============================================================
+    function buildShareUrl(token) {
+      return location.origin + '/view.html?t=' + token;
+    }
+
+    // ============================================================
+    // KUNDEN
+    // ============================================================
+    async function loadKunden() {
+      showMsg('kundenMsg','','');
       try {
-        const base64 = await fileToBase64(file);
-        // Wir senden weiterhin `customer_name` an die Function,
-        // damit das DB-Schema unverändert bleibt; Inhalt ist die Adresse.
-        const data = await apiCall('/create-link', {
-          method: 'POST',
-          body: JSON.stringify({
-            customer_name: address,
-            note,
-            file_name: file.name,
-            file_base64: base64,
-          }),
+        var data = await apiCall('/list-kunden');
+        renderKunden(data.kunden || []);
+      } catch(e) {
+        if (e.status === 401) { clearPwd(); showLogin(); return; }
+        showMsg('kundenMsg','Fehler: '+e.message,'error');
+      }
+    }
+
+    function renderKunden(kunden) {
+      var body = $('kundenBody');
+      if (!kunden.length) {
+        body.innerHTML = '<tr><td colspan="7" class="muted">Noch keine Kunden.</td></tr>';
+        return;
+      }
+      body.innerHTML = kunden.map(function(k) {
+        var anredePrefix = {frau:'Frau ',herr:'Herr ',familie:'Familie '};
+        var name = (anredePrefix[k.anrede_typ]||'') + escapeHtml((k.anrede_typ!=='familie'&&k.vorname?k.vorname+' ':'')+k.nachname);
+        var statusCls = k.status==='aktiv' ? 'active' : 'inactive';
+        var besuchInfo = k.besuche
+          ? k.besuche + ' Besuche'
+          : '<span class="muted">--</span>';
+        var markiertInfo = k.markierte_punkte
+          ? k.markierte_punkte + ' Punkte' + (k.kommentare ? ', ' + k.kommentare + ' Notizen' : '')
+          : '<span class="muted">--</span>';
+        return '<tr>'
+          + '<td><strong>'+name+'</strong><br><span class="token-short">'+k.access_token.slice(0,8)+'...</span></td>'
+          + '<td>'+escapeHtml(k.projekt_adresse||'')+'</td>'
+          + '<td>'+(k.termin_datum ? fmtDateShort(k.termin_datum) + (k.termin_uhrzeit ? ' '+k.termin_uhrzeit.slice(0,5) : '') : '--')+'</td>'
+          + '<td>'+besuchInfo+'</td>'
+          + '<td>'+markiertInfo+'</td>'
+          + '<td><span class="status '+statusCls+'">'+escapeHtml(k.status)+'</span></td>'
+          + '<td><div class="actions">'
+            + '<button data-kaction="detail" data-id="'+k.id+'">Details</button>'
+            + '<button data-kaction="link" data-token="'+k.access_token+'">Link</button>'
+            + '<button data-kaction="swipe" data-token="'+k.access_token+'">Swipe</button>'
+            + '<button data-kaction="toggle" data-id="'+k.id+'" data-status="'+k.status+'">'+(k.status==='aktiv'?'Deaktivieren':'Aktivieren')+'</button>'
+            + '<button class="danger" data-kaction="delete" data-id="'+k.id+'" data-name="'+name+'">Loeschen</button>'
+          + '</div></td></tr>';
+      }).join('');
+    }
+
+    $('kundenBody').addEventListener('click', async function(ev) {
+      var btn = ev.target.closest('button[data-kaction]');
+      if (!btn) return;
+      var action = btn.dataset.kaction;
+      if (action === 'link') {
+        var url = location.origin + '/inspiration.html?t=' + btn.dataset.token;
+        try { await navigator.clipboard.writeText(url); showMsg('kundenMsg','Inspiration-Link kopiert.','success'); }
+        catch(e) { showMsg('kundenMsg','Link: '+url,'info'); }
+        return;
+      }
+      if (action === 'swipe') {
+        var url = location.origin + '/swipe.html?t=' + btn.dataset.token;
+        try { await navigator.clipboard.writeText(url); showMsg('kundenMsg','Swipe-Link kopiert.','success'); }
+        catch(e) { showMsg('kundenMsg','Link: '+url,'info'); }
+        return;
+      }
+      if (action === 'detail') {
+        openKundeDetail(btn.dataset.id);
+        return;
+      }
+      if (action === 'toggle') {
+        btn.disabled = true;
+        var newStatus = btn.dataset.status === 'aktiv' ? 'deaktiviert' : 'aktiv';
+        try {
+          await apiCall('/update-kunde', { method:'POST', body: JSON.stringify({ id:btn.dataset.id, status:newStatus }) });
+          await loadKunden();
+        } catch(e) { showMsg('kundenMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
+        return;
+      }
+      if (action === 'delete') {
+        if (!confirm('Kunde wirklich loeschen? Alle Interessen und Logs werden entfernt.')) return;
+        btn.disabled = true;
+        try {
+          await apiCall('/delete-kunde', { method:'POST', body: JSON.stringify({ id:btn.dataset.id }) });
+          await loadKunden(); showMsg('kundenMsg','Geloescht.','success');
+        } catch(e) { showMsg('kundenMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
+      }
+    });
+
+    // Punkte-Checkboxen laden
+    var punkteCache = [];
+    async function loadPunkteCheckboxes() {
+      try {
+        var data = await apiCall('/list-punkte');
+        punkteCache = data.punkte || [];
+        if (!kategorienCache.length) {
+          var kData = await apiCall('/list-kategorien');
+          kategorienCache = kData.kategorien || [];
+        }
+        renderPunkteCheckboxes();
+      } catch(e) { $('punkteCheckboxes').innerHTML = '<span class="muted">Fehler beim Laden.</span>'; }
+    }
+
+    function renderPunkteCheckboxes() {
+      var container = $('punkteCheckboxes');
+      renderPunkteCheckboxesInto(container, null);
+    }
+
+    // Universelle Punkte-Checkbox-Renderer
+    // container: DOM-Element, selectedIds: null = alle, Array = nur diese
+    function renderPunkteCheckboxesInto(container, selectedIds) {
+      var grouped = {};
+      punkteCache.forEach(function(p) {
+        if (!grouped[p.kategorie]) grouped[p.kategorie] = [];
+        grouped[p.kategorie].push(p);
+      });
+      var katOrder = kategorienCache.map(function(k) { return k.id; });
+      Object.keys(grouped).forEach(function(k) {
+        if (katOrder.indexOf(k) === -1) katOrder.push(k);
+      });
+      var katTitels = {};
+      kategorienCache.forEach(function(k) { katTitels[k.id] = k.titel; });
+
+      var html = '';
+      katOrder.forEach(function(k) {
+        if (!grouped[k]) return;
+        var titel = katTitels[k] || k.charAt(0).toUpperCase() + k.slice(1);
+        html += '<div class="punkte-group">'
+          + '<div class="punkte-group-title" style="display:flex;justify-content:space-between;align-items:center">'
+          + escapeHtml(titel)
+          + '<span style="display:flex;gap:0.4rem">'
+          + '<a href="#" class="kat-toggle-all" data-kat-toggle="'+escapeHtml(k)+'" data-action="none" style="font-size:0.7rem;font-weight:400;text-transform:none;letter-spacing:0;color:#963030;text-decoration:none">Alle abwaehlen</a>'
+          + '<a href="#" class="kat-toggle-all" data-kat-toggle="'+escapeHtml(k)+'" data-action="all" style="font-size:0.7rem;font-weight:400;text-transform:none;letter-spacing:0;color:#2d7a2d;text-decoration:none">Alle waehlen</a>'
+          + '</span></div>';
+        grouped[k].sort(function(a,b) { return a.reihenfolge - b.reihenfolge; }).forEach(function(p) {
+          var isChecked = selectedIds === null || (Array.isArray(selectedIds) && selectedIds.indexOf(p.id) !== -1);
+          html += '<label class="punkt-cb"><input type="checkbox" name="punkt" value="'+p.id+'" data-punkt-kat="'+escapeHtml(k)+'"' + (isChecked ? ' checked' : '') + ' /> '+escapeHtml(p.titel)+'</label>';
         });
-        const shareUrl = buildShareUrl(data.link.token);
-        showMsg('createMsg',
-          `Link erstellt: <a href="${shareUrl}" target="_blank">${shareUrl}</a>`,
-          'success');
-        $('address').value = '';
-        $('note').value = '';
-        $('pdfFile').value = '';
-        await loadLinks();
-      } catch (e) {
-        showMsg('createMsg', 'Fehler: ' + e.message, 'error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Link erstellen';
+        html += '</div>';
+      });
+      container.innerHTML = html;
+    }
+
+    // Kategorie komplett waehlen/abwaehlen (delegiert auf Container)
+    function setupPunkteToggle(container) {
+      container.addEventListener('click', function(ev) {
+        var link = ev.target.closest('.kat-toggle-all');
+        if (!link) return;
+        ev.preventDefault();
+        var kat = link.dataset.katToggle;
+        var action = link.dataset.action;
+        var checked = action === 'all';
+        container.querySelectorAll('input[data-punkt-kat="'+kat+'"]').forEach(function(cb) {
+          cb.checked = checked;
+        });
+      });
+    }
+
+    // Toggle fuer das Hauptformular
+    $('punkteCheckboxes').addEventListener('click', function(ev) {
+      var link = ev.target.closest('.kat-toggle-all');
+      if (!link) return;
+      ev.preventDefault();
+      var kat = link.dataset.katToggle;
+      var action = link.dataset.action;
+      var checked = action === 'all';
+      document.querySelectorAll('#punkteCheckboxes input[data-punkt-kat="'+kat+'"]').forEach(function(cb) {
+        cb.checked = checked;
+      });
+    });
+
+    // Ausgewaehlte Punkte aus einem Container lesen
+    function getSelectedPunkteFrom(container) {
+      var all = container.querySelectorAll('input[name="punkt"]');
+      var checked = container.querySelectorAll('input[name="punkt"]:checked');
+      if (checked.length === all.length) return null;
+      return Array.from(checked).map(function(cb) { return cb.value; });
+    }
+
+    function getSelectedPunkte() {
+      return getSelectedPunkteFrom($('punkteCheckboxes'));
+    }
+
+    $('kundeCreateBtn').addEventListener('click', async function() {
+      var nachname = $('k-nachname').value.trim();
+      showMsg('kundeCreateMsg','','');
+      if (!nachname) { showMsg('kundeCreateMsg','Nachname fehlt.','error'); return; }
+      var btn = $('kundeCreateBtn');
+      btn.disabled = true;
+      try {
+        var selected = getSelectedPunkte();
+        var data = await apiCall('/create-kunde', { method:'POST', body: JSON.stringify({
+          anrede_typ: $('k-anrede').value,
+          vorname: $('k-vorname').value.trim(),
+          nachname: nachname,
+          email: $('k-email').value.trim(),
+          telefon: $('k-telefon').value.trim(),
+          projekt_adresse: $('k-adresse').value.trim(),
+          termin_datum: $('k-datum').value || null,
+          termin_uhrzeit: $('k-uhrzeit').value || null,
+          admin_notizen: $('k-notizen').value.trim(),
+          ansprechperson_id: $('k-ansprechperson').value || null,
+          sichtbare_punkte: selected,
+        }) });
+        var inspoUrl = location.origin + '/inspiration.html?t=' + data.kunde.access_token;
+        showMsg('kundeCreateMsg',
+          'Kunde angelegt! Link: <a href="'+inspoUrl+'" target="_blank">'+inspoUrl+'</a>','success');
+        $('k-vorname').value=''; $('k-nachname').value=''; $('k-email').value='';
+        $('k-telefon').value=''; $('k-adresse').value=''; $('k-datum').value='';
+        $('k-notizen').value='';
+        document.querySelectorAll('#punkteCheckboxes input:checked').forEach(function(c) { c.checked=false; });
+        await loadKunden();
+      } catch(e) { showMsg('kundeCreateMsg','Fehler: '+e.message,'error'); }
+      finally { btn.disabled=false; }
+    });
+
+    // ============================================================
+    // KUNDEN-DETAIL-PANEL (erweitert mit allen Sektionen)
+    // ============================================================
+    var detailKundeId = null;
+    var detailKundeToken = null;
+    var ansprechpersonenList = [];
+
+    async function openKundeDetail(id) {
+      detailKundeId = id;
+      $('detailContent').innerHTML = '<div class="muted">Lade...</div>';
+      $('detailPanel').classList.add('open');
+      $('detailOverlay').classList.add('open');
+      try {
+        var data = await apiCall('/get-kunde-interessen?id=' + id);
+        var k = data.kunde;
+        detailKundeToken = k.access_token;
+        var ap = {frau:'Frau ',herr:'Herr ',familie:'Familie '};
+        var name = (ap[k.anrede_typ]||'') + escapeHtml((k.anrede_typ!=='familie'&&k.vorname?k.vorname+' ':'')+k.nachname);
+
+        var html = '';
+
+        // ---- Sektion 1: Kundendaten (editierbar) ----
+        html += '<div class="detail-section">';
+        html += '<h3>Kundendaten</h3>';
+        html += '<div class="detail-form-row">';
+        html += '<div><label for="dk-anrede">Anrede</label>';
+        html += '<select id="dk-anrede">'
+          + '<option value="frau"' + (k.anrede_typ==='frau'?' selected':'') + '>Frau</option>'
+          + '<option value="herr"' + (k.anrede_typ==='herr'?' selected':'') + '>Herr</option>'
+          + '<option value="familie"' + (k.anrede_typ==='familie'?' selected':'') + '>Familie</option>'
+          + '</select></div>';
+        html += '<div><label for="dk-vorname">Vorname</label>';
+        html += '<input type="text" id="dk-vorname" value="'+escapeHtml(k.vorname||'')+'" autocomplete="off" /></div>';
+        html += '</div>';
+        html += '<div class="detail-form-row">';
+        html += '<div><label for="dk-nachname">Nachname</label>';
+        html += '<input type="text" id="dk-nachname" value="'+escapeHtml(k.nachname||'')+'" autocomplete="off" /></div>';
+        html += '<div><label for="dk-adresse">Projekt-Adresse</label>';
+        html += '<input type="text" id="dk-adresse" value="'+escapeHtml(k.projekt_adresse||'')+'" autocomplete="off" /></div>';
+        html += '</div>';
+        html += '<div class="detail-form-row">';
+        html += '<div><label for="dk-email">E-Mail</label>';
+        html += '<input type="email" id="dk-email" value="'+escapeHtml(k.email||'')+'" autocomplete="new-password" /></div>';
+        html += '<div><label for="dk-telefon">Telefon</label>';
+        html += '<input type="tel" id="dk-telefon" value="'+escapeHtml(k.telefon||'')+'" autocomplete="off" /></div>';
+        html += '</div>';
+        html += '<div class="detail-form-row">';
+        html += '<div><label for="dk-datum">Termin Datum</label>';
+        html += '<input type="date" id="dk-datum" value="'+(k.termin_datum||'')+'" style="width:100%;max-width:100%;box-sizing:border-box" /></div>';
+        html += '<div><label for="dk-uhrzeit">Termin Uhrzeit</label>';
+        html += '<input type="time" id="dk-uhrzeit" value="'+(k.termin_uhrzeit||'')+'" style="width:100%;max-width:100%;box-sizing:border-box" /></div>';
+        html += '</div>';
+        html += '<label for="dk-ansprechperson">Ansprechperson</label>';
+        html += '<select id="dk-ansprechperson"><option value="">-- Keine --</option></select>';
+        html += '<label for="dk-notizen">Admin-Notizen (intern)</label>';
+        html += '<textarea id="dk-notizen" autocomplete="off">'+escapeHtml(k.admin_notizen||'')+'</textarea>';
+        // Status-Toggle
+        var statusActive = k.status === 'aktiv';
+        html += '<div style="display:flex;align-items:center;gap:0.8rem;margin-top:0.8rem">';
+        html += '<span style="font-size:0.85rem;font-weight:500">Status:</span>';
+        html += '<span class="status '+(statusActive?'active':'inactive')+'">'+escapeHtml(k.status)+'</span>';
+        html += '<button class="actions" style="display:inline" id="dk-toggle-status" data-status="'+k.status+'">'+(statusActive?'Deaktivieren':'Aktivieren')+'</button>';
+        html += '</div>';
+        html += '<div id="detailKundeMsg"></div>';
+        html += '<button class="primary" id="dk-save" style="margin-top:0.8rem">Speichern</button>';
+        html += '</div>';
+
+        // ---- Sektion 2: Links ----
+        html += '<div class="detail-section">';
+        html += '<h3>Links</h3>';
+        html += '<div class="detail-link-buttons">';
+        html += '<button id="dk-copy-inspo" data-token="'+k.access_token+'">Inspiration-Link kopieren</button>';
+        html += '<button id="dk-copy-swipe" data-token="'+k.access_token+'">Swipe-Link kopieren</button>';
+        html += '</div>';
+        html += '<p style="font-size:0.82rem;margin:0.3rem 0"><strong>Token:</strong> <span class="token-short">'+k.access_token+'</span></p>';
+        html += '<div id="detailLinkMsg"></div>';
+        html += '</div>';
+
+        // ---- Sektion 3: Sichtbare Punkte ----
+        html += '<div class="detail-section">';
+        html += '<h3>Sichtbare Punkte</h3>';
+        html += '<p class="muted" style="margin:0 0 0.6rem">Haken entfernen = Kunde sieht diesen Punkt nicht.</p>';
+        html += '<div id="detailPunkteCheckboxes" class="muted">Lade...</div>';
+        html += '<div id="detailPunkteMsg"></div>';
+        html += '<button class="primary" id="dk-save-punkte" style="font-size:0.85rem;padding:0.5rem 1rem">Punkte speichern</button>';
+        html += '</div>';
+
+        // ---- Sektion 4: Dokumente ----
+        html += '<div class="detail-section">';
+        html += '<h3>Dokumente</h3>';
+        var docs = data.dokumente || [];
+        if (docs.length) {
+          docs.forEach(function(d) {
+            html += '<div class="detail-doc">';
+            html += '<div><span class="doc-name">'+escapeHtml(d.note||d.customer_name||'Dokument')+'</span><br><span class="doc-meta">'+fmtDate(d.created_at)+' &middot; '+d.view_count+' Aufrufe</span></div>';
+            html += '<div class="doc-actions">';
+            html += '<span class="status '+(d.is_active?'active':'inactive')+'">'+(d.is_active?'Aktiv':'Inaktiv')+'</span>';
+            html += '<button style="border:1px solid #929A9D;background:#fff;color:#4B575D;padding:0.2rem 0.4rem;border-radius:3px;cursor:pointer;font-size:0.72rem;margin-left:0.3rem" data-doc-toggle="'+d.id+'" data-doc-active="'+(d.is_active?'1':'0')+'">'+(d.is_active?'Deakt.':'Aktiv.')+'</button>';
+            html += '<button class="danger" style="border:1px solid #929A9D;background:#fff;color:#963030;padding:0.2rem 0.4rem;border-radius:3px;cursor:pointer;font-size:0.72rem;margin-left:0.2rem" data-doc-delete="'+d.id+'">X</button>';
+            html += '</div>';
+            html += '</div>';
+          });
+        } else {
+          html += '<p class="muted">Noch keine Dokumente.</p>';
+        }
+        html += '<div style="margin-top:0.7rem">';
+        html += '<label for="detail-doc-note" style="font-size:0.8rem">Bezeichnung</label>';
+        html += '<input type="text" id="detail-doc-note" placeholder="z.B. Visualisierung Bad OG" style="margin-bottom:0.4rem;font-size:0.85rem" autocomplete="off" />';
+        html += '<input type="file" id="detail-doc-file" accept="application/pdf" style="font-size:0.85rem" />';
+        html += '<button class="primary" id="detail-doc-upload" style="font-size:0.85rem;padding:0.5rem 1rem;margin-top:0.5rem">PDF hochladen</button>';
+        html += '<div id="detailDocMsg"></div>';
+        html += '</div>';
+        html += '</div>';
+
+        // ---- Sektion 5: Interessen ----
+        var interessen = data.interessen || [];
+        var marked = interessen.filter(function(i) { return i.interessiert; });
+        html += '<div class="detail-section">';
+        html += '<h3>Interessen ('+marked.length+' markiert)</h3>';
+        if (!marked.length) {
+          html += '<p class="muted">Noch nichts markiert.</p>';
+        } else {
+          marked.forEach(function(i) {
+            var punkt = i.inspiration_punkte || {};
+            html += '<div class="interest-item">';
+            html += '<div class="int-cat">'+escapeHtml(punkt.kategorie||'')+'</div>';
+            html += '<div class="int-title">'+escapeHtml(punkt.titel||i.punkt_id)+'</div>';
+            if (i.kommentar) html += '<div class="int-comment">&laquo;'+escapeHtml(i.kommentar)+'&raquo;</div>';
+            html += '</div>';
+          });
+        }
+        html += '</div>';
+
+        // ---- Sektion 6: Aktivitaet (zusammengeklappt) ----
+        var log = data.log || [];
+        html += '<div class="detail-section">';
+        html += '<h3>Aktivitaet</h3>';
+        if (log.length) {
+          html += '<button id="dk-show-log" style="border:1px solid #929A9D;background:#fff;color:#4B575D;padding:0.35rem 0.7rem;border-radius:3px;cursor:pointer;font-size:0.8rem">Historie anzeigen ('+log.length+' Eintraege)</button>';
+          html += '<div id="dk-log-entries" class="hidden" style="margin-top:0.6rem">';
+          var aktionLabels = {
+            'seite_geoeffnet': 'Seite geoeffnet',
+            'punkt_markiert': 'Punkt markiert',
+            'punkt_demarkiert': 'Punkt demarkiert',
+            'kommentar_hinzu': 'Kommentar hinzugefuegt',
+          };
+          log.forEach(function(l) {
+            var label = aktionLabels[l.aktion] || l.aktion;
+            var details = '';
+            if (l.details && l.details.punkt_id) {
+              var punkt = interessen.find(function(i) { return i.punkt_id === l.details.punkt_id; });
+              if (punkt && punkt.inspiration_punkte) details = ' -- ' + punkt.inspiration_punkte.titel;
+            }
+            html += '<div class="log-entry" style="padding:0.4rem 0;border-bottom:1px solid #f0f0f0">'
+              + '<div style="font-size:0.82rem;color:#4B575D"><strong>'+escapeHtml(label)+'</strong>'+escapeHtml(details)+'</div>'
+              + '<div style="font-size:0.72rem;color:#929A9D">'+fmtDate(l.timestamp)+'</div>'
+              + '</div>';
+          });
+          html += '</div>';
+        } else {
+          html += '<p class="muted">Noch keine Aktivitaet.</p>';
+        }
+        html += '</div>';
+
+        $('detailContent').innerHTML = html;
+
+        // --- Event-Handler fuer Detail-Panel aufsetzen ---
+
+        // Ansprechpersonen-Dropdown befuellen
+        var apSel = $('dk-ansprechperson');
+        if (apSel && ansprechpersonenList.length) {
+          ansprechpersonenList.forEach(function(a) {
+            if (!a.aktiv) return;
+            var opt = document.createElement('option');
+            opt.value = a.id;
+            opt.textContent = a.name;
+            apSel.appendChild(opt);
+          });
+          if (k.ansprechperson_id) apSel.value = k.ansprechperson_id;
+        }
+
+        // Sichtbare Punkte laden
+        var detPunkteContainer = $('detailPunkteCheckboxes');
+        if (detPunkteContainer && punkteCache.length) {
+          renderPunkteCheckboxesInto(detPunkteContainer, k.sichtbare_punkte);
+          setupPunkteToggle(detPunkteContainer);
+        }
+
+        // Kundendaten speichern
+        $('dk-save').addEventListener('click', async function() {
+          this.disabled = true;
+          showMsg('detailKundeMsg','','');
+          try {
+            await apiCall('/update-kunde', { method:'POST', body: JSON.stringify({
+              id: id,
+              anrede_typ: $('dk-anrede').value,
+              vorname: $('dk-vorname').value.trim(),
+              nachname: $('dk-nachname').value.trim(),
+              email: $('dk-email').value.trim(),
+              telefon: $('dk-telefon').value.trim(),
+              projekt_adresse: $('dk-adresse').value.trim(),
+              termin_datum: $('dk-datum').value || null,
+              termin_uhrzeit: $('dk-uhrzeit').value || null,
+              admin_notizen: $('dk-notizen').value.trim(),
+              ansprechperson_id: $('dk-ansprechperson').value || null,
+            }) });
+            showMsg('detailKundeMsg','Gespeichert.','success');
+            await loadKunden();
+          } catch(e) { showMsg('detailKundeMsg','Fehler: '+e.message,'error'); }
+          finally { this.disabled = false; }
+        });
+
+        // Status-Toggle
+        var toggleBtn = $('dk-toggle-status');
+        if (toggleBtn) {
+          toggleBtn.addEventListener('click', async function() {
+            var newStatus = this.dataset.status === 'aktiv' ? 'deaktiviert' : 'aktiv';
+            this.disabled = true;
+            try {
+              await apiCall('/update-kunde', { method:'POST', body: JSON.stringify({ id: id, status: newStatus }) });
+              await loadKunden();
+              openKundeDetail(id);
+            } catch(e) { showMsg('detailKundeMsg','Fehler: '+e.message,'error'); this.disabled = false; }
+          });
+        }
+
+        // Link kopieren - Inspiration
+        $('dk-copy-inspo').addEventListener('click', function() {
+          var url = location.origin + '/inspiration.html?t=' + this.dataset.token;
+          navigator.clipboard.writeText(url).then(function() {
+            showMsg('detailLinkMsg','Inspiration-Link kopiert.','success');
+          }).catch(function() {
+            showMsg('detailLinkMsg','Link: '+url,'info');
+          });
+        });
+
+        // Link kopieren - Swipe
+        $('dk-copy-swipe').addEventListener('click', function() {
+          var url = location.origin + '/swipe.html?t=' + this.dataset.token;
+          navigator.clipboard.writeText(url).then(function() {
+            showMsg('detailLinkMsg','Swipe-Link kopiert.','success');
+          }).catch(function() {
+            showMsg('detailLinkMsg','Link: '+url,'info');
+          });
+        });
+
+        // Punkte speichern
+        $('dk-save-punkte').addEventListener('click', async function() {
+          this.disabled = true;
+          showMsg('detailPunkteMsg','','');
+          try {
+            var selected = getSelectedPunkteFrom($('detailPunkteCheckboxes'));
+            await apiCall('/update-kunde', { method:'POST', body: JSON.stringify({
+              id: id,
+              sichtbare_punkte: selected,
+            }) });
+            showMsg('detailPunkteMsg','Punkte gespeichert.','success');
+          } catch(e) { showMsg('detailPunkteMsg','Fehler: '+e.message,'error'); }
+          finally { this.disabled = false; }
+        });
+
+        // Dokument-Upload
+        $('detail-doc-upload').addEventListener('click', async function() {
+          var file = $('detail-doc-file').files[0];
+          var label = $('detail-doc-note').value.trim() || 'Dokument';
+          if (!file) { showMsg('detailDocMsg','Bitte PDF auswaehlen.','error'); return; }
+          this.disabled = true; this.textContent = 'Laedt hoch...';
+          showMsg('detailDocMsg','','');
+          try {
+            var base64 = await fileToBase64(file);
+            await apiCall('/create-link', { method:'POST', body: JSON.stringify({
+              customer_name: label,
+              note: label,
+              file_name: file.name,
+              file_base64: base64,
+              token: detailKundeToken,
+            }) });
+            showMsg('detailDocMsg','Hochgeladen!','success');
+            setTimeout(function() { openKundeDetail(id); }, 600);
+          } catch(e) { showMsg('detailDocMsg','Fehler: '+e.message,'error'); this.disabled=false; this.textContent='PDF hochladen'; }
+        });
+
+        // Dokument-Aktionen (Toggle / Loeschen) via Event-Delegation
+        $('detailContent').addEventListener('click', async function(ev) {
+          // Dokument-Status-Toggle
+          var toggleDocBtn = ev.target.closest('button[data-doc-toggle]');
+          if (toggleDocBtn) {
+            toggleDocBtn.disabled = true;
+            try {
+              await apiCall('/toggle-link', { method:'POST', body: JSON.stringify({ id: toggleDocBtn.dataset.docToggle, is_active: toggleDocBtn.dataset.docActive !== '1' }) });
+              openKundeDetail(id);
+            } catch(e) { showMsg('detailDocMsg','Fehler: '+e.message,'error'); toggleDocBtn.disabled = false; }
+            return;
+          }
+          // Dokument loeschen
+          var delDocBtn = ev.target.closest('button[data-doc-delete]');
+          if (delDocBtn) {
+            if (!confirm('Dokument wirklich loeschen?')) return;
+            delDocBtn.disabled = true;
+            try {
+              await apiCall('/delete-link', { method:'POST', body: JSON.stringify({ id: delDocBtn.dataset.docDelete }) });
+              showMsg('detailDocMsg','Geloescht.','success');
+              openKundeDetail(id);
+            } catch(e) { showMsg('detailDocMsg','Fehler: '+e.message,'error'); delDocBtn.disabled = false; }
+            return;
+          }
+        });
+
+        // Aktivitaets-Log aufklappen
+        var showLogBtn = $('dk-show-log');
+        if (showLogBtn) {
+          showLogBtn.addEventListener('click', function() {
+            var entries = $('dk-log-entries');
+            if (entries.classList.contains('hidden')) {
+              entries.classList.remove('hidden');
+              this.textContent = 'Historie ausblenden';
+            } else {
+              entries.classList.add('hidden');
+              this.textContent = 'Historie anzeigen ('+log.length+' Eintraege)';
+            }
+          });
+        }
+
+      } catch(e) {
+        $('detailContent').innerHTML = '<div class="msg error">Fehler: '+escapeHtml(e.message)+'</div>';
+      }
+    }
+
+    function closeDetail() {
+      $('detailPanel').classList.remove('open');
+      $('detailOverlay').classList.remove('open');
+      detailKundeId = null;
+    }
+    $('detailClose').addEventListener('click', closeDetail);
+    $('detailOverlay').addEventListener('click', closeDetail);
+
+    // ============================================================
+    // KATALOG
+    // ============================================================
+    var katalogPunkte = [];
+    var katLabels = { wc:'WC', waschtisch:'Waschtisch', armaturen:'Armaturen', dusche:'Dusche' };
+
+    async function loadKatalog() {
+      showMsg('katalogMsg','','');
+      try {
+        var data = await apiCall('/list-punkte');
+        katalogPunkte = data.punkte || [];
+        renderKatalog();
+        updateKatVorschlaege();
+        setupDragDrop();
+        await loadKategorien();
+        await loadAnsprechpersonen();
+      } catch(e) { showMsg('katalogMsg','Fehler: '+e.message,'error'); }
+    }
+
+    function updateKatVorschlaege() {
+      var kats = [];
+      katalogPunkte.forEach(function(p) {
+        if (kats.indexOf(p.kategorie) === -1) kats.push(p.kategorie);
+      });
+      var dl = document.getElementById('kat-vorschlaege');
+      dl.innerHTML = kats.map(function(k) {
+        return '<option value="'+escapeHtml(k)+'">';
+      }).join('');
+    }
+
+    function renderKatalog() {
+      var grid = $('katalogGrid');
+      if (!katalogPunkte.length) {
+        grid.innerHTML = '<div class="muted">Keine Punkte im Katalog.</div>';
+        return;
+      }
+      grid.innerHTML = katalogPunkte.map(function(p) {
+        var imgHtml = p.bild_url
+          ? '<img class="kat-img" src="'+escapeHtml(p.bild_url)+'" alt="'+escapeHtml(p.titel)+'" loading="lazy" />'
+          : '<div class="kat-placeholder">Kein Bild</div>';
+        var videoTag = p.video_url ? '<span style="font-size:0.7rem;color:#2d7a2d;font-weight:600"> + Video</span>' : '';
+        return '<div class="kat-card" data-punkt-id="'+p.id+'" data-punkt-kat="'+escapeHtml(p.kategorie)+'" draggable="true">'
+          + '<div class="drag-handle" title="Verschieben"></div>'
+          + imgHtml
+          + '<div class="kat-body">'
+            + '<div class="kat-cat">'+(katLabels[p.kategorie]||p.kategorie)+' &middot; '+p.reihenfolge+videoTag+'</div>'
+            + '<h3>'+escapeHtml(p.titel)+'</h3>'
+            + '<p>'+escapeHtml(p.kurzbeschreibung||'')+'</p>'
+            + (p.vorteil ? '<p style="font-size:0.78rem;color:#2d7a2d"><strong>+</strong> '+escapeHtml(p.vorteil)+'</p>' : '')
+            + (p.zu_bedenken ? '<p style="font-size:0.78rem;color:#BF853B"><strong>!</strong> '+escapeHtml(p.zu_bedenken)+'</p>' : '')
+          + '</div>'
+          + '<div class="kat-actions">'
+            + '<button data-kataction="bild" data-id="'+p.id+'">Bild '+(p.bild_url?'ersetzen':'hochladen')+'</button>'
+            + '<button data-kataction="video" data-id="'+p.id+'">Video '+(p.video_url?'ersetzen':'hochladen')+'</button>'
+            + '<button data-kataction="edit" data-id="'+p.id+'">Bearbeiten</button>'
+            + '<button class="danger" data-kataction="delete" data-id="'+p.id+'">Entfernen</button>'
+          + '</div></div>';
+      }).join('');
+    }
+
+    // Hero-Hintergrundbild hochladen
+    $('heroBgUpload').addEventListener('click', async function() {
+      var file = $('heroBgFile').files[0];
+      if (!file) { showMsg('heroBgMsg','Bitte Bild auswaehlen.','error'); return; }
+      this.disabled = true; this.textContent = 'Laedt hoch...';
+      showMsg('heroBgMsg','','');
+      try {
+        var base64 = await fileToBase64(file);
+        var data = await apiCall('/update-hero-bg', { method:'POST', body: JSON.stringify({
+          file_base64: base64, file_name: file.name
+        }) });
+        showMsg('heroBgMsg','Hintergrund aktualisiert.','success');
+        $('heroBgPreview').src = data.url + '?t=' + Date.now();
+        $('heroBgFile').value = '';
+      } catch(e) { showMsg('heroBgMsg','Fehler: '+e.message,'error'); }
+      finally { this.disabled = false; this.textContent = 'Hintergrund ersetzen'; }
+    });
+
+    // Neuen Punkt anlegen
+    $('npCreateBtn').addEventListener('click', async function() {
+      var titel = $('np-titel').value.trim();
+      showMsg('npMsg','','');
+      if (!titel) { showMsg('npMsg','Titel fehlt.','error'); return; }
+      this.disabled = true;
+      try {
+        await apiCall('/create-punkt', { method:'POST', body: JSON.stringify({
+          kategorie: $('np-kategorie').value.trim().toLowerCase(),
+          titel: titel,
+          kurzbeschreibung: $('np-kurz').value.trim(),
+          vorteil: $('np-vorteil').value.trim(),
+          zu_bedenken: $('np-bedenken').value.trim(),
+        }) });
+        showMsg('npMsg','Punkt hinzugefuegt.','success');
+        $('np-titel').value=''; $('np-kurz').value=''; $('np-vorteil').value=''; $('np-bedenken').value='';
+        punkteCache = [];
+        await loadKatalog();
+        loadPunkteCheckboxes();
+      } catch(e) { showMsg('npMsg','Fehler: '+e.message,'error'); }
+      finally { this.disabled=false; }
+    });
+
+    // Medien-Upload (versteckter File-Input)
+    var mediaUploadTarget = null;
+    var mediaUploadType = null;
+    var currentEditPunktId = null;
+
+    $('katalogGrid').addEventListener('click', async function(ev) {
+      var btn = ev.target.closest('button[data-kataction]');
+      if (!btn) return;
+      var action = btn.dataset.kataction;
+      var id = btn.dataset.id;
+
+      if (action === 'bild' || action === 'video') {
+        mediaUploadTarget = id;
+        mediaUploadType = action;
+        var input = $('mediaUpload');
+        input.accept = action === 'bild' ? 'image/jpeg,image/png,image/webp' : 'video/mp4,video/webm';
+        input.value = '';
+        input.click();
+        return;
+      }
+
+      if (action === 'edit') {
+        openTextEditor(id);
+        return;
+      }
+
+      if (action === 'delete') {
+        var punkt = katalogPunkte.find(function(x) { return x.id === id; });
+        if (!confirm((punkt?punkt.titel:id)+' wirklich entfernen?')) return;
+        btn.disabled = true;
+        try {
+          await apiCall('/delete-punkt', { method:'POST', body: JSON.stringify({ id: id }) });
+          showMsg('katalogMsg','Entfernt.','success');
+          punkteCache = [];
+          await loadKatalog();
+          loadPunkteCheckboxes();
+        } catch(e) { showMsg('katalogMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
       }
     });
 
-    // Login-Handler
-    $('loginBtn').addEventListener('click', async () => {
-      const pwd = $('pwd').value;
-      if (!pwd) return;
-      showMsg('loginMsg', 'Prüfe Passwort…', 'info');
-      const ok = await tryLogin(pwd);
-      if (ok) {
-        showMsg('loginMsg', '', '');
-        showApp();
+    $('mediaUpload').addEventListener('change', async function() {
+      var file = this.files[0];
+      if (!file || !mediaUploadTarget) return;
+
+      if (mediaUploadType === 'med-bild' || mediaUploadType === 'med-video') {
+        showMsg('medMsg', 'Laedt hoch...', 'info');
+        try {
+          var base64 = await fileToBase64(file);
+          await apiCall('/upload-punkt-medium-file', { method:'POST', body: JSON.stringify({
+            medium_id: mediaUploadTarget,
+            file_base64: base64,
+            file_name: file.name,
+            media_type: mediaUploadType === 'med-bild' ? 'bild' : 'video',
+          }) });
+          showMsg('medMsg', 'Hochgeladen.', 'success');
+          if (currentEditPunktId) loadPunktMedien(currentEditPunktId);
+        } catch(e) { showMsg('medMsg', 'Fehler: '+e.message, 'error'); }
+      } else if (mediaUploadType === 'ap-foto') {
+        showMsg('apMsg', 'Laedt Foto hoch...', 'info');
+        try {
+          var base64 = await fileToBase64(file);
+          await apiCall('/upload-ansprechperson-foto', { method:'POST', body: JSON.stringify({
+            ansprechperson_id: mediaUploadTarget,
+            file_base64: base64,
+            file_name: file.name,
+          }) });
+          showMsg('apMsg', 'Foto hochgeladen.', 'success');
+          await loadAnsprechpersonen();
+        } catch(e) { showMsg('apMsg', 'Fehler: '+e.message, 'error'); }
       } else {
-        showMsg('loginMsg', 'Passwort falsch.', 'error');
+        showMsg('katalogMsg', 'Laedt hoch...', 'info');
+        try {
+          var base64 = await fileToBase64(file);
+          await apiCall('/upload-inspiration-media', { method:'POST', body: JSON.stringify({
+            punkt_id: mediaUploadTarget,
+            file_base64: base64,
+            file_name: file.name,
+            media_type: mediaUploadType,
+          }) });
+          showMsg('katalogMsg', (mediaUploadType==='bild'?'Bild':'Video')+' hochgeladen.', 'success');
+          await loadKatalog();
+        } catch(e) { showMsg('katalogMsg', 'Fehler: '+e.message, 'error'); }
       }
+      mediaUploadTarget = null;
+      mediaUploadType = null;
     });
 
-    $('pwd').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') $('loginBtn').click();
-    });
+    // Inline-Text-Editor (Katalog-Punkt bearbeiten)
+    function openTextEditor(id) {
+      var p = katalogPunkte.find(function(x) { return x.id === id; });
+      if (!p) return;
+      currentEditPunktId = id;
+      $('detailContent').innerHTML = '<h3>Punkt bearbeiten</h3>'
+        + '<label>Kategorie</label><input type="text" id="ed-kat" list="kat-vorschlaege" value="'+escapeHtml(p.kategorie)+'" />'
+        + '<label>Titel</label><input type="text" id="ed-titel" value="'+escapeHtml(p.titel)+'" />'
+        + '<label>Kurzbeschreibung</label><textarea id="ed-kurz">'+(p.kurzbeschreibung||'')+'</textarea>'
+        + '<label>Vorteil</label><textarea id="ed-vorteil">'+(p.vorteil||'')+'</textarea>'
+        + '<label>Zu bedenken</label><textarea id="ed-bedenken">'+(p.zu_bedenken||'')+'</textarea>'
+        + '<label>Reihenfolge</label><input type="text" id="ed-order" value="'+p.reihenfolge+'" style="width:80px" />'
+        + '<div id="edMsg"></div>'
+        + '<button class="primary" id="edSave">Speichern</button>'
+        + '<h3 style="margin-top:1.5rem">Slides / Varianten</h3>'
+        + '<p class="muted" style="margin:-0.3rem 0 0.5rem">Mehrere Bilder oder Videos pro Punkt (z.B. verschiedene Farben). Erscheinen als horizontale Carousel im Swipe-Modus.</p>'
+        + '<div id="medienList" class="medien-list"><span class="muted">Lade...</span></div>'
+        + '<div style="display:flex;gap:0.5rem;align-items:end;margin-top:0.5rem">'
+        + '<div style="flex:1"><label style="font-size:0.78rem">Name (z.B. Farbe)</label><input type="text" id="med-name" placeholder="Naturstein grau" style="font-size:0.85rem" autocomplete="off" /></div>'
+        + '<button class="primary" id="medAddBtn" style="margin:0;font-size:0.8rem;padding:0.4rem 0.8rem">Slide hinzufuegen</button>'
+        + '</div>'
+        + '<div id="medMsg"></div>';
+      $('detailPanel').classList.add('open');
+      $('detailOverlay').classList.add('open');
 
-    $('logoutBtn').addEventListener('click', () => {
-      clearPwd();
+      loadPunktMedien(id);
+
+      $('medAddBtn').addEventListener('click', async function() {
+        var name = $('med-name').value.trim();
+        this.disabled = true;
+        try {
+          await apiCall('/create-punkt-medium', { method:'POST', body: JSON.stringify({ punkt_id: id, name: name || null }) });
+          $('med-name').value = '';
+          loadPunktMedien(id);
+        } catch(e) { showMsg('medMsg','Fehler: '+e.message,'error'); }
+        finally { this.disabled = false; }
+      });
+
+      $('edSave').addEventListener('click', async function() {
+        this.disabled = true;
+        showMsg('edMsg','','');
+        try {
+          await apiCall('/update-punkt', { method:'POST', body: JSON.stringify({
+            id: id,
+            kategorie: $('ed-kat').value.trim().toLowerCase(),
+            titel: $('ed-titel').value.trim(),
+            kurzbeschreibung: $('ed-kurz').value.trim(),
+            vorteil: $('ed-vorteil').value.trim(),
+            zu_bedenken: $('ed-bedenken').value.trim(),
+            reihenfolge: parseInt($('ed-order').value) || 1,
+          }) });
+          showMsg('edMsg','Gespeichert.','success');
+          await loadKatalog();
+          setTimeout(closeDetail, 800);
+        } catch(e) { showMsg('edMsg','Fehler: '+e.message,'error'); this.disabled=false; }
+      });
+    }
+
+    // ============================================================
+    // PUNKT-MEDIEN (Slides)
+    // ============================================================
+    async function loadPunktMedien(punktId) {
+      var el = $('medienList');
+      if (!el) return;
+      try {
+        var data = await apiCall('/list-punkt-medien?punkt_id=' + punktId);
+        var medien = data.medien || [];
+        if (!medien.length) {
+          el.innerHTML = '<span class="muted">Noch keine Slides. Fuege oben welche hinzu.</span>';
+          return;
+        }
+        el.innerHTML = medien.map(function(m) {
+          var thumb = m.bild_url
+            ? '<img src="'+escapeHtml(m.bild_url)+'" />'
+            : '<div class="medien-placeholder">'+(m.video_url?'Video':'--')+'</div>';
+          return '<div class="medien-item" data-med-id="'+m.id+'">'
+            + thumb
+            + '<div class="medien-info"><input type="text" value="'+escapeHtml(m.name||'')+'" placeholder="Name/Farbe" data-med-name="'+m.id+'" /></div>'
+            + '<div class="actions">'
+              + '<button data-medaction="bild" data-id="'+m.id+'">Bild</button>'
+              + '<button data-medaction="video" data-id="'+m.id+'">Video</button>'
+              + '<button data-medaction="save" data-id="'+m.id+'">Name speichern</button>'
+              + '<button class="danger" data-medaction="delete" data-id="'+m.id+'">X</button>'
+            + '</div></div>';
+        }).join('');
+
+        el.onclick = async function(ev) {
+          var btn = ev.target.closest('button[data-medaction]');
+          if (!btn) return;
+          var medId = btn.dataset.id;
+          var action = btn.dataset.medaction;
+
+          if (action === 'bild' || action === 'video') {
+            mediaUploadTarget = medId;
+            mediaUploadType = 'med-' + action;
+            var input = $('mediaUpload');
+            input.accept = action === 'bild' ? 'image/jpeg,image/png,image/webp' : 'video/mp4,video/webm';
+            input.value = '';
+            input.click();
+            return;
+          }
+          if (action === 'save') {
+            var nameInput = el.querySelector('[data-med-name="'+medId+'"]');
+            btn.disabled = true;
+            try {
+              await apiCall('/update-punkt-medium', { method:'POST', body: JSON.stringify({ id: medId, name: nameInput.value.trim() || null }) });
+            } catch(e) { alert('Fehler: '+e.message); }
+            finally { btn.disabled = false; }
+            return;
+          }
+          if (action === 'delete') {
+            if (!confirm('Slide entfernen?')) return;
+            btn.disabled = true;
+            try {
+              await apiCall('/delete-punkt-medium', { method:'POST', body: JSON.stringify({ id: medId }) });
+              loadPunktMedien(punktId);
+            } catch(e) { alert('Fehler: '+e.message); btn.disabled = false; }
+          }
+        };
+      } catch(e) { el.innerHTML = '<span class="muted">Fehler.</span>'; }
+    }
+
+    // ============================================================
+    // ANSPRECHPERSONEN
+    // ============================================================
+    async function loadAnsprechpersonenDropdown() {
+      try {
+        var data = await apiCall('/list-ansprechpersonen');
+        ansprechpersonenList = data.ansprechpersonen || [];
+        updateAnsprechDropdown(ansprechpersonenList);
+      } catch(e) { /* still */ }
+    }
+
+    async function loadAnsprechpersonen() {
+      try {
+        var data = await apiCall('/list-ansprechpersonen');
+        ansprechpersonenList = data.ansprechpersonen || [];
+        renderAnsprechpersonen(ansprechpersonenList);
+        updateAnsprechDropdown(ansprechpersonenList);
+      } catch(e) { $('ansprechBody').innerHTML = '<span class="muted">Fehler.</span>'; }
+    }
+
+    function renderAnsprechpersonen(list) {
+      var el = $('ansprechBody');
+      if (!list.length) { el.innerHTML = '<span class="muted">Noch keine Ansprechpersonen.</span>'; return; }
+      el.innerHTML = list.map(function(a) {
+        var foto = a.foto_url
+          ? '<img src="'+escapeHtml(a.foto_url)+'" alt="'+escapeHtml(a.name)+'" />'
+          : '<div class="ap-placeholder">?</div>';
+        return '<div class="ap-item" data-ap-id="'+a.id+'">'
+          + foto
+          + '<div class="ap-info"><strong>'+escapeHtml(a.name)+'</strong><br><span class="muted">'+escapeHtml(a.email||'')+' &middot; '+escapeHtml(a.telefon||'')+'</span></div>'
+          + '<div class="actions">'
+            + '<button data-apaction="foto" data-id="'+a.id+'">Foto</button>'
+            + '<button class="danger" data-apaction="delete" data-id="'+a.id+'">Entfernen</button>'
+          + '</div></div>';
+      }).join('');
+    }
+
+    // Dropdown im Kunden-Formular befuellen
+    function updateAnsprechDropdown(list) {
+      var sel = $('k-ansprechperson');
+      if (!sel) return;
+      var val = sel.value;
+      sel.innerHTML = '<option value="">-- Keine --</option>';
+      list.forEach(function(a) {
+        if (!a.aktiv) return;
+        var opt = document.createElement('option');
+        opt.value = a.id;
+        opt.textContent = a.name;
+        sel.appendChild(opt);
+      });
+      if (val) sel.value = val;
+    }
+
+    if ($('apCreateBtn')) {
+      $('apCreateBtn').addEventListener('click', async function() {
+        var name = $('ap-name').value.trim();
+        if (!name) { showMsg('apMsg','Name fehlt.','error'); return; }
+        this.disabled = true;
+        try {
+          await apiCall('/create-ansprechperson', { method:'POST', body: JSON.stringify({
+            name: name, email: $('ap-email').value.trim(), telefon: $('ap-telefon').value.trim()
+          }) });
+          showMsg('apMsg','Hinzugefuegt.','success');
+          $('ap-name').value=''; $('ap-email').value=''; $('ap-telefon').value='';
+          await loadAnsprechpersonen();
+        } catch(e) { showMsg('apMsg','Fehler: '+e.message,'error'); }
+        finally { this.disabled=false; }
+      });
+    }
+
+    if ($('ansprechBody')) {
+      $('ansprechBody').addEventListener('click', async function(ev) {
+        var btn = ev.target.closest('button[data-apaction]');
+        if (!btn) return;
+        var id = btn.dataset.id;
+        if (btn.dataset.apaction === 'foto') {
+          mediaUploadTarget = id;
+          mediaUploadType = 'ap-foto';
+          var input = $('mediaUpload');
+          input.accept = 'image/jpeg,image/png,image/webp';
+          input.value = '';
+          input.click();
+          return;
+        }
+        if (btn.dataset.apaction === 'delete') {
+          if (!confirm('Ansprechperson entfernen?')) return;
+          btn.disabled = true;
+          try {
+            await apiCall('/delete-ansprechperson', { method:'POST', body: JSON.stringify({ id: id }) });
+            await loadAnsprechpersonen();
+          } catch(e) { showMsg('apMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
+        }
+      });
+    }
+
+    // ============================================================
+    // KATEGORIEN-EDITOR
+    // ============================================================
+    var kategorienCache = [];
+
+    async function loadKategorien() {
+      try {
+        var data = await apiCall('/list-kategorien');
+        kategorienCache = data.kategorien || [];
+        renderKategorien();
+        setupKatDragDrop();
+      } catch(e) { $('kategorienBody').innerHTML = '<span class="muted">Fehler.</span>'; }
+    }
+
+    function renderKategorien() {
+      var el = $('kategorienBody');
+      if (!kategorienCache.length) { el.innerHTML = '<span class="muted">Keine Kategorien.</span>'; return; }
+      el.innerHTML = kategorienCache.map(function(k) {
+        return '<div class="kat-header-edit" data-kat-id="'+escapeHtml(k.id)+'" data-kat-order="'+k.reihenfolge+'" draggable="true">'
+          + '<div style="display:flex;align-items:center;gap:0.5rem"><div class="drag-handle" title="Verschieben"></div><h3 style="margin:0;flex:1">'+escapeHtml(k.titel)+' <span class="muted">('+escapeHtml(k.id)+')</span></h3></div>'
+          + '<input type="text" value="'+escapeHtml(k.titel)+'" data-kat-field="titel" placeholder="Titel" />'
+          + '<textarea data-kat-field="intro" placeholder="Intro-Text">'+escapeHtml(k.intro||'')+'</textarea>'
+          + '<div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.5rem">'
+            + '<button class="primary" data-kat-save="'+escapeHtml(k.id)+'" style="margin:0;font-size:0.8rem;padding:0.35rem 0.8rem">Speichern</button>'
+          + '</div></div>';
+      }).join('');
+
+      el.querySelectorAll('button[data-kat-save]').forEach(function(btn) {
+        btn.addEventListener('click', async function() {
+          var katId = this.dataset.katSave;
+          var container = el.querySelector('[data-kat-id="'+katId+'"]');
+          btn.disabled = true;
+          try {
+            await apiCall('/update-kategorie', { method:'POST', body: JSON.stringify({
+              id: katId,
+              titel: container.querySelector('[data-kat-field="titel"]').value.trim(),
+              intro: container.querySelector('[data-kat-field="intro"]').value.trim(),
+            }) });
+            container.querySelector('h3').innerHTML = escapeHtml(container.querySelector('[data-kat-field="titel"]').value.trim()) + ' <span class="muted">('+escapeHtml(katId)+')</span>';
+          } catch(e) { alert('Fehler: '+e.message); }
+          finally { btn.disabled=false; }
+        });
+      });
+    }
+
+    // ============================================================
+    // DRAG & DROP FUER KATALOG-PUNKTE
+    // ============================================================
+    var dragItem = null;
+    var dragKat = null;
+
+    function setupDragDrop() {
+      var grid = $('katalogGrid');
+      if (!grid) return;
+
+      grid.addEventListener('dragstart', function(e) {
+        var card = e.target.closest('.kat-card');
+        if (!card) return;
+        dragItem = card.dataset.punktId;
+        dragKat = card.dataset.punktKat;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      grid.addEventListener('dragend', function(e) {
+        var card = e.target.closest('.kat-card');
+        if (card) card.classList.remove('dragging');
+        grid.querySelectorAll('.drag-over').forEach(function(c) { c.classList.remove('drag-over'); });
+        dragItem = null;
+        dragKat = null;
+      });
+
+      grid.addEventListener('dragover', function(e) {
+        var card = e.target.closest('.kat-card');
+        if (!card || card.dataset.punktId === dragItem) return;
+        if (card.dataset.punktKat !== dragKat) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        grid.querySelectorAll('.drag-over').forEach(function(c) { c.classList.remove('drag-over'); });
+        card.classList.add('drag-over');
+      });
+
+      grid.addEventListener('drop', async function(e) {
+        e.preventDefault();
+        var target = e.target.closest('.kat-card');
+        if (!target || !dragItem || target.dataset.punktId === dragItem) return;
+        if (target.dataset.punktKat !== dragKat) return;
+        target.classList.remove('drag-over');
+
+        var cards = Array.from(grid.querySelectorAll('.kat-card[data-punkt-kat="'+dragKat+'"]'));
+        var ids = cards.map(function(c) { return c.dataset.punktId; });
+        var fromIdx = ids.indexOf(dragItem);
+        var toIdx = ids.indexOf(target.dataset.punktId);
+        ids.splice(fromIdx, 1);
+        ids.splice(toIdx, 0, dragItem);
+
+        var updates = ids.map(function(id, i) { return { id: id, reihenfolge: i + 1 }; });
+        try {
+          await apiCall('/update-punkte-order', { method:'POST', body: JSON.stringify({ updates: updates }) });
+          await loadKatalog();
+        } catch(e) { alert('Fehler: '+e.message); }
+      });
+    }
+
+    // ============================================================
+    // DRAG & DROP FUER KATEGORIEN
+    // ============================================================
+    function setupKatDragDrop() {
+      var container = $('kategorienBody');
+      if (!container) return;
+      var dragKatItem = null;
+
+      container.addEventListener('dragstart', function(e) {
+        var el = e.target.closest('.kat-header-edit');
+        if (!el) return;
+        dragKatItem = el.dataset.katId;
+        el.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      container.addEventListener('dragend', function(e) {
+        var el = e.target.closest('.kat-header-edit');
+        if (el) el.classList.remove('dragging');
+        container.querySelectorAll('.drag-over').forEach(function(c) { c.classList.remove('drag-over'); });
+        dragKatItem = null;
+      });
+
+      container.addEventListener('dragover', function(e) {
+        var el = e.target.closest('.kat-header-edit');
+        if (!el || el.dataset.katId === dragKatItem) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        container.querySelectorAll('.drag-over').forEach(function(c) { c.classList.remove('drag-over'); });
+        el.classList.add('drag-over');
+      });
+
+      container.addEventListener('drop', async function(e) {
+        e.preventDefault();
+        var target = e.target.closest('.kat-header-edit');
+        if (!target || !dragKatItem || target.dataset.katId === dragKatItem) return;
+        target.classList.remove('drag-over');
+
+        var items = Array.from(container.querySelectorAll('.kat-header-edit'));
+        var ids = items.map(function(el) { return el.dataset.katId; });
+        var fromIdx = ids.indexOf(dragKatItem);
+        var toIdx = ids.indexOf(target.dataset.katId);
+        ids.splice(fromIdx, 1);
+        ids.splice(toIdx, 0, dragKatItem);
+
+        try {
+          for (var i = 0; i < ids.length; i++) {
+            await apiCall('/update-kategorie', { method:'POST', body: JSON.stringify({
+              id: ids[i], reihenfolge: i + 1
+            }) });
+          }
+          await loadKategorien();
+        } catch(e) { alert('Fehler: '+e.message); }
+      });
+    }
+
+    // ============================================================
+    // INIT - Auto-Login falls Passwort im sessionStorage
+    // ============================================================
+    if (getPwd()) {
+      tryLogin(getPwd()).then(function(ok) {
+        if (ok) showApp();
+        else showLogin();
+      });
+    } else {
       showLogin();
-    });
-
-    // Initial: falls Passwort schon da, direkt versuchen
-    (async function init() {
-      if (getPwd()) {
-        const ok = await tryLogin(getPwd());
-        if (ok) { showApp(); return; }
-      }
-      showLogin();
-    })();
+    }
   </script>
 </body>
 </html>

@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="de-CH"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Ihr Bad — Jäggi Vollmer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ihr Bad — Jäggi Vollmer</title>
+
+<style>
+
+</style>
+
+<style>
+  /* ========================================================
+     JÄGGI VOLLMER — Bad-Inspirations-Seite
+     Designsystem: Sand/Cream + Walnuss + sparsames Gold
+     ======================================================== */
+
+  :root {
+    --bg:        #F4EDE3;
+    --bg-2:     #E8DDC9;
+    --card:     #FAF6EE;
+    --walnut:   #4A3326;
+    --ink:      #1F1A14;
+    --gold:     #BF853B;
+    --muted:    #6B5F50;
+    --hairline: rgba(74,51,38,0.08);
+    --hairline-strong: rgba(74,51,38,0.16);
+    --shadow:   0 8px 30px rgba(74, 51, 38, 0.08);
+    --shadow-lift: 0 18px 60px rgba(74, 51, 38, 0.12);
+    --ease:     cubic-bezier(0.16, 1, 0.3, 1);
+
+    --container: 1180px;
+    --gutter: clamp(20px, 4vw, 56px);
+    --nav-h: 60px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  /* paper grain overlay (omitted in standalone bundle — was an inline SVG filter that the bundler can't handle) */
+
+  img { max-width: 100%; display: block; }
+
+  /* ---------- Type ---------- */
+  .serif { font-family: "Fraunces", Georgia, serif; font-weight: 400; letter-spacing: -0.005em; }
+  .eyebrow {
+    font-family: "DM Sans", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 22px; height: 1px;
+    background: var(--gold);
+    display: inline-block;
+  }
+  .eyebrow.no-rule::before { display: none; }
+  .muted { color: var(--muted); }
+  .tabular { font-variant-numeric: tabular-nums; }
+
+  /* ---------- Reveal pattern ---------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+    will-change: opacity, transform;
+  }
+  .reveal.in-view { opacity: 1; transform: none; }
+  .reveal.delay-1 { transition-delay: 0.08s; }
+  .reveal.delay-2 { transition-delay: 0.18s; }
+  .reveal.delay-3 { transition-delay: 0.28s; }
+  .reveal.delay-4 { transition-delay: 0.38s; }
+  .reveal.delay-5 { transition-delay: 0.48s; }
+
+  /* ============== HERO (Layered Weave) ============== */
+  .hero {
+    position: relative;
+    height: 100vh;
+    min-height: 640px;
+    overflow: hidden;
+    isolation: isolate;
+    z-index: 2;
+    --py-bg: 0px;       /* parallax offsets, updated by JS */
+    --py-text: 0px;
+    --py-obj: 0px;
+    --pr-obj: 0deg;
+  }
+  .hero__bg {
+    position: absolute; inset: -4%;
+    background-size: cover;
+    background-position: center;
+    background-image:
+      var(--hero-bg, url("/assets/inspiration/heroBg.jpg"));
+    animation: kenBurns 22s var(--ease) infinite alternate;
+    z-index: -2;
+    transform: translateY(var(--py-bg));
+    will-change: transform;
+  }
+  @keyframes kenBurns {
+    from { background-position: 50% 48%; }
+    to   { background-position: 52% 52%; }
+  }
+  .hero__bg::after {
+    /* slight darken so the weave reads */
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(31,26,20,0.38) 0%, rgba(31,26,20,0.32) 40%, rgba(31,26,20,0.50) 100%);
+  }
+  .hero__vignette {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 45%, rgba(31,26,20,0) 0%, rgba(31,26,20,0) 45%, rgba(31,26,20,0.40) 100%),
+      linear-gradient(to bottom, rgba(31,26,20,0.10) 0%, rgba(31,26,20,0) 18%, rgba(31,26,20,0) 62%, rgba(244,237,227,0.30) 84%, rgba(244,237,227,1) 100%);
+    z-index: -1;
+  }
+  .hero__inner {
+    position: relative;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 0 var(--gutter);
+  }
+  .hero__content {
+    max-width: 860px;
+    width: 100%;
+    color: #FAF6EE;
+    text-shadow: 0 2px 30px rgba(31,26,20,0.30);
+    transform: translateY(var(--py-text));
+    will-change: transform, opacity, filter;
+    transition: opacity 0.3s linear, filter 0.3s linear;
+  }
+  .hero__eyebrow {
+    color: var(--gold);
+    font-size: 14px;
+    letter-spacing: 0.32em;
+    font-weight: 500;
+    text-transform: uppercase;
+    display: inline-block;
+    position: relative;
+    z-index: 5;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: rise 1.1s var(--ease) 0.10s forwards;
+  }
+  .hero__eyebrow::after {
+    content: "";
+    display: block;
+    width: 36px; height: 1px;
+    background: var(--gold);
+    margin: 14px auto 0;
+    opacity: 0.7;
+  }
+
+  /* ---- Stacked layout: line1 / object / line2 ---- */
+  .hero__weave {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(8px, 1.4vh, 18px);
+    margin: clamp(20px, 3vh, 32px) auto 26px;
+    width: 100%;
+    max-width: 920px;
+    perspective: 1400px;
+  }
+  .hero__headline {
+    font-family: "Fraunces", Georgia, serif;
+    font-variation-settings: "opsz" 144;
+    font-weight: 380;
+    font-size: clamp(34px, 5.4vw, 66px);
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    margin: 0;
+    color: #FAF6EE;
+    width: 100%;
+    text-align: center;
+    text-wrap: balance;
+  }
+  .hero__headline--line1 {
+    opacity: 0;
+    transform: translateY(22px);
+    animation: rise 1.2s var(--ease) 0.22s forwards;
+  }
+  .hero__headline--line2 {
+    opacity: 0;
+    transform: translateY(22px);
+    animation: rise 1.2s var(--ease) 0.85s forwards;
+  }
+  .hero__headline em {
+    font-style: italic;
+    font-weight: 360;
+    color: #F4EDE3;
+  }
+
+  /* ---- 3D Object (freistehende Brass-Armatur) ---- */
+  .hero__object {
+    position: relative;
+    width: clamp(90px, 9vw, 130px);
+    height: clamp(140px, 14vw, 200px);
+    transform-style: preserve-3d;
+    transform:
+      translate3d(0, var(--py-obj), 0)
+      rotateX(var(--rx-obj, 0deg))
+      rotateY(var(--ry-obj, 0deg))
+      rotateZ(var(--pr-obj, 0deg));
+    z-index: 2;
+    pointer-events: none;
+    filter: drop-shadow(0 24px 40px rgba(31,26,20,0.55)) drop-shadow(0 6px 12px rgba(31,26,20,0.45));
+    will-change: transform;
+  }
+  .hero__object img,
+  .hero__object svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    overflow: visible;
+    backface-visibility: visible;
+    animation: heroSpin 16s linear infinite;
+  }
+  @keyframes heroSpin {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(360deg); }
+  }
+  .hero__object--enter {
+    opacity: 0;
+    animation: objectEnter3D 1.6s var(--ease) 0.45s forwards;
+  }
+  @keyframes objectEnter3D {
+    0%   {
+      opacity: 0;
+      transform:
+        translate3d(0, calc(var(--py-obj) + 60px), -300px)
+        rotateX(35deg) rotateY(-55deg) rotateZ(-8deg) scale(0.7);
+    }
+    55%  { opacity: 1; }
+    100% {
+      opacity: 1;
+      transform:
+        translate3d(0, var(--py-obj), 0)
+        rotateX(var(--rx-obj, 0deg)) rotateY(var(--ry-obj, 0deg)) rotateZ(var(--pr-obj, 0deg))
+        scale(1);
+    }
+  }
+
+  /* ---- Termin / Sub ---- */
+  .hero__termin {
+    font-size: clamp(15px, 1.4vw, 19px);
+    color: #F4EDE3;
+    letter-spacing: 0.005em;
+    font-variant-numeric: tabular-nums;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    opacity: 0;
+    transform: translateY(16px);
+    animation: rise 1.2s var(--ease) 1.05s forwards;
+  }
+  .hero__termin::before {
+    content: ""; width: 28px; height: 1px; background: var(--gold);
+  }
+  .hero__sub {
+    margin: 22px auto 0;
+    max-width: 520px;
+    font-size: 16px;
+    color: rgba(250, 246, 238, 0.88);
+    line-height: 1.65;
+    opacity: 0;
+    transform: translateY(16px);
+    animation: rise 1.2s var(--ease) 1.20s forwards;
+  }
+  @keyframes rise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero__scroll {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 56px;
+    background: rgba(250,246,238,0.4);
+    overflow: hidden;
+    z-index: 4;
+  }
+  .hero__scroll::after {
+    content: "";
+    position: absolute;
+    top: -56px;
+    left: 0;
+    width: 1px;
+    height: 56px;
+    background: linear-gradient(to bottom, rgba(250,246,238,0), var(--gold));
+    animation: scrollPulse 2.4s var(--ease) infinite;
+  }
+  @keyframes scrollPulse {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(112px); }
+  }
+
+  /* ---- Variant chip (Prototype-Affordance) ---- */
+  .hero__variants {
+    position: absolute;
+    right: clamp(16px, 3vw, 32px);
+    bottom: 28px;
+    z-index: 6;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px 8px 16px;
+    background: rgba(31,26,20,0.32);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(244,237,227,0.18);
+    border-radius: 999px;
+    color: rgba(244,237,227,0.85);
+    font-size: 10.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: rise 1s var(--ease) 1.0s forwards;
+  }
+  .hero__variants-label { opacity: 0.7; }
+  .hero__variant {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1px solid rgba(244,237,227,0.35);
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.2s linear, background 0.2s linear;
+  }
+  .hero__variant::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: var(--swatch, #BF853B);
+    opacity: 0.85;
+  }
+  .hero__variant:hover { border-color: var(--gold); }
+  .hero__variant.active {
+    border-color: var(--gold);
+    background: rgba(191,133,59,0.18);
+  }
+  .hero__variant.active::after { opacity: 1; box-shadow: 0 0 0 1px rgba(244,237,227,0.4) inset; }
+
+  /* ============== TOP NAV ============== */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    background: rgba(244, 237, 227, 0.88);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border-bottom: 1px solid var(--hairline);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    padding: 0 clamp(16px, 4vw, 40px);
+    transform: translateY(-100%);
+    transition: transform 0.6s var(--ease), background 0.3s linear;
+  }
+  .nav.visible { transform: translateY(0); }
+
+  .nav__inner {
+    width: 100%;
+    max-width: var(--container);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+  }
+  .nav__brand {
+    display: flex;
+    align-items: center;
+  }
+  .nav__brand img {
+    height: 32px;
+    width: auto;
+    display: block;
+  }
+  .nav__links {
+    display: flex;
+    gap: clamp(14px, 2.4vw, 32px);
+    justify-self: center;
+  }
+  .nav__link {
+    position: relative;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 6px 2px 12px;
+    font-weight: 500;
+    transition: color 0.2s linear;
+  }
+  .nav__link::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 4px;
+    height: 1px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s var(--ease);
+  }
+  .nav__link:hover::after,
+  .nav__link.active::after { transform: scaleX(1); }
+  .nav__link.active::before {
+    content: "";
+    position: absolute;
+    left: 50%; bottom: -2px;
+    transform: translateX(-50%);
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  .nav__counter {
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    border: 1px solid var(--gold);
+    border-radius: 999px;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    background: rgba(250, 246, 238, 0.4);
+    transition: transform 0.25s var(--ease), background 0.25s linear;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .nav__counter b { color: var(--gold); font-weight: 600; font-size: 13px; }
+  .nav__counter.bump { transform: scale(1.12); background: rgba(191,133,59,0.12); }
+
+  .nav__menu-btn {
+    display: none;
+    background: none;
+    border: 0;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--ink);
+  }
+
+  @media (max-width: 760px) {
+    .nav__links { display: none; }
+    .nav__menu-btn { display: inline-flex; justify-self: start; }
+    .nav__inner { grid-template-columns: auto 1fr auto; }
+    .nav__brand { justify-self: center; }
+    .nav__brand img { height: 26px; }
+    .nav__menu-btn ~ * { }
+  }
+
+  /* mobile sheet */
+  .sheet {
+    position: fixed;
+    inset: 0;
+    background: rgba(244, 237, 227, 0.96);
+    backdrop-filter: blur(20px);
+    z-index: 120;
+    padding: 80px 28px 32px;
+    transform: translateY(-100%);
+    transition: transform 0.5s var(--ease);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sheet.open { transform: translateY(0); }
+  .sheet a {
+    font-family: "Fraunces", serif;
+    font-size: 32px;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 16px 4px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .sheet__close {
+    position: absolute;
+    top: 18px; right: 18px;
+    background: none; border: 0;
+    font-size: 20px; cursor: pointer;
+    color: var(--ink);
+  }
+
+  /* ============== Intro Section ============== */
+  .intro {
+    padding: clamp(80px, 14vh, 160px) var(--gutter);
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+  .intro__wrap { max-width: 580px; margin: 0 auto; }
+  .intro__h {
+    font-family: "Fraunces", serif;
+    font-variation-settings: "opsz" 72;
+    font-weight: 380;
+    font-size: clamp(32px, 4.4vw, 44px);
+    line-height: 1.12;
+    margin: 22px 0 28px;
+    letter-spacing: -0.01em;
+  }
+  .intro__h em { font-style: italic; font-weight: 360; color: var(--walnut); }
+  .intro p {
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* ============== Category Sections (Sticky) ============== */
+  .cat {
+    position: relative;
+    padding: 0;
+  }
+  .cat__container {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+    display: grid;
+    grid-template-columns: 40% 1fr;
+    gap: clamp(40px, 6vw, 88px);
+    align-items: start;
+  }
+
+  /* left sticky panel */
+  .cat__left {
+    position: sticky;
+    top: calc(var(--nav-h) + 20px);
+    height: calc(100vh - var(--nav-h) - 40px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 24px;
+    padding: 28px 0;
+  }
+  .cat__stage {
+    position: relative;
+    flex: 1;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--bg-2);
+    box-shadow: var(--shadow);
+  }
+  .cat__stage-layer {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 0.9s var(--ease), transform 8s linear;
+    transform: scale(1.02);
+  }
+  .cat__stage-layer.active {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  .cat__stage-meta {
+    position: absolute;
+    left: 22px;
+    bottom: 20px;
+    color: #FAF6EE;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 12px rgba(0,0,0,0.4);
+    font-variant-numeric: tabular-nums;
+    z-index: 2;
+  }
+  .cat__stage-meta b { color: var(--gold); font-weight: 500; }
+  .cat__stage::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 50%;
+    background: linear-gradient(to top, rgba(31,26,20,0.45), rgba(31,26,20,0));
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .cat__header {
+    padding-right: 8px;
+  }
+  .cat__h {
+    font-family: "Fraunces", serif;
+    font-variation-settings: "opsz" 96;
+    font-weight: 380;
+    font-size: clamp(36px, 4.4vw, 56px);
+    line-height: 1.04;
+    margin: 14px 0 16px;
+    letter-spacing: -0.012em;
+  }
+  .cat__intro {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 0;
+    max-width: 36ch;
+  }
+
+  /* right cards rail */
+  .cat__right {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(60px, 12vh, 120px);
+    padding: 28px 0 clamp(40px, 8vh, 120px);
+  }
+  .cat__right > .card:first-child { margin-top: 4vh; }
+  .cat__right > .card:last-child { margin-bottom: 16vh; }
+
+  /* ============== Card ============== */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--hairline);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.4s var(--ease), transform 0.6s var(--ease);
+  }
+  .card.in-view { }
+  .card__media {
+    aspect-ratio: 16 / 10;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--bg-2);
+    position: relative;
+  }
+  .card__media--video::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(31,26,20,0.06);
+  }
+  .play-btn {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 62px; height: 62px;
+    border-radius: 50%;
+    background: rgba(250, 246, 238, 0.7);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(250,246,238,0.6);
+    display: grid; place-items: center;
+    z-index: 2;
+  }
+  .play-btn::after {
+    content: "";
+    width: 0; height: 0;
+    margin-left: 4px;
+    border-left: 14px solid var(--gold);
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+  }
+
+  .card__body { padding: 28px 30px 26px; }
+  .card__title {
+    font-family: "Fraunces", serif;
+    font-variation-settings: "opsz" 36;
+    font-weight: 400;
+    font-size: 26px;
+    line-height: 1.18;
+    margin: 0 0 10px;
+    letter-spacing: -0.005em;
+  }
+  .card__desc {
+    color: var(--muted);
+    font-size: 15.5px;
+    line-height: 1.65;
+    margin: 0 0 18px;
+  }
+  .card__points {
+    display: flex; flex-direction: column;
+    gap: 8px;
+    margin: 0 0 22px;
+    font-size: 14px;
+  }
+  .card__point {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    line-height: 1.55;
+  }
+  .card__point::before {
+    content: "▸";
+    flex: 0 0 auto;
+    width: 14px;
+    text-align: center;
+    color: var(--gold);
+    margin-top: 1px;
+    font-size: 11px;
+  }
+  .card__point--pro { color: var(--walnut); }
+  .card__point--pro b { color: var(--gold); font-weight: 600; }
+  .card__point--con { color: var(--muted); }
+  .card__point--con b { color: var(--ink); font-weight: 500; }
+
+  .card__actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  /* Toggle pill */
+  .toggle {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 0 18px;
+    height: 44px;
+    min-height: 44px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.18s var(--ease);
+    letter-spacing: 0.005em;
+  }
+  .toggle__dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    display: inline-grid;
+    place-items: center;
+    position: relative;
+  }
+  .toggle__dot::after {
+    content: "";
+    width: 7px; height: 4px;
+    border-left: 1.5px solid #FAF6EE;
+    border-bottom: 1.5px solid #FAF6EE;
+    transform: rotate(-45deg) translate(0, -1px);
+    opacity: 0;
+    transition: opacity 0.2s linear;
+  }
+  .toggle:hover { border-color: var(--walnut); }
+  .toggle.active {
+    background: var(--walnut);
+    color: #FAF6EE;
+    border-color: var(--walnut);
+    transform: scale(1.03);
+  }
+  .toggle.active .toggle__dot { border-color: #FAF6EE; background: transparent; }
+  .toggle.active .toggle__dot::after { opacity: 1; }
+  .toggle.pop { animation: pop 0.32s var(--ease); }
+  @keyframes pop {
+    0%   { transform: scale(1.0); }
+    40%  { transform: scale(1.08); }
+    100% { transform: scale(1.03); }
+  }
+
+  /* Note button */
+  .note-btn {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--hairline-strong);
+    color: var(--ink);
+    height: 44px;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: background 0.2s linear, border-color 0.2s linear;
+    position: relative;
+  }
+  .note-btn:hover { background: rgba(74,51,38,0.04); border-color: var(--walnut); }
+  .note-btn__icon { width: 16px; height: 16px; }
+  .note-btn .dot {
+    position: absolute;
+    top: 8px; right: 10px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.2s linear, transform 0.2s var(--ease);
+  }
+  .note-btn.has-note .dot { opacity: 1; transform: scale(1); }
+
+  .note-area {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.45s var(--ease);
+    margin-top: 0;
+  }
+  .note-area.open {
+    grid-template-rows: 1fr;
+    margin-top: 14px;
+  }
+  .note-area__inner { overflow: hidden; }
+  .note-area textarea {
+    width: 100%;
+    min-height: 92px;
+    border: 1px solid var(--hairline-strong);
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.55;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s linear;
+  }
+  .note-area textarea:focus { border-color: var(--walnut); }
+
+  /* ============== Summary ============== */
+  .summary {
+    background: var(--walnut);
+    color: #F4EDE3;
+    padding: clamp(80px, 14vh, 140px) var(--gutter);
+    position: relative;
+    z-index: 2;
+  }
+  .summary__wrap {
+    max-width: 880px;
+    margin: 0 auto;
+  }
+  .summary .eyebrow { color: var(--gold); }
+  .summary .eyebrow::before { background: var(--gold); }
+  .summary__h {
+    font-family: "Fraunces", serif;
+    font-variation-settings: "opsz" 96;
+    font-weight: 380;
+    font-size: clamp(34px, 4.6vw, 50px);
+    line-height: 1.08;
+    margin: 18px 0 38px;
+    letter-spacing: -0.012em;
+    max-width: 18ch;
+  }
+  .summary__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0 0 36px;
+    padding: 0;
+    list-style: none;
+  }
+  .summary__item {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    gap: 22px;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(244,237,227,0.12);
+    opacity: 0;
+    transform: translateY(8px);
+    animation: summRise 0.5s var(--ease) forwards;
+  }
+  .summary__item:first-child { border-top: 1px solid rgba(244,237,227,0.12); }
+  @keyframes summRise { to { opacity: 1; transform: none; } }
+  .summary__thumb {
+    width: 64px; height: 64px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    background-color: rgba(244,237,227,0.06);
+  }
+  .summary__text { display: flex; flex-direction: column; gap: 3px; }
+  .summary__title {
+    font-family: "Fraunces", serif;
+    font-size: 19px;
+    font-weight: 400;
+    color: #FAF6EE;
+    letter-spacing: -0.005em;
+  }
+  .summary__cat {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(244,237,227,0.55);
+  }
+  .summary__note {
+    margin-top: 6px;
+    font-style: italic;
+    font-size: 14.5px;
+    color: rgba(244,237,227,0.78);
+    line-height: 1.5;
+    max-width: 56ch;
+  }
+  .summary__remove {
+    background: none;
+    border: 0;
+    color: rgba(244,237,227,0.5);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 6px 8px;
+    border-radius: 999px;
+    transition: color 0.2s linear, background 0.2s linear;
+  }
+  .summary__remove:hover { color: var(--gold); background: rgba(244,237,227,0.06); }
+
+  .summary__empty {
+    border: 1px dashed rgba(244,237,227,0.22);
+    border-radius: 16px;
+    padding: 28px 30px;
+    color: rgba(244,237,227,0.75);
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 56ch;
+  }
+  .summary__reassure {
+    font-size: 14.5px;
+    color: rgba(244,237,227,0.6);
+    max-width: 56ch;
+    line-height: 1.65;
+    margin: 30px 0 0;
+  }
+
+  /* ============== Termin Card ============== */
+  .termin {
+    padding: clamp(80px, 14vh, 140px) var(--gutter);
+    background: var(--bg);
+    position: relative;
+    z-index: 2;
+  }
+  .termin__card {
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--card);
+    border: 1px solid var(--walnut);
+    border-radius: 20px;
+    padding: clamp(36px, 6vw, 52px);
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .termin__date {
+    font-family: "Fraunces", serif;
+    font-variation-settings: "opsz" 48;
+    font-weight: 380;
+    font-size: clamp(26px, 3.2vw, 32px);
+    line-height: 1.2;
+    margin: 16px 0 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .termin__time {
+    font-size: 20px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+  .termin__addr {
+    font-size: 15px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .termin__rule {
+    height: 1px;
+    background: var(--gold);
+    width: 48px;
+    margin: 26px auto;
+  }
+  .termin__contact {
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .termin__contact a {
+    color: var(--walnut);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold);
+    font-variant-numeric: tabular-nums;
+  }
+  .termin__person {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    margin-bottom: 14px;
+  }
+  .termin__person-foto {
+    width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+    border: 2px solid var(--gold);
+  }
+  .termin__person-name {
+    font-family: var(--serif); font-size: 18px; font-weight: 500; color: var(--ink);
+  }
+  .termin__person-email {
+    font-size: 13px; color: var(--muted);
+  }
+  .termin__person-email a { color: var(--gold); text-decoration: none; }
+  .termin__person-email a:hover { text-decoration: underline; }
+  .termin__hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 14px;
+  }
+  .termin__hint a {
+    color: var(--gold);
+    text-decoration: none;
+  }
+  .termin__hint a:hover { text-decoration: underline; }
+
+  /* ============== Footer ============== */
+  .footer {
+    padding: 80px var(--gutter);
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.8;
+    border-top: 1px solid var(--hairline);
+    background: var(--bg);
+    position: relative;
+    z-index: 2;
+  }
+  .footer__mark {
+    margin-bottom: 18px;
+  }
+  .footer__mark img {
+    height: 36px;
+    width: auto;
+    display: block;
+    margin: 0 auto;
+  }
+  .footer__hint { margin-top: 18px; font-style: italic; }
+
+  /* ============== Responsive ============== */
+  @media (max-width: 880px) {
+    .cat__container {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .cat__left {
+      position: relative;
+      top: auto;
+      height: auto;
+      padding-top: 60px;
+      padding-bottom: 8px;
+    }
+    .cat__stage { display: none; }
+    .cat__right {
+      gap: 28px;
+      padding-top: 8px;
+    }
+    .cat__right > .card:first-child { margin-top: 0; }
+    .cat__right > .card:last-child { margin-bottom: 24px; }
+    .card__media { aspect-ratio: 16 / 11; }
+    .card__body { padding: 24px 22px 22px; }
+    .card__title { font-size: 23px; }
+    .hero__inner { padding: 0 22px; }
+    .hero__termin { font-size: 15px; }
+    .hero__weave { margin: 12px auto 18px; gap: 8px; }
+    .hero__object { width: clamp(80px, 22vw, 120px); height: clamp(120px, 32vw, 180px); }
+    .hero__variants { bottom: 18px; right: 14px; padding: 6px 10px 6px 12px; font-size: 9.5px; letter-spacing: 0.18em; gap: 8px; }
+    .hero__variant { width: 18px; height: 18px; }
+    .summary__item {
+      grid-template-columns: 56px 1fr auto;
+      gap: 16px;
+    }
+    .summary__thumb { width: 56px; height: 56px; }
+  }
+
+  @media (max-width: 460px) {
+    :root { --gutter: 20px; }
+    .card__body { padding: 22px 20px 20px; }
+    .card__actions { gap: 8px; }
+    .toggle, .note-btn { font-size: 13px; padding: 0 14px; }
+    .summary__h { font-size: 30px; }
+    .intro__h { font-size: 30px; }
+  }
+
+  /* prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+    .hero__bg { animation: none; }
+  }
+</style>
+</head>
+
+<body>
+
+  <!-- ====================== HERO ====================== -->
+  <section class="hero" data-screen-label="01 Hero">
+    <div class="hero__bg" aria-hidden="true"></div>
+    <div class="hero__vignette" aria-hidden="true"></div>
+    <div class="hero__inner">
+      <div class="hero__content" id="hero-content">
+        <div class="hero__eyebrow">Willkommen</div>
+
+        <div class="hero__weave">
+          <h1 class="hero__headline hero__headline--line1">
+            <span data-greet="">Frau Müller</span>,
+          </h1>
+          <div class="hero__object hero__object--enter" id="hero-object" aria-hidden="true"></div>
+          <h1 class="hero__headline hero__headline--line2">
+            wir freuen uns auf <em>Ihr Bad.</em>
+          </h1>
+        </div>
+
+        <div class="hero__termin tabular">
+          Unser Termin: <span data-termin-line="">Donnerstag, 12. Juni 2026 · 14:00 Uhr</span>
+        </div>
+        <p class="hero__sub">
+          Eine kleine Reise durch Möglichkeiten — markieren Sie, was Sie interessiert.
+          Wir besprechen alles in Ruhe am Termin.
+        </p>
+      </div>
+    </div>
+
+    <div class="hero__scroll" aria-hidden="true"></div>
+  </section>
+
+  <!-- ====================== NAV ====================== -->
+  <nav class="nav" id="nav" aria-label="Hauptnavigation">
+    <div class="nav__inner">
+      <button class="nav__menu-btn" id="menu-btn" aria-label="Menü öffnen">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M3 7h18M3 12h18M3 17h18"></path>
+        </svg>
+      </button>
+      <div class="nav__brand"><img src="/logo.png" alt="Jäggi Vollmer" /></div>
+      <div class="nav__links">
+        <a href="#wc" class="nav__link" data-target="wc">WC</a>
+        <a href="#waschtisch" class="nav__link" data-target="waschtisch">Waschtisch</a>
+        <a href="#armaturen" class="nav__link" data-target="armaturen">Armaturen</a>
+        <a href="#dusche" class="nav__link" data-target="dusche">Dusche</a>
+      </div>
+      <a href="#zusammenfassung" class="nav__counter" id="counter" aria-live="polite">
+        <b id="counter-num">0</b> <span>markiert</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- mobile sheet -->
+  <div class="sheet" id="sheet" aria-hidden="true">
+    <button class="sheet__close" id="sheet-close" aria-label="Schliessen">✕</button>
+    <a href="#wc" data-target="wc">WC</a>
+    <a href="#waschtisch" data-target="waschtisch">Waschtisch</a>
+    <a href="#armaturen" data-target="armaturen">Armaturen</a>
+    <a href="#dusche" data-target="dusche">Dusche</a>
+    <a href="#zusammenfassung" data-target="zusammenfassung">Ihre Auswahl</a>
+  </div>
+
+  <!-- ====================== INTRO ====================== -->
+  <section class="intro" data-screen-label="02 Intro">
+    <div class="intro__wrap">
+      <div class="eyebrow reveal">Ein erster Blick</div>
+      <h2 class="intro__h reveal delay-1">
+        Es gibt mehr als nur <em>ein WC.</em>
+      </h2>
+      <p class="reveal delay-2">
+        Wenn wir bei Ihnen vorbeikommen, möchten wir uns auf das konzentrieren, was Ihnen
+        wichtig ist. Viele unserer Kunden wissen vorher nicht, wie viele Möglichkeiten es
+        heute gibt — vom geräuscharmen WC bis zur Armatur, deren Technik unsichtbar in der
+        Wand verschwindet. Diese Seite ist Ihre persönliche Vorschau. Ohne Verkaufsdruck.
+      </p>
+    </div>
+  </section>
+
+  <!-- Categories will be rendered by JS into #categories -->
+  <main id="categories"></main>
+
+  <!-- ====================== SUMMARY ====================== -->
+  <section class="summary" id="zusammenfassung" data-screen-label="07 Zusammenfassung">
+    <div class="summary__wrap">
+      <div class="eyebrow reveal">Ihre Auswahl</div>
+      <h2 class="summary__h reveal delay-1">Wir haben uns notiert, was Sie inspiriert.</h2>
+      <div id="summary-body"></div>
+      <p class="summary__reassure reveal delay-2">
+        Diese Übersicht erscheint automatisch bei unserer Begehung. So sparen wir Zeit
+        für die Fragen, die wirklich wichtig sind.
+      </p>
+    </div>
+  </section>
+
+  <!-- ====================== TERMIN ====================== -->
+  <section class="termin" data-screen-label="08 Termin">
+    <div class="termin__card reveal">
+      <div class="eyebrow no-rule">Ihr Termin</div>
+      <div class="termin__date tabular" data-termin-date="">Donnerstag, 12. Juni 2026</div>
+      <div class="termin__time tabular" data-termin-time="">14:00 Uhr</div>
+      <div class="termin__rule"></div>
+      <div id="termin-ansprechperson"></div>
+      <div class="termin__hint">Bei Fragen jederzeit per <a href="tel:+41616920311">Anruf</a> oder <a href="https://wa.me/41799360311" target="_blank" rel="noopener">WhatsApp</a>.</div>
+    </div>
+  </section>
+
+  <!-- ====================== FOOTER ====================== -->
+  <footer class="footer" data-screen-label="09 Footer">
+    <div>Jäggi Vollmer GmbH · Horburgstrasse 96 · 4057 Basel</div>
+    <div class="footer__hint">Diese Seite wurde persönlich für Sie erstellt.</div>
+  </footer>
+
+<script>
+/* ============================================================
+   SUPABASE + KUNDENDATEN — dynamisch via RPC geladen
+   ============================================================ */
+const SUPABASE_URL = 'https://ywcnccpjhnnspbkcmpng.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3Y25jY3BqaG5uc3Bia2NtcG5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMTg4MTMsImV4cCI6MjA5MTY5NDgxM30.xylQ_9hBQsKNIJJrXU6hTr6T2uSnYq62OPV7HZf-0-Y';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const token = new URLSearchParams(location.search).get('t') || '';
+
+// Wird beim Laden via RPC befüllt
+let kunde = {
+  anredeTyp: 'person', anrede: '', vorname: '', nachname: '',
+  termin: { datum: '', uhrzeit: '', adresse: '' },
+  kontakt: { berater: 'Jäggi Vollmer', telefon: '+41 61 692 03 11' }
+};
+
+function getGreeting(k) {
+  if (k.anredeTyp === 'familie') return `Familie ${k.nachname}`;
+  return `${k.anrede} ${k.nachname}`;
+}
+
+function formatTermin(t) {
+  const d = new Date(t.datum + 'T' + t.uhrzeit);
+  const wochentage = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+  const monate = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const wt = wochentage[d.getDay()];
+  const datumLang = `${wt}, ${d.getDate()}. ${monate[d.getMonth()]} ${d.getFullYear()}`;
+  const uhrzeit = (t.uhrzeit || '').slice(0, 5) + ' Uhr';
+  return { wt, datumLang, uhrzeit };
+}
+
+/* ============================================================
+   KATEGORIE-DATEN
+   ============================================================ */
+// Fallback-Bilder für Items ohne bild_url in der DB
+const IMG = {
+  wcHero:        '/assets/inspiration/bathDoor.jpg',
+  waschHero:     '/assets/inspiration/bathStone.jpg',
+  armaturHero:   '/assets/inspiration/bathBrass.jpg',
+  duscheHero:    '/assets/inspiration/bathMain.jpg',
+  wcWand:        '/assets/inspiration/bathDoor.jpg',
+  wcSilent:      '/assets/inspiration/bathSilent.jpg',
+  wcRandlos:     '/assets/inspiration/bathMinimal.jpg',
+  wcDusch:       '/assets/inspiration/bathDuschwc.jpg',
+  wAufsatz:      '/assets/inspiration/bathStone.jpg',
+  wUnterbau:     '/assets/inspiration/bathMain.jpg',
+  wDoppel:       '/assets/inspiration/bathBrassDetail.jpg',
+  aAuf:          '/assets/inspiration/bathBrassDetail.jpg',
+  aUnter:        '/assets/inspiration/bathBrass.jpg',
+  aThermo:       '/assets/inspiration/bathSilent.jpg',
+  aSensor:       '/assets/inspiration/bathSensor.jpg',
+  dWalk:         '/assets/inspiration/bathMain.jpg',
+  dRegen:        '/assets/inspiration/bathDuschwc.jpg',
+  dGlas:         '/assets/inspiration/bathSilent.jpg',
+};
+// Fallback-Bilder pro Kategorie-Index
+const FALLBACK_IMGS = {
+  wc: [IMG.wcWand, IMG.wcSilent, IMG.wcRandlos, IMG.wcDusch],
+  waschtisch: [IMG.wAufsatz, IMG.wUnterbau, IMG.wDoppel],
+  armaturen: [IMG.aAuf, IMG.aUnter, IMG.aThermo, IMG.aSensor],
+  dusche: [IMG.dWalk, IMG.dRegen, IMG.dGlas],
+};
+const HERO_IMGS = { wc: IMG.wcHero, waschtisch: IMG.waschHero, armaturen: IMG.armaturHero, dusche: IMG.duscheHero };
+
+// Wird beim Laden dynamisch aus der DB befüllt.
+// Falls DB keine Daten liefert, bleiben die Original-Texte erhalten.
+let categories = [];
+const CAT_META = {};
+
+// Baut categories-Array aus den DB-Punkten + Kategorie-Metadaten
+function buildCategories(punkte, kategorien) {
+  // Kategorie-Meta aus DB befüllen
+  (kategorien || []).forEach(function(k) { CAT_META[k.id] = { titel: k.titel, intro: k.intro || '' }; });
+
+  const grouped = {};
+  const catOrder = [];
+  for (const p of punkte) {
+    if (!grouped[p.kategorie]) { grouped[p.kategorie] = []; catOrder.push(p.kategorie); }
+    grouped[p.kategorie].push(p);
+  }
+  // Reihenfolge aus kategorien-Tabelle (DB), dann neue
+  const dbOrder = (kategorien || []).map(k => k.id);
+  const order = dbOrder.filter(k => grouped[k]);
+  catOrder.forEach(k => { if (order.indexOf(k) === -1) order.push(k); });
+
+  let num = 1;
+  return order.map(k => {
+    const meta = CAT_META[k] || { titel: k.charAt(0).toUpperCase() + k.slice(1), intro: '' };
+    const fallback = FALLBACK_IMGS[k] || [];
+    return {
+      id: k, num: String(num++).padStart(2,'0'), title: meta.titel, intro: meta.intro,
+      items: grouped[k].sort((a,b) => a.reihenfolge - b.reihenfolge).map((p, i) => ({
+        id: p.id,
+        img: p.bild_url || fallback[i] || '/assets/inspiration/bathMain.jpg',
+        video: !!p.video_url,
+        videoUrl: p.video_url || null,
+        title: p.titel,
+        desc: p.kurzbeschreibung || '',
+        pro: p.vorteil || '',
+        con: p.zu_bedenken || '',
+      }))
+    };
+  });
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  marked: new Set(),    // item ids
+  notes: new Map(),     // item id -> note text
+};
+
+function getItem(id) {
+  for (const c of categories) {
+    const it = c.items.find(x => x.id === id);
+    if (it) return { item: it, category: c };
+  }
+  return null;
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function escapeHtml(s){ return String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+
+function renderCategories() {
+  const root = document.getElementById('categories');
+  root.innerHTML = categories.map((cat, ci) => `
+    <section class="cat" id="${cat.id}" data-cat="${cat.id}" data-screen-label="0${ci+3} ${cat.title}">
+      <div class="cat__container">
+        <aside class="cat__left">
+          <div class="cat__stage" aria-hidden="true">
+            ${cat.items.map((it, i) => `
+              <div class="cat__stage-layer ${i===0?'active':''}" data-layer="${it.id}" style="background-image:url('${it.img}')"></div>
+            `).join('')}
+            <div class="cat__stage-meta">
+              <span data-stage-counter><b>1</b> von ${cat.items.length}</span>
+            </div>
+          </div>
+          <div class="cat__header">
+            <div class="eyebrow reveal"><b style="color:var(--gold);font-weight:500">${cat.num}</b> · ${cat.title.toUpperCase()}</div>
+            <h2 class="cat__h reveal">${escapeHtml(cat.title)}</h2>
+            <p class="cat__intro reveal">${escapeHtml(cat.intro)}</p>
+          </div>
+        </aside>
+
+        <div class="cat__right">
+          ${cat.items.map((it, i) => renderCard(cat, it, i)).join('')}
+        </div>
+      </div>
+    </section>
+  `).join('');
+}
+
+function renderCard(cat, it, i) {
+  return `
+    <article class="card reveal" data-card-id="${it.id}" data-cat-id="${cat.id}" data-card-index="${i}">
+      <div class="card__media ${it.video ? 'card__media--video':''}" style="background-image:url('${it.img}')">
+        ${it.video ? '<button class="play-btn" aria-label="Video abspielen"></button>' : ''}
+      </div>
+      <div class="card__body">
+        <h3 class="card__title">${escapeHtml(it.title)}</h3>
+        <p class="card__desc">${escapeHtml(it.desc)}</p>
+        <div class="card__points">
+          <div class="card__point card__point--pro"><span><b>Vorteil:</b> ${escapeHtml(it.pro)}</span></div>
+          <div class="card__point card__point--con"><span><b>Zu bedenken:</b> ${escapeHtml(it.con)}</span></div>
+        </div>
+        <div class="card__actions">
+          <button class="toggle" data-toggle="${it.id}" aria-pressed="false">
+            <span class="toggle__dot" aria-hidden="true"></span>
+            <span class="toggle__label">Interessiert</span>
+          </button>
+          <button class="note-btn" data-note-toggle="${it.id}" aria-expanded="false">
+            <svg class="note-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+            </svg>
+            <span>Notiz</span>
+            <span class="dot" aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="note-area" data-note-area="${it.id}">
+          <div class="note-area__inner">
+            <textarea data-note-input="${it.id}" placeholder="Was ist Ihnen dabei wichtig?"></textarea>
+          </div>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+/* ============================================================
+   PERSONALIZATION INJECTION
+   ============================================================ */
+function applyKunde() {
+  const greet = getGreeting(kunde);
+  document.querySelectorAll('[data-greet]').forEach(el => el.textContent = greet);
+  const t = formatTermin(kunde.termin);
+  document.querySelectorAll('[data-termin-line]').forEach(el => el.textContent = `${t.datumLang} · ${t.uhrzeit}`);
+  document.querySelectorAll('[data-termin-date]').forEach(el => el.textContent = t.datumLang);
+  document.querySelectorAll('[data-termin-time]').forEach(el => el.textContent = t.uhrzeit);
+  document.querySelectorAll('[data-termin-addr]').forEach(el => el.textContent = kunde.termin.adresse);
+}
+
+/* ============================================================
+   TOGGLES, COUNTER, NOTES
+   ============================================================ */
+function updateCounter() {
+  const n = state.marked.size;
+  const el = document.getElementById('counter-num');
+  el.textContent = n;
+  const counter = document.getElementById('counter');
+  counter.classList.remove('bump');
+  // restart animation
+  void counter.offsetWidth;
+  counter.classList.add('bump');
+  setTimeout(()=>counter.classList.remove('bump'), 320);
+}
+
+function toggleMark(id, btn) {
+  const wasMarked = state.marked.has(id);
+  if (wasMarked) {
+    state.marked.delete(id);
+    btn.classList.remove('active');
+    btn.setAttribute('aria-pressed','false');
+    btn.querySelector('.toggle__label').textContent = 'Interessiert';
+  } else {
+    state.marked.add(id);
+    btn.classList.add('active', 'pop');
+    btn.setAttribute('aria-pressed','true');
+    btn.querySelector('.toggle__label').textContent = 'Vorgemerkt';
+    setTimeout(()=>btn.classList.remove('pop'), 340);
+  }
+  updateCounter();
+  renderSummary();
+  // Supabase-Persistenz (fire and forget mit Rollback bei Fehler)
+  if (token) {
+    sb.rpc('upsert_interesse', {
+      p_token: token, p_punkt_id: id, p_interessiert: !wasMarked
+    }).then(({error}) => {
+      if (error) {
+        // Rollback
+        if (wasMarked) { state.marked.add(id); btn.classList.add('active'); btn.setAttribute('aria-pressed','true'); btn.querySelector('.toggle__label').textContent = 'Vorgemerkt'; }
+        else { state.marked.delete(id); btn.classList.remove('active'); btn.setAttribute('aria-pressed','false'); btn.querySelector('.toggle__label').textContent = 'Interessiert'; }
+        updateCounter(); renderSummary();
+      }
+    });
+  }
+}
+
+function toggleNote(id, btn) {
+  const area = document.querySelector(`[data-note-area="${id}"]`);
+  const open = area.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) {
+    const ta = area.querySelector('textarea');
+    ta.value = state.notes.get(id) || '';
+    setTimeout(()=>ta.focus(), 320);
+  } else {
+    // commit text
+    const ta = area.querySelector('textarea');
+    commitNote(id, ta.value, btn);
+  }
+}
+
+function commitNote(id, text, btn) {
+  text = (text || '').trim();
+  if (text) {
+    state.notes.set(id, text);
+    btn.classList.add('has-note');
+  } else {
+    state.notes.delete(id);
+    btn.classList.remove('has-note');
+  }
+  renderSummary();
+  // Supabase: Kommentar mit Debounce speichern
+  if (token) {
+    clearTimeout(state._noteTimers && state._noteTimers.get(id));
+    if (!state._noteTimers) state._noteTimers = new Map();
+    state._noteTimers.set(id, setTimeout(() => {
+      sb.rpc('update_kommentar', { p_token: token, p_punkt_id: id, p_kommentar: text });
+    }, 500));
+  }
+}
+
+/* ============================================================
+   SUMMARY RENDER
+   ============================================================ */
+function renderSummary() {
+  const root = document.getElementById('summary-body');
+  if (state.marked.size === 0) {
+    root.innerHTML = `
+      <div class="summary__empty reveal in-view">
+        Noch nichts markiert — das ist völlig okay. Oft entsteht die Idee erst
+        beim Sehen und Anfassen am Termin.
+      </div>
+    `;
+    return;
+  }
+
+  // preserve order: walk categories
+  const items = [];
+  for (const cat of categories) {
+    for (const it of cat.items) {
+      if (state.marked.has(it.id)) items.push({ cat, it });
+    }
+  }
+
+  root.innerHTML = `
+    <ul class="summary__list">
+      ${items.map(({cat, it}, i) => `
+        <li class="summary__item" style="animation-delay:${i*60}ms">
+          <div class="summary__thumb" style="background-image:url('${it.img}')"></div>
+          <div class="summary__text">
+            <div class="summary__cat">${escapeHtml(cat.title)}</div>
+            <div class="summary__title">${escapeHtml(it.title)}</div>
+            ${state.notes.has(it.id) ? `<div class="summary__note">„${escapeHtml(state.notes.get(it.id))}"</div>` : ''}
+          </div>
+          <button class="summary__remove" data-summary-remove="${it.id}" aria-label="Entfernen">✕</button>
+        </li>
+      `).join('')}
+    </ul>
+  `;
+}
+
+/* ============================================================
+   STICKY STAGE — crossfade bg based on which card is at center
+   ============================================================ */
+function setupStageObserver() {
+  document.querySelectorAll('.cat').forEach(catEl => {
+    const cards = catEl.querySelectorAll('.card');
+    const layers = catEl.querySelectorAll('.cat__stage-layer');
+    const counterEl = catEl.querySelector('[data-stage-counter] b');
+    const total = cards.length;
+
+    function setActive(idx) {
+      layers.forEach(l => l.classList.remove('active'));
+      const id = cards[idx].dataset.cardId;
+      const layer = catEl.querySelector(`[data-layer="${id}"]`);
+      if (layer) layer.classList.add('active');
+      if (counterEl) counterEl.textContent = (idx+1);
+    }
+
+    // visibility map
+    const visible = new Map();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        visible.set(e.target, e.intersectionRatio);
+      });
+      // pick the most visible card
+      let best = -1, bestRatio = -1;
+      cards.forEach((c, i) => {
+        const r = visible.get(c) || 0;
+        if (r > bestRatio) { bestRatio = r; best = i; }
+      });
+      if (best >= 0 && bestRatio > 0) setActive(best);
+    }, {
+      root: null,
+      rootMargin: '-30% 0px -30% 0px',
+      threshold: [0, 0.25, 0.5, 0.75, 1]
+    });
+    cards.forEach(c => io.observe(c));
+  });
+}
+
+/* ============================================================
+   NAV — visibility + active link + counter live
+   ============================================================ */
+function setupNav() {
+  const nav = document.getElementById('nav');
+  const links = document.querySelectorAll('.nav__link, .sheet a');
+  let lastVisible = false;
+
+  function update() {
+    const y = window.scrollY;
+    const showAfter = window.innerHeight * 0.8;
+    const visible = y > showAfter;
+    if (visible !== lastVisible) {
+      nav.classList.toggle('visible', visible);
+      lastVisible = visible;
+    }
+  }
+  update();
+  window.addEventListener('scroll', update, { passive: true });
+
+  // smooth scroll with offset
+  links.forEach(a => {
+    a.addEventListener('click', (e) => {
+      const id = a.getAttribute('href').replace('#','');
+      const el = document.getElementById(id);
+      if (!el) return;
+      e.preventDefault();
+      const top = el.getBoundingClientRect().top + window.scrollY - 70;
+      window.scrollTo({ top, behavior: 'smooth' });
+      // close sheet if open
+      document.getElementById('sheet').classList.remove('open');
+    });
+  });
+
+  // active link on scroll
+  const sections = document.querySelectorAll('.cat');
+  const navLinks = document.querySelectorAll('.nav__link');
+  const sio = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        navLinks.forEach(l => l.classList.toggle('active', l.dataset.target === id));
+      }
+    });
+  }, { rootMargin: '-50% 0px -45% 0px', threshold: 0 });
+  sections.forEach(s => sio.observe(s));
+}
+
+/* ============================================================
+   REVEAL ON SCROLL
+   ============================================================ */
+function setupReveal() {
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in-view');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+  els.forEach(el => io.observe(el));
+}
+
+/* ============================================================
+   HERO PARALLAX + FADE + WEAVE OBJECT
+   ============================================================ */
+
+// --- Inline SVG-Objekte (transparenter Hintergrund, warmer Brass-Verlauf) ---
+const OBJECT_SVGS = {
+  // 01 - Standarmatur (echtes Foto, freigestellt)
+  faucet: {
+    aspect: '600 / 904',
+    svg: `<img src="/assets/inspiration/faucetBrass.png" alt="" draggable="false" style="width:100%;height:100%;object-fit:contain;-webkit-user-drag:none;user-select:none">`
+  },
+
+  // 02 - Regenbrause am Deckenanschluss (vertikaler Stab mit Disc)
+  shower: {
+    aspect: '1 / 5',
+    svg: `
+<svg viewBox="0 0 160 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="brassS" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"  stop-color="#3d2510"/>
+      <stop offset="22%" stop-color="#7e5021"/>
+      <stop offset="48%" stop-color="#d6a35e"/>
+      <stop offset="55%" stop-color="#f1ca85"/>
+      <stop offset="68%" stop-color="#bf853b"/>
+      <stop offset="100%" stop-color="#1f1208"/>
+    </linearGradient>
+    <radialGradient id="discG" cx="50%" cy="40%" r="60%">
+      <stop offset="0%"  stop-color="#f5d899"/>
+      <stop offset="55%" stop-color="#bf853b"/>
+      <stop offset="100%" stop-color="#4a2e13"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Wandanker oben -->
+  <rect x="66" y="20" width="28" height="6" rx="1.5" fill="url(#brassS)"/>
+
+  <!-- Vertikaler Stab -->
+  <rect x="74" y="26" width="12" height="88" fill="url(#brassS)"/>
+
+  <!-- Auslegerarm zum Brause-Disc -->
+  <path d="M 80 110 L 80 150 Q 80 168, 96 168 L 132 168"
+        stroke="url(#brassS)" stroke-width="12" fill="none" stroke-linejoin="round"/>
+
+  <!-- Regenbrause Disc (gross) -->
+  <ellipse cx="132" cy="188" rx="22" ry="6" fill="#1f1208" opacity="0.5"/>
+  <ellipse cx="132" cy="180" rx="24" ry="8" fill="url(#discG)"/>
+  <ellipse cx="132" cy="178" rx="22" ry="4" fill="#f5d899" opacity="0.4"/>
+
+  <!-- Zweiter vertikaler Stab fuer Handbrause -->
+  <rect x="74" y="114" width="12" height="640" fill="url(#brassS)"/>
+  <rect x="76" y="114" width="2" height="640" fill="#f6d99c" opacity="0.55"/>
+
+  <!-- Halterung -->
+  <rect x="66" y="460" width="22" height="8" rx="2" fill="url(#brassS)"/>
+
+  <!-- Handbrause -->
+  <rect x="48" y="468" width="10" height="60" rx="3" fill="url(#brassS)"/>
+  <circle cx="53" cy="540" r="12" fill="url(#discG)"/>
+
+  <!-- Bedienteil unten -->
+  <rect x="56" y="720" width="48" height="34" rx="3" fill="url(#brassS)"/>
+  <circle cx="68" cy="737" r="6" fill="#1f1208"/>
+  <circle cx="92" cy="737" r="6" fill="#1f1208"/>
+</svg>`
+  },
+
+  // 03 - Freistehende Wanne (Silhouette, niedriger gehalten)
+  tub: {
+    aspect: '5 / 3',
+    svg: `
+<svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="tubG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#fbf6ec"/>
+      <stop offset="55%" stop-color="#e7d8bd"/>
+      <stop offset="100%" stop-color="#7c5a39"/>
+    </linearGradient>
+    <linearGradient id="tubInner" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#6a4a2c"/>
+      <stop offset="50%" stop-color="#c79a64"/>
+      <stop offset="100%" stop-color="#fbf6ec"/>
+    </linearGradient>
+    <linearGradient id="brassT" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"  stop-color="#5e3a1a"/>
+      <stop offset="50%" stop-color="#f1ca85"/>
+      <stop offset="100%" stop-color="#5e3a1a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Bodenschatten -->
+  <ellipse cx="500" cy="560" rx="380" ry="22" fill="#1f1a14" opacity="0.30"/>
+
+  <!-- Wannenkoerper, ovale Silhouette -->
+  <path d="M 120 330
+           Q 120 230, 280 220
+           L 720 220
+           Q 880 230, 880 330
+           Q 880 470, 720 510
+           L 280 510
+           Q 120 470, 120 330 Z"
+        fill="url(#tubG)"/>
+
+  <!-- Innenraum (Vertiefung) -->
+  <path d="M 170 320
+           Q 170 260, 300 252
+           L 700 252
+           Q 830 260, 830 320
+           Q 830 420, 700 448
+           L 300 448
+           Q 170 420, 170 320 Z"
+        fill="url(#tubInner)" opacity="0.9"/>
+
+  <!-- Wasser-Andeutung -->
+  <ellipse cx="500" cy="330" rx="310" ry="82" fill="#2a3a3d" opacity="0.45"/>
+  <ellipse cx="500" cy="322" rx="300" ry="6" fill="#fbf6ec" opacity="0.25"/>
+
+  <!-- Highlight oben -->
+  <path d="M 200 250 Q 320 232, 500 230 Q 680 232, 800 250"
+        stroke="#fbf6ec" stroke-width="3" fill="none" opacity="0.7"/>
+
+  <!-- Brass-Standarmatur am rechten Wannenrand -->
+  <rect x="864" y="330" width="6" height="210" fill="url(#brassT)"/>
+  <path d="M 867 332 L 867 290 Q 867 274, 850 274 L 820 274"
+        stroke="url(#brassT)" stroke-width="6" fill="none" stroke-linejoin="round"/>
+  <ellipse cx="820" cy="282" rx="4" ry="3" fill="#1f1a14"/>
+
+  <!-- Fuesse -->
+  <rect x="230" y="500" width="24" height="40" rx="3" fill="#5a3a1c"/>
+  <rect x="746" y="500" width="24" height="40" rx="3" fill="#5a3a1c"/>
+</svg>`
+  }
+};
+
+function setObjectVariant(name) {
+  const obj = document.getElementById('hero-object');
+  const conf = OBJECT_SVGS[name];
+  if (!obj || !conf) return;
+  obj.style.setProperty('--obj-aspect', conf.aspect);
+  obj.innerHTML = conf.svg;
+  // re-trigger entrance animation if not first paint
+  obj.classList.remove('hero__object--enter');
+  void obj.offsetWidth;
+  obj.classList.add('hero__object--enter');
+  // chips
+  document.querySelectorAll('.hero__variant').forEach(b => {
+    const on = b.dataset.variant === name;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-checked', on ? 'true' : 'false');
+  });
+}
+
+function setupHero() {
+  // Initial-Variante
+  setObjectVariant('faucet');
+
+  // Varianten-Wechsel
+  document.querySelectorAll('.hero__variant').forEach(btn => {
+    btn.addEventListener('click', () => setObjectVariant(btn.dataset.variant));
+  });
+
+  // Parallax + Fade beim Scrollen — KEIN sticky/scroll-scrubbing
+  const hero = document.querySelector('.hero');
+  const content = document.getElementById('hero-content');
+  if (!hero || !content) return;
+
+  let ticking = false;
+  const fadeTargets = hero.querySelectorAll('.hero__eyebrow, .hero__headline, .hero__termin, .hero__sub, .hero__variants');
+  function update() {
+    const y = window.scrollY;
+    const vh = window.innerHeight;
+    // Fade nur die Text-Elemente (Objekt bleibt sichtbar fuer den Spin)
+    const fade = Math.min(1, Math.max(0, y / (vh * 0.6)));
+    const opa = 1 - fade;
+    const blur = `blur(${fade * 6}px)`;
+    fadeTargets.forEach(el => {
+      el.style.opacity = String(opa);
+      el.style.filter = blur;
+    });
+    // Objekt mit langsamerem Fade (hält länger, damit der Spin sichtbar ist)
+    const objFade = Math.min(1, Math.max(0, (y - vh * 0.55) / (vh * 0.35)));
+    content.style.opacity = '1';
+    content.style.filter = 'none';
+    const obj = document.getElementById('hero-object');
+    if (obj) {
+      obj.style.opacity = String(1 - objFade);
+      obj.style.filter = `blur(${objFade * 4}px)`;
+    }
+
+    // Parallax + 3D-Rotation beim Scrollen
+    const k = Math.min(1.6, y / vh);
+    hero.style.setProperty('--py-bg',   (k * 40)  + 'px');
+    hero.style.setProperty('--py-text', (k * -70) + 'px');
+    hero.style.setProperty('--py-obj',  (k * -120) + 'px');
+    // 3D-Spin der Armatur — Y-Achse hauptsächlich, leichte X-Neigung
+    hero.style.setProperty('--ry-obj',  (k * 120) + 'deg');
+    hero.style.setProperty('--rx-obj',  (k * 10)  + 'deg');
+    hero.style.setProperty('--pr-obj',  (k * 4)   + 'deg');
+    ticking = false;
+  }
+  window.addEventListener('scroll', () => {
+    if (!ticking) { requestAnimationFrame(update); ticking = true; }
+  }, { passive: true });
+  update();
+}
+
+/* ============================================================
+   MOBILE SHEET
+   ============================================================ */
+function setupSheet() {
+  const sheet = document.getElementById('sheet');
+  document.getElementById('menu-btn').addEventListener('click', () => sheet.classList.add('open'));
+  document.getElementById('sheet-close').addEventListener('click', () => sheet.classList.remove('open'));
+}
+
+/* ============================================================
+   EVENT DELEGATION — toggles, notes, summary remove
+   ============================================================ */
+function setupEvents() {
+  document.addEventListener('click', (e) => {
+    const tg = e.target.closest('[data-toggle]');
+    if (tg) { toggleMark(tg.dataset.toggle, tg); return; }
+
+    const nb = e.target.closest('[data-note-toggle]');
+    if (nb) { toggleNote(nb.dataset.noteToggle, nb); return; }
+
+    const rm = e.target.closest('[data-summary-remove]');
+    if (rm) {
+      const id = rm.dataset.summaryRemove;
+      state.marked.delete(id);
+      state.notes.delete(id);
+      // update toggle ui
+      const t = document.querySelector(`[data-toggle="${id}"]`);
+      if (t) {
+        t.classList.remove('active');
+        t.setAttribute('aria-pressed','false');
+        t.querySelector('.toggle__label').textContent = 'Interessiert';
+      }
+      const nbtn = document.querySelector(`[data-note-toggle="${id}"]`);
+      if (nbtn) nbtn.classList.remove('has-note');
+      const area = document.querySelector(`[data-note-area="${id}"]`);
+      if (area) { area.classList.remove('open'); area.querySelector('textarea').value = ''; }
+      updateCounter();
+      renderSummary();
+    }
+  });
+
+  // textarea live save
+  document.addEventListener('input', (e) => {
+    const ta = e.target.closest('[data-note-input]');
+    if (!ta) return;
+    const id = ta.dataset.noteInput;
+    const text = (ta.value || '').trim();
+    if (text) state.notes.set(id, text); else state.notes.delete(id);
+    const btn = document.querySelector(`[data-note-toggle="${id}"]`);
+    if (btn) btn.classList.toggle('has-note', !!text);
+  });
+
+  // commit/collapse on blur
+  document.addEventListener('blur', (e) => {
+    const ta = e.target.closest('[data-note-input]');
+    if (!ta) return;
+    const id = ta.dataset.noteInput;
+    const btn = document.querySelector(`[data-note-toggle="${id}"]`);
+    commitNote(id, ta.value, btn);
+    // collapse only if empty
+    if (!state.notes.has(id)) {
+      const area = document.querySelector(`[data-note-area="${id}"]`);
+      area.classList.remove('open');
+      btn.setAttribute('aria-expanded','false');
+    }
+    renderSummary();
+  }, true);
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!token) {
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:DM Sans,sans-serif;background:#F4EDE3;color:#4B575D;text-align:center;padding:2rem"><div><h2 style="color:#BF853B">Link unvollständig</h2><p>Dieser Link scheint unvollständig zu sein.<br>Bitte kontaktieren Sie Jäggi Vollmer.<br><br>+41 61 692 03 11</p></div></div>';
+    return;
+  }
+
+  try {
+    const { data, error } = await sb.rpc('get_inspiration_data', { p_token: token });
+    if (error) throw error;
+
+    // Kundendaten befüllen
+    const k = data.kunde;
+    kunde.anredeTyp = k.anrede_typ;
+    var anredeMap = {frau:'Frau',herr:'Herr'};
+    kunde.anrede = anredeMap[k.anrede_typ] || '';
+    kunde.vorname = k.vorname || '';
+    kunde.nachname = k.nachname || '';
+    kunde.termin.datum = k.termin_datum || '';
+    kunde.termin.uhrzeit = k.termin_uhrzeit || '';
+    kunde.termin.adresse = k.projekt_adresse || '';
+
+    // Kategorien aus DB-Punkten + Metadaten bauen
+    categories = buildCategories(data.punkte || [], data.kategorien || []);
+
+    // Bestehende Interessen in State laden
+    for (const i of (data.interessen || [])) {
+      if (i.interessiert) state.marked.add(i.punkt_id);
+      if (i.kommentar) state.notes.set(i.punkt_id, i.kommentar);
+    }
+
+    // Hero-Hintergrundbild aus Storage laden (falls vorhanden)
+    try {
+      const { data: heroFiles } = await sb.storage.from('inspiration-medien').list('hero');
+      if (heroFiles && heroFiles.length > 0) {
+        const { data: heroUrl } = sb.storage.from('inspiration-medien').getPublicUrl('hero/' + heroFiles[0].name);
+        if (heroUrl && heroUrl.publicUrl) {
+          document.querySelector('.hero__bg').style.setProperty('--hero-bg', 'url("' + heroUrl.publicUrl + '")');
+        }
+      }
+    } catch(e) { /* Fallback-Bild bleibt */ }
+
+    // Rendering (gleiche Reihenfolge wie im Original)
+    renderCategories();
+    applyKunde();
+    renderSummary();
+    updateCounter();
+    setupNav();
+    setupReveal();
+    setupStageObserver();
+    setupHero();
+    setupSheet();
+    setupEvents();
+
+    // Nach dem Rendern: gespeicherte Markierungen und Notizen in die UI übernehmen
+    for (const id of state.marked) {
+      const btn = document.querySelector(`[data-toggle="${id}"]`);
+      if (btn) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed','true');
+        btn.querySelector('.toggle__label').textContent = 'Vorgemerkt';
+      }
+    }
+    for (const [id, text] of state.notes) {
+      const ta = document.querySelector(`[data-note-input="${id}"]`);
+      if (ta) ta.value = text;
+      const nb = document.querySelector(`[data-note-toggle="${id}"]`);
+      if (nb) nb.classList.add('has-note');
+    }
+
+    // Ansprechperson in Termin-Karte anzeigen
+    var ap = data.ansprechperson;
+    var apEl = document.getElementById('termin-ansprechperson');
+    if (ap && apEl) {
+      var apHtml = '<div class="termin__person">';
+      if (ap.foto_url) {
+        apHtml += '<img class="termin__person-foto" src="' + ap.foto_url + '" alt="' + (ap.name||'') + '" />';
+      }
+      apHtml += '<div class="termin__person-name">' + (ap.name||'') + '</div>';
+      if (ap.email) {
+        apHtml += '<div class="termin__person-email"><a href="mailto:' + ap.email + '">' + ap.email + '</a></div>';
+      }
+      if (ap.telefon) {
+        apHtml += '<div class="termin__person-email"><a href="tel:' + ap.telefon + '">' + ap.telefon + '</a></div>';
+      }
+      apHtml += '</div>';
+      apEl.innerHTML = apHtml;
+    } else if (apEl) {
+      apEl.innerHTML = '<div class="termin__contact">Jäggi Vollmer · <a href="tel:+41616920311">+41 61 692 03 11</a></div>';
+    }
+
+    // Dokumente-Tab anzeigen wenn vorhanden
+    if (data.hat_dokumente) {
+      const termin = document.querySelector('.termin');
+      if (termin) {
+        const docsDiv = document.createElement('div');
+        docsDiv.style.cssText = 'text-align:center;margin:2rem auto 0;max-width:400px';
+        docsDiv.innerHTML = '<a href="/view.html?t='+token+'" style="display:inline-block;padding:0.9rem 2rem;background:#BF853B;color:#fff;text-decoration:none;border-radius:6px;font-family:DM Sans,sans-serif;font-weight:500;font-size:0.95rem">Ihre Pläne &amp; Visualisierungen ansehen</a>';
+        termin.parentNode.insertBefore(docsDiv, termin.nextSibling);
+      }
+    }
+
+  } catch (e) {
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:DM Sans,sans-serif;background:#F4EDE3;color:#4B575D;text-align:center;padding:2rem"><div><h2 style="color:#BF853B">Zugang nicht möglich</h2><p>Dieser Link ist nicht mehr aktiv oder existiert nicht.<br>Bei Fragen kontaktieren Sie uns gerne.<br><br><strong>Jäggi Vollmer</strong><br>+41 61 692 03 11</p></div></div>';
+  }
+});
+</script>
+
+</body></html>

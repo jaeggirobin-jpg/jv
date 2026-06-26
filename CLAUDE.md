@@ -202,6 +202,12 @@ Diese Features sind **noch nicht gebaut**, aber die Architektur soll sie ermögl
 - **Dateinamen** — Kleinschreibung, Bindestriche (kebab-case)
 - **Input-Validierung** — immer serverseitig in den Functions prüfen
 
+### Bekannte Mobile-Probleme (wiederkehrend)
+
+- **Input-Felder `date` und `time` auf Mobile (iOS/Android):** Diese ragen auf schmalen Screens über den Container hinaus wenn `max-width: 100%` und `box-sizing: border-box` fehlen. IMMER `max-width: 100%; box-sizing: border-box;` auf alle Input-Typen setzen inkl. `date`, `time`, `number`.
+- **`font-size` unter 16px auf iOS:** Inputs mit `font-size` kleiner als 16px verursachen einen automatischen Zoom auf iOS Safari. Auf Mobile immer mindestens `font-size: 16px` für Inputs setzen.
+- **Autofill/Autocomplete:** Browser füllt Kunden-Formularfelder mit dem Admin-Passwort. Lösung: `autocomplete="off"` oder `autocomplete="new-password"` auf allen Kunden-Feldern.
+
 ---
 
 ## Sicherheits-Prinzipien
