@@ -95,6 +95,19 @@
       padding: 1.5rem;
       border-top: 1px solid #4B575D;
     }
+    /* Trenner-Titel bei mehreren Dokumenten */
+    .doc-heading {
+      max-width: 1000px;
+      margin: 1.5rem auto 0.8rem;
+      padding: 0 0.5rem;
+      color: #BF853B;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .doc-heading:first-child { margin-top: 0; }
+
     /* Druckversuche erschweren */
     @media print {
       html, body { display: none !important; }
@@ -253,29 +266,15 @@
       ctx.restore();
     }
 
-    async function renderPdf(signedUrl) {
-      // Logo für das Wasserzeichen vorab laden (parallel egal — wir warten)
-      await loadLogo();
-
+    // Ein einzelnes PDF in den angegebenen Container rendern
+    async function renderSinglePdf(signedUrl, containerEl, containerWidth) {
       const loadingTask = pdfjsLib.getDocument({
         url: signedUrl,
-        // Verhindert, dass PDF.js versucht, Range-Requests via Browser-Cache zu nutzen
         disableRange: false,
         disableStream: false,
       });
 
       const pdf = await loadingTask.promise;
-      const pagesEl = $('pages');
-      pagesEl.innerHTML = '';
-
-      // Zielbreite: exakt die Innenbreite des #viewer-Containers
-      // (berücksichtigt Padding unterschiedlicher Breakpoints automatisch).
-      const viewerEl = $('viewer');
-      const viewerStyles = getComputedStyle(viewerEl);
-      const paddingX =
-        parseFloat(viewerStyles.paddingLeft) +
-        parseFloat(viewerStyles.paddingRight);
-      const containerWidth = Math.min(1000, viewerEl.clientWidth - paddingX);
 
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         const page = await pdf.getPage(pageNum);
@@ -309,7 +308,38 @@
         drawWatermark(canvas);
 
         wrap.appendChild(canvas);
-        pagesEl.appendChild(wrap);
+        containerEl.appendChild(wrap);
+      }
+    }
+
+    // Ein oder mehrere Dokumente rendern
+    async function renderDocuments(documents) {
+      // Logo für das Wasserzeichen vorab laden
+      await loadLogo();
+
+      const pagesEl = $('pages');
+      pagesEl.innerHTML = '';
+
+      // Zielbreite: exakt die Innenbreite des #viewer-Containers
+      const viewerEl = $('viewer');
+      const viewerStyles = getComputedStyle(viewerEl);
+      const paddingX =
+        parseFloat(viewerStyles.paddingLeft) +
+        parseFloat(viewerStyles.paddingRight);
+      const containerWidth = Math.min(1000, viewerEl.clientWidth - paddingX);
+
+      for (let i = 0; i < documents.length; i++) {
+        const doc = documents[i];
+
+        // Bei mehreren Dokumenten: Titel/Trenner vor jedem Dokument
+        if (documents.length > 1) {
+          const heading = document.createElement('div');
+          heading.className = 'doc-heading';
+          heading.textContent = doc.note || ('Dokument ' + (i + 1));
+          pagesEl.appendChild(heading);
+        }
+
+        await renderSinglePdf(doc.signed_url, pagesEl, containerWidth);
       }
     }
 
@@ -350,7 +380,11 @@
         }
 
         hideStatus();
-        await renderPdf(data.signed_url);
+        // Neue API liefert data.documents (Array). Fallback auf einzelne URL.
+        const documents = (data.documents && data.documents.length)
+          ? data.documents
+          : [{ signed_url: data.signed_url, note: null }];
+        await renderDocuments(documents);
       } catch (e) {
         showStatus(
           `<h2>Fehler beim Laden</h2>

@@ -86,13 +86,19 @@ exports.handler = async (event) => {
     return respond(413, { error: 'Datei zu gross (max. 25 MB)' });
   }
 
-  // Falls ein Kunden-Token mitgegeben wird (z.B. aus der kunden-Tabelle),
-  // diesen verwenden statt einen neuen zu generieren. So funktioniert
-  // der gleiche Token für Inspiration UND Dokumente.
-  const existingToken = (payload.token || '').trim();
-  const token = (existingToken && /^[a-f0-9]{32}$/.test(existingToken))
-    ? existingToken
-    : crypto.randomBytes(16).toString('hex');
+  // Jedes Dokument bekommt einen EIGENEN zufälligen Token (32 Hex).
+  // So können mehrere Dokumente pro Kunde existieren, ohne dass der
+  // UNIQUE-Constraint auf doc_links.token verletzt wird.
+  const token = crypto.randomBytes(16).toString('hex');
+
+  // Kunden-Token (aus der kunden-Tabelle) verknüpft mehrere Dokumente
+  // mit einem Kunden. Fehlt er, ist das Dokument eigenständig
+  // (kunde_token = eigener Token → view.html?t=token funktioniert direkt).
+  const passedKundeToken = (payload.token || '').trim();
+  const kundeToken = /^[a-f0-9]{32}$/.test(passedKundeToken)
+    ? passedKundeToken
+    : token;
+
   const filePath = `${token}/${fileName}`;
 
   // Supabase-Client serverseitig mit Service-Role-Key
@@ -118,6 +124,7 @@ exports.handler = async (event) => {
     .from('doc_links')
     .insert({
       token,
+      kunde_token: kundeToken,
       customer_name: customerName,
       note: note || null,
       file_path: filePath,
@@ -132,9 +139,11 @@ exports.handler = async (event) => {
     return respond(500, { error: 'DB-Eintrag fehlgeschlagen: ' + insertError.message });
   }
 
+  // Der Share-Link zeigt auf den Kunden-Token, damit ALLE Dokumente
+  // des Kunden unter view.html?t=... erscheinen.
   return respond(200, {
     ok: true,
     link: data,
-    share_url: `/view.html?t=${token}`,
+    share_url: `/view.html?t=${kundeToken}`,
   });
 };

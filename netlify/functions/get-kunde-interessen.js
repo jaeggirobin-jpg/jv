@@ -86,11 +86,11 @@ exports.handler = async (event) => {
     return respond(500, { error: 'Fehler beim Laden des Logs: ' + logError.message });
   }
 
-  // Verknüpfte Dokumente (gleicher Token)
+  // Verknüpfte Dokumente (alle über kunde_token verknüpften Dokumente)
   const { data: dokumente } = await supabase
     .from('doc_links')
-    .select('id, token, customer_name, note, file_path, is_active, created_at, view_count')
-    .eq('token', kunde.access_token)
+    .select('id, token, kunde_token, customer_name, note, file_path, is_active, created_at, view_count')
+    .eq('kunde_token', kunde.access_token)
     .order('created_at', { ascending: false });
 
   return respond(200, {

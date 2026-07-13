@@ -39,48 +39,64 @@ exports.handler = async (event) => {
     process.env.SUPABASE_SERVICE_KEY
   );
 
-  // Link in DB suchen
-  // Wichtig: customer_name wird zwar geladen (für Logging),
-  // aber NICHT an den Client zurückgegeben — der Kunde soll
-  // die Adresse im Viewer nicht sehen.
-  const { data: link, error: dbError } = await supabase
+  // Alle Dokumente des Kunden suchen (verknüpft über kunde_token).
+  // Ein Token kann mehrere Dokumente haben (mehrere Visualisierungen).
+  // customer_name wird nicht an den Client zurückgegeben.
+  const { data: links, error: dbError } = await supabase
     .from('doc_links')
-    .select('id, token, customer_name, file_path, is_active, view_count')
-    .eq('token', token)
-    .maybeSingle();
+    .select('id, note, file_path, is_active, view_count, created_at')
+    .eq('kunde_token', token)
+    .order('created_at', { ascending: true });
 
   if (dbError) {
     return respond(500, { error: 'Datenbankfehler' });
   }
 
-  if (!link) {
+  if (!links || links.length === 0) {
     return respond(404, { error: 'Link nicht gefunden' });
   }
 
-  if (!link.is_active) {
+  // Nur aktive Dokumente ausliefern
+  const activeLinks = links.filter((l) => l.is_active);
+
+  if (activeLinks.length === 0) {
     return respond(403, { error: 'Dieser Link wurde deaktiviert. Bitte kontaktieren Sie Jäggi Vollmer.' });
   }
 
-  // Signierte URL mit 60s TTL erzeugen
-  const { data: signed, error: signError } = await supabase.storage
-    .from('pdfs')
-    .createSignedUrl(link.file_path, 60);
+  // Für jedes aktive Dokument eine signierte URL (60s TTL) erzeugen
+  const documents = [];
+  for (const link of activeLinks) {
+    const { data: signed, error: signError } = await supabase.storage
+      .from('pdfs')
+      .createSignedUrl(link.file_path, 60);
 
-  if (signError || !signed) {
+    if (signError || !signed) {
+      continue; // dieses Dokument überspringen, Rest weiterhin ausliefern
+    }
+
+    documents.push({
+      signed_url: signed.signedUrl,
+      note: link.note || null,
+    });
+
+    // Aufruf-Zähler pro Dokument aktualisieren (fire and forget)
+    await supabase
+      .from('doc_links')
+      .update({
+        last_viewed_at: new Date().toISOString(),
+        view_count: (link.view_count || 0) + 1,
+      })
+      .eq('id', link.id);
+  }
+
+  if (documents.length === 0) {
     return respond(500, { error: 'Signierte URL konnte nicht erzeugt werden' });
   }
 
-  // Aufruf-Zähler und Zeitstempel aktualisieren (fire and forget)
-  await supabase
-    .from('doc_links')
-    .update({
-      last_viewed_at: new Date().toISOString(),
-      view_count: (link.view_count || 0) + 1,
-    })
-    .eq('id', link.id);
-
   return respond(200, {
     ok: true,
-    signed_url: signed.signedUrl,
+    documents,
+    // Rückwärtskompatibel: erste URL auch einzeln
+    signed_url: documents[0].signed_url,
   });
 };
