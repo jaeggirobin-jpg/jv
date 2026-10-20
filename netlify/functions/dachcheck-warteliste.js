@@ -1,5 +1,5 @@
-// warteliste.js — E-Mail für «Benachrichtigt mich, wenn ihr in meine Region kommt» speichern
-const { antwort, ipHash, rpc } = require('../lib/gemeinsam');
+// dachcheck-warteliste.js — E-Mail für «Benachrichtigt mich, wenn ihr in meine Region kommt» speichern
+const { antwort, ipHash, rpc } = require('./_lib/dachcheck');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 

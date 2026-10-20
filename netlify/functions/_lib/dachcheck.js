@@ -1,8 +1,8 @@
-// gemeinsam.js — Hilfsfunktionen für die Drohnen-Check-Functions
+// dachcheck.js — Hilfsfunktionen für die Drohnen-Check-Functions (dachcheck-*.js)
 // Keine npm-Abhängigkeiten: Supabase (PostgREST) und Resend werden direkt per fetch angesprochen.
 
 const crypto = require('crypto');
-const config = require('../../public/config.js');
+const config = require('../../../public/dachcheck/config.js');
 
 const HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -49,6 +49,21 @@ async function anfrageAktualisieren(referenz, felder) {
   if (!res.ok) console.error('Update fehlgeschlagen', res.status, await res.text());
 }
 
+// Direkter PostgREST-Aufruf (für die Übersicht). pfad z. B. 'drohnencheck_anfragen?select=*'
+async function rest(pfad, { method = 'GET', body } = {}) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  if (!url || !key) throw new Error('SUPABASE_URL oder SUPABASE_SERVICE_KEY fehlt');
+  const res = await fetch(url.replace(/\/$/, '') + '/rest/v1/' + pfad, {
+    method,
+    headers: { 'Content-Type': 'application/json', apikey: key, Authorization: 'Bearer ' + key, Prefer: 'return=representation' },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error('REST ' + method + ' ' + pfad + ' fehlgeschlagen: ' + res.status + ' ' + text);
+  return text ? JSON.parse(text) : null;
+}
+
 // E-Mail via Resend (EU-Region empfohlen). Gibt true/false zurück, wirft nie.
 async function mailSenden({ an, betreff, html, text, antwortAn }) {
   const key = process.env.RESEND_API_KEY;
@@ -88,12 +103,5 @@ function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-const WOCHENTAGE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-function terminLabel(wert) {
-  const [datum, teil] = String(wert).split('_');
-  const d = new Date(datum + 'T12:00:00Z');
-  if (isNaN(d)) return String(wert);
-  return WOCHENTAGE[d.getUTCDay()] + ' ' + d.getUTCDate() + '.' + (d.getUTCMonth() + 1) + '.' + d.getUTCFullYear() + ' ' + (teil === 'vm' ? 'Vormittag' : 'Nachmittag');
-}
 
-module.exports = { config, antwort, ipHash, rpc, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc, terminLabel };
+module.exports = { config, antwort, ipHash, rpc, rest, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc };

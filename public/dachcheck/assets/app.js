@@ -418,7 +418,7 @@
       utm: speicher.get('dc_utm') || {}
     };
     setzeLaden(true);
-    fetch('/api/anfrage', {
+    fetch('/api/dachcheck-anfrage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(daten)
@@ -447,7 +447,7 @@
     if (!markiere(input, !EMAIL_RE.test(email))) { input.focus(); return; }
     var w = feldWerte();
     setzeLaden(true);
-    fetch('/api/warteliste', {
+    fetch('/api/dachcheck-warteliste', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, plz: w.plz, ort: w.ort, firma_website: w.firma_website || '', utm: speicher.get('dc_utm') || {} })

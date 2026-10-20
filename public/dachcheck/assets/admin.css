@@ -1,0 +1,96 @@
+/* admin.css — Übersicht der Drohnen-Check-Anfragen
+   Komplett unter .dc-admin gekapselt, damit sie sowohl in admin.html (Subdomain)
+   als auch im bestehenden Admin-Panel (public/index.html, Tab «Drohnen-Check») funktioniert. */
+
+.dc-admin {
+  --dc-kupfer: #BD843A; --dc-kupfer-dunkel: #94621F; --dc-kupfer-hell: #F4EADD;
+  --dc-text: #25292E; --dc-neben: #5C636B; --dc-linie: #E3DFD9; --dc-weiss: #fff;
+  --dc-gut: #2F7A46; --dc-rot: #B3332B;
+  color: var(--dc-text);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.dc-admin *, .dc-admin *::before, .dc-admin *::after { box-sizing: border-box; }
+.dc-admin [hidden] { display: none !important; }
+
+.dc-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .4em;
+  min-height: 40px; padding: 0 14px; font-family: inherit; font-weight: 600; font-size: .9rem; line-height: 1.2;
+  color: var(--dc-text); background: var(--dc-weiss); border: 1.5px solid var(--dc-linie);
+  border-radius: 8px; cursor: pointer; text-decoration: none;
+}
+.dc-btn:hover { border-color: #CFC9C1; }
+.dc-btn--primaer { background: var(--dc-kupfer-dunkel); border-color: var(--dc-kupfer-dunkel); color: #fff; }
+.dc-btn--primaer:hover { background: #7d5219; }
+
+.dc-kopfzeile { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.dc-kopfzeile h2 { margin: 0; font-size: 1.4rem; }
+.dc-aktionen { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.dc-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--dc-linie); margin-bottom: 14px; }
+.dc-tabs button { font-family: inherit; font-weight: 600; font-size: .92rem; background: none; border: 0; padding: 10px 14px; cursor: pointer; color: var(--dc-neben); border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.dc-tabs button[aria-selected="true"] { color: var(--dc-text); border-bottom-color: var(--dc-kupfer); }
+.dc-tabs span { font-weight: 400; }
+
+.dc-filter { display: grid; gap: 10px; margin-bottom: 14px; }
+.dc-filter input[type="search"] { width: 100%; max-width: 100%; min-height: 44px; padding: 10px 14px; font-size: 16px; font-family: inherit; border: 1.5px solid #CFC9C1; border-radius: 8px; background: var(--dc-weiss); color: var(--dc-text); }
+.dc-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.dc-chips button { font-family: inherit; font-weight: 500; font-size: .84rem; padding: 5px 12px; border-radius: 999px; border: 1.5px solid var(--dc-linie); background: var(--dc-weiss); color: var(--dc-text); cursor: pointer; }
+.dc-chips button[aria-pressed="true"] { border-color: var(--dc-kupfer-dunkel); background: var(--dc-kupfer-hell); }
+
+.dc-layout { display: grid; gap: 14px; }
+.dc-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; align-content: start; }
+.dc-liste li button { width: 100%; text-align: left; font: inherit; color: inherit; background: var(--dc-weiss); border: 1.5px solid var(--dc-linie); border-radius: 10px; padding: 11px 13px; cursor: pointer; display: grid; gap: 2px; }
+.dc-liste li button:hover { border-color: #CFC9C1; }
+.dc-liste li button[aria-current="true"] { border-color: var(--dc-kupfer-dunkel); box-shadow: 0 0 0 1px var(--dc-kupfer-dunkel) inset; }
+.dc-zeile1 { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.dc-name { font-weight: 600; }
+.dc-meta { font-size: .85rem; color: var(--dc-neben); }
+.dc-leer { color: var(--dc-neben); padding: 20px 0; }
+
+.dc-badge { display: inline-flex; align-items: center; gap: 6px; font-size: .76rem; font-weight: 600; padding: 2px 9px; border-radius: 999px; white-space: nowrap; background: #ECEEEF; color: var(--dc-text); }
+.dc-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .8; }
+.dc-badge.s-neu { background: #FBF0DD; color: #7A4D00; }
+.dc-badge.s-termin, .dc-badge.s-geflogen, .dc-badge.s-report { background: #E7EEF6; color: #24496B; }
+.dc-badge.s-auftrag { background: #E6F1E9; color: #22603A; }
+.dc-badge.s-abgeschlossen, .dc-badge.s-abgesagt { background: #ECEEEF; color: var(--dc-neben); }
+.dc-badge.mieter { background: #FBEAE9; color: #8E2721; }
+.dc-badge.mieter::before { display: none; }
+
+.dc-detail { background: var(--dc-weiss); border: 1px solid var(--dc-linie); border-radius: 12px; padding: 18px; align-self: start; }
+.dc-detail h3 { margin: 0; font-size: 1.35rem; }
+.dc-detail h4 { font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--dc-neben); margin: 20px 0 8px; }
+.dc-detail dl { display: grid; grid-template-columns: 130px 1fr; gap: 5px 12px; margin: 0; font-size: .93rem; }
+.dc-detail dt { color: var(--dc-neben); }
+.dc-detail dd { margin: 0; word-break: break-word; }
+.dc-zurueck { margin-bottom: 12px; }
+.dc-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.dc-loeschung { font-size: .84rem; color: var(--dc-neben); margin: 6px 0 0; }
+.dc-verwaltung { display: grid; gap: 12px; }
+.dc-verwaltung label { display: block; font-weight: 600; font-size: .88rem; margin-bottom: 4px; }
+.dc-verwaltung select, .dc-verwaltung input, .dc-verwaltung textarea { width: 100%; max-width: 100%; min-height: 44px; padding: 9px 12px; font-size: 16px; font-family: inherit; border: 1.5px solid #CFC9C1; border-radius: 8px; background: var(--dc-weiss); color: var(--dc-text); }
+.dc-verwaltung textarea { min-height: 90px; resize: vertical; }
+.dc-gespeichert { font-size: .88rem; color: var(--dc-gut); }
+
+.dc-hinweis { color: var(--dc-neben); font-size: .92rem; }
+.dc-tabelle { overflow-x: auto; margin-top: 12px; }
+.dc-tabelle table { width: 100%; border-collapse: collapse; background: var(--dc-weiss); border: 1px solid var(--dc-linie); font-size: .9rem; }
+.dc-tabelle th, .dc-tabelle td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--dc-linie); }
+.dc-tabelle th { background: #FBFAF8; }
+.dc-fehler { background: #FBEAE9; color: var(--dc-rot); padding: 12px 14px; border-radius: 8px; margin-top: 14px; }
+
+/* Schmale Bildschirme: Detail ersetzt die Liste */
+@media (max-width: 899px) {
+  .dc-layout.detail-offen .dc-liste { display: none; }
+}
+@media (min-width: 900px) {
+  .dc-layout { grid-template-columns: minmax(280px, 360px) 1fr; }
+  .dc-detail { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; }
+  .dc-zurueck { display: none; }
+}
+
+/* Eigenständige Seite admin.html */
+body.admin { padding-bottom: 40px; }
+.a-login { max-width: 420px; padding-top: 48px; }
+.a-login h1 { font-size: 1.9rem; margin-bottom: 24px; }
+.a-main { padding-top: 24px; }

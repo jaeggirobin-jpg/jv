@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
   <title>JV Admin</title>
+  <link rel="stylesheet" href="/dachcheck/assets/admin.css" />
   <style>
     * { box-sizing: border-box; }
     html, body {
@@ -379,6 +380,7 @@
       <div class="tabs">
         <button class="active" data-tab="kunden">Kunden</button>
         <button data-tab="katalog">Katalog</button>
+        <button data-tab="dachcheck">Drohnen-Check</button>
       </div>
 
       <!-- ============ Tab: Kunden ============ -->
@@ -543,6 +545,10 @@
           </div>
         </div>
       </div>
+      <!-- ============ Tab: Drohnen-Check (Anfragen von dachcheck.jaeggivollmer.ch) ============ -->
+      <div class="tab-panel" id="tab-dachcheck">
+        <div class="card"><div id="dc-admin-root"></div></div>
+      </div>
     </main>
   </div>
 
@@ -556,6 +562,8 @@
   <!-- Versteckter File-Input fuer Medien-Upload -->
   <input type="file" id="mediaUpload" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" style="display:none" />
 
+  <script src="/dachcheck/config.js"></script>
+  <script src="/dachcheck/assets/admin.js"></script>
   <script>
     var STORAGE_KEY = 'jv_admin_pwd';
     var API = '/.netlify/functions';
@@ -704,7 +712,7 @@
     }
 
     // ============================================================
-    // TABS (nur noch Kunden + Katalog)
+    // TABS (Kunden, Katalog, Drohnen-Check)
     // ============================================================
     document.querySelector('.tabs').addEventListener('click', function(ev) {
       var btn = ev.target.closest('button[data-tab]');
@@ -716,6 +724,14 @@
       $('tab-' + tab).classList.add('active');
       if (tab === 'kunden') { loadKunden(); loadPunkteCheckboxes(); }
       if (tab === 'katalog') loadKatalog();
+      if (tab === 'dachcheck') {
+        // Übersicht aus public/dachcheck/assets/admin.js
+        window.DCAdmin.mount($('dc-admin-root'), {
+          getPwd: getPwd,
+          api: API,
+          onUnauthorized: function() { clearPwd(); showLogin(); }
+        });
+      }
     });
 
     // ============================================================

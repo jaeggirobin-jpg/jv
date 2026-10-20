@@ -56,7 +56,7 @@
 <body>
 <header>
   <div class="wrap">
-    <img src="../drohnen-check/public/assets/logo-jaeggi-vollmer.svg" alt="Jäggi Vollmer" onerror="this.style.display='none'">
+    <img src="../public/dachcheck/assets/logo-jaeggi-vollmer.svg" alt="Jäggi Vollmer" onerror="this.style.display='none'">
     <h1>Unsere digitalen Anwendungen</h1>
     <p class="lead">Alle Features im Repository <code>jv</code> auf einen Blick: was es gibt, wo es läuft und wie weit es ist.</p>
     <div class="filter" role="group" aria-label="Filter nach Status">
@@ -113,10 +113,11 @@
       <ul>
         <li>Mobile first, Anfrage-Button immer sichtbar</li>
         <li>Formular in 5 Schritten mit PLZ-Prüfung (BS/BL), Warteliste für andere Regionen</li>
-        <li>Referenznummer <code>DC-2026-0001</code>, Mail an Kunde und intern, UTM-Auswertung</li>
+        <li>Referenznummer <code>DC-2026-0001</code>, Info-Mail ohne Personendaten an info@, UTM-Auswertung</li>
+        <li>Anfragen-Übersicht mit Status, Termin, Notiz und CSV-Export, auch als Tab im Admin-Panel</li>
         <li>Löschung nach 60 Tagen automatisch, Meta Pixel nur nach Zustimmung</li>
       </ul>
-      <dl><dt>Adresse</dt><dd><code>dachcheck.jaeggivollmer.ch</code> (geplant, eigene Netlify-Site)</dd><dt>Ordner</dt><dd><code>drohnen-check/</code></dd><dt>Daten</dt><dd>Tabellen <code>drohnencheck_*</code></dd></dl>
+      <dl><dt>Adresse</dt><dd><code>dachcheck.jaeggivollmer.ch</code> (Subdomain der bestehenden Site)</dd><dt>Ordner</dt><dd><code>public/dachcheck/</code>, Functions <code>dachcheck-*</code></dd><dt>Daten</dt><dd>Tabellen <code>drohnencheck_*</code></dd></dl>
     </article>
 
   </div>
@@ -132,6 +133,7 @@
         <li><strong>Interessen:</strong> sehen, was der Kunde markiert und kommentiert hat, mit Aktivitätslog</li>
         <li><strong>Katalog:</strong> Kategorien, Punkte, Reihenfolge, Bilder und Videos, Hero-Hintergrundbild</li>
         <li><strong>Ansprechpersonen:</strong> mit Foto</li>
+        <li><strong>Drohnen-Check:</strong> Anfragen und Warteliste bearbeiten</li>
       </ul>
       <dl><dt>Adresse</dt><dd><code>docs.jaeggivollmer.ch/</code> (passwortgeschützt)</dd><dt>Datei</dt><dd><code>public/index.html</code> + 29 Netlify Functions</dd></dl>
     </article>
@@ -179,11 +181,10 @@
     <table>
       <thead><tr><th>Baustein</th><th>Wofür</th><th>Details</th></tr></thead>
       <tbody>
-        <tr><td>Netlify, Site «JV Docs»</td><td>Admin, Viewer, Katalog, Swipe</td><td><code>docs.jaeggivollmer.ch</code> und <code>inspiration.jaeggivollmer.ch</code>, Ordner <code>public/</code>, Functions unter <code>/api/*</code></td></tr>
-        <tr><td>Netlify, Site «Drohnen-Check»</td><td>Landingpage Drohnen-Check</td><td>eigene Site mit Base directory <code>drohnen-check</code></td></tr>
+        <tr><td>Netlify, Site «JV Docs»</td><td>Admin, Viewer, Katalog, Swipe, Drohnen-Check</td><td><code>docs.jaeggivollmer.ch</code>, <code>inspiration.jaeggivollmer.ch</code> und <code>dachcheck.jaeggivollmer.ch</code> (Rewrite auf <code>public/dachcheck/</code>), Functions unter <code>/api/*</code></td></tr>
         <tr><td>Supabase <code>jaeggivollmer</code></td><td>Datenbank und Dateien</td><td>Tabellen <code>kunden</code>, <code>doc_links</code>, <code>ansprechpersonen</code>, <code>kunden_interessen</code>, <code>aktivitaet_log</code>, <code>inspiration_kategorien</code>, <code>inspiration_punkte</code>, <code>punkt_medien</code>, <code>drohnencheck_*</code>; Storage <code>pdfs</code> (privat), <code>inspiration-medien</code></td></tr>
         <tr><td>GEMA</td><td>separates Repository</td><td>nutzt dieselbe Supabase-Datenbank, hier nicht enthalten</td></tr>
-        <tr><td>Resend</td><td>E-Mail-Versand</td><td>Drohnen-Check, geplant auch für Link-Notifikationen</td></tr>
+        <tr><td>Resend</td><td>E-Mail-Versand</td><td>Info-Mail Drohnen-Check, geplant auch für Link-Notifikationen</td></tr>
       </tbody>
     </table>
   </div>
