@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gratis Drohnen-Rinnen-Check | Jäggi Vollmer Basel</title>
+<meta name="description" content="Wir prüfen Ihre Dachrinne mit der Drohne. Gratis, ohne Leiter, ohne Verpflichtung. Kurzreport mit Ampel innert 24 Stunden. Basel-Stadt und Basel-Landschaft.">
+<meta name="theme-color" content="#F7F5F2">
+<link rel="preload" href="assets/fonts/oswald-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="icon" href="assets/logo-jaeggi-vollmer.svg" type="image/svg+xml">
+</head>
+<body>
+
+<a class="nur-sr" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="kopf">
+  <div class="wrap">
+    <a class="kopf__logo" href="./" aria-label="Jäggi Vollmer, zur Startseite">
+      <img src="assets/logo-jaeggi-vollmer.svg" alt="Jäggi Vollmer" width="138" height="44">
+    </a>
+    <button class="btn kopf__cta" type="button" data-cta></button>
+  </div>
+</header>
+
+<main id="inhalt">
+
+  <section class="hero" aria-labelledby="hero-titel">
+    <div class="hero__bild platzhalter" role="img" id="hero-bild"><span class="platzhalter__label" data-text="hero.bildHinweis"></span></div>
+    <div class="wrap hero__inhalt">
+      <h1 id="hero-titel" data-text="hero.titel"></h1>
+      <p data-text="hero.unterzeile"></p>
+      <button class="btn btn--gross" type="button" data-cta></button>
+    </div>
+  </section>
+
+  <section class="abschnitt abschnitt--weiss" aria-labelledby="ablauf-titel">
+    <div class="wrap">
+      <h2 id="ablauf-titel" data-text="ablauf.titel"></h2>
+      <ol class="schritte" id="schritte"></ol>
+    </div>
+  </section>
+
+  <section class="abschnitt" aria-labelledby="report-titel">
+    <div class="wrap">
+      <h2 id="report-titel" data-text="report.titel"></h2>
+      <p class="einleitung" data-text="report.text"></p>
+      <div class="report">
+        <div class="report__vorschau" id="report-vorschau"></div>
+        <ul class="ampel" id="ampel"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="abschnitt abschnitt--kupfer" aria-labelledby="versprechen-titel">
+    <div class="wrap">
+      <div class="versprechen">
+        <h2 id="versprechen-titel" data-text="versprechen.titel"></h2>
+        <p data-text="versprechen.text"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="abschnitt" aria-labelledby="mehr-titel">
+    <div class="wrap">
+      <h2 id="mehr-titel" data-text="mehr.titel"></h2>
+      <div class="karten" id="karten"></div>
+    </div>
+  </section>
+
+  <section class="abschnitt abschnitt--weiss" aria-labelledby="vertrauen-titel">
+    <div class="wrap vertrauen-grid">
+      <div>
+        <h2 id="vertrauen-titel" data-text="vertrauen.titel"></h2>
+        <div class="fakten" id="fakten"></div>
+        <p class="einleitung" data-text="vertrauen.text"></p>
+      </div>
+      <div class="team-bild platzhalter" role="img" id="team-bild"><span class="platzhalter__label" data-text="vertrauen.bildHinweis"></span></div>
+    </div>
+  </section>
+
+  <section class="abschnitt" aria-labelledby="faq-titel">
+    <div class="wrap">
+      <h2 id="faq-titel" data-text="faq.titel"></h2>
+      <div class="faq" id="faq"></div>
+    </div>
+  </section>
+
+  <section class="abschnitt abschnitt--weiss abschluss" aria-labelledby="abschluss-titel">
+    <div class="wrap">
+      <h2 id="abschluss-titel" data-text="abschluss.titel"></h2>
+      <p data-text="abschluss.text"></p>
+      <button class="btn" type="button" data-cta></button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="fuss">
+  <div class="wrap fuss__grid">
+    <div>
+      <div class="fuss__logo"><img src="assets/logo-jaeggi-vollmer.svg" alt="Jäggi Vollmer" width="106" height="34" loading="lazy"></div>
+    </div>
+    <address id="fuss-kontakt" style="font-style:normal"></address>
+    <nav class="fuss__links" aria-label="Rechtliches" id="fuss-links"></nav>
+  </div>
+</footer>
+
+<div class="cta-leiste"><button class="btn btn--gross" type="button" data-cta></button></div>
+
+<!-- Cookie-Hinweis: erscheint nur, wenn in config.js ein Meta Pixel hinterlegt ist -->
+<div class="cookie" id="cookie" role="dialog" aria-live="polite" aria-label="Zustimmung Tracking" hidden>
+  <p id="cookie-text" style="margin:0"></p>
+  <div class="cookie__knoepfe">
+    <button class="btn btn--sekundaer" type="button" id="cookie-nein"></button>
+    <button class="btn" type="button" id="cookie-ja"></button>
+  </div>
+</div>
+
+<!-- ── Anmeldeformular ─────────────────────────────────────────────────── -->
+<div class="formular" id="formular" role="dialog" aria-modal="true" aria-labelledby="formular-titel">
+  <div class="formular__karte">
+    <div class="formular__kopf">
+      <div class="formular__zeile">
+        <p class="formular__titel" id="formular-titel"></p>
+        <button class="schliessen" type="button" id="formular-schliessen" aria-label="Formular schliessen">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="fortschritt" id="fortschritt">
+        <div class="fortschritt__text" id="fortschritt-text" aria-live="polite"></div>
+        <div class="fortschritt__balken"><span id="fortschritt-balken"></span></div>
+      </div>
+    </div>
+
+    <form class="formular__body" id="anfrage" novalidate autocomplete="on">
+      <div class="wrap">
+        <div class="formular-fehler" id="formular-fehler" role="alert" hidden></div>
+
+        <!-- Schritt 1 · Adresse -->
+        <section class="schritt-panel" data-schritt="1">
+          <h2 tabindex="-1">Wo steht das Gebäude?</h2>
+          <div class="feld-reihe">
+            <div class="feld"><label for="strasse">Strasse</label><input type="text" id="strasse" name="strasse" autocomplete="address-line1" required><div class="fehlertext">Bitte geben Sie die Strasse an.</div></div>
+            <div class="feld"><label for="hausnummer">Nr.</label><input type="text" id="hausnummer" name="hausnummer" autocomplete="off" required><div class="fehlertext">Bitte Nr.</div></div>
+          </div>
+          <div class="feld-reihe feld-reihe--plz">
+            <div class="feld"><label for="plz">PLZ</label><input type="text" id="plz" name="plz" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="postal-code" required><div class="fehlertext">4 Ziffern</div></div>
+            <div class="feld"><label for="ort">Ort</label><input type="text" id="ort" name="ort" autocomplete="address-level2" required><div class="fehlertext">Bitte geben Sie den Ort an.</div></div>
+          </div>
+        </section>
+
+        <!-- Schritt 1b · Ausserhalb Einzugsgebiet -->
+        <section class="schritt-panel" data-schritt="ausserhalb" hidden>
+          <h2 tabindex="-1" data-text="formular.ausserhalb.titel"></h2>
+          <p data-text="formular.ausserhalb.text"></p>
+          <div id="warteliste-eingabe">
+            <div class="feld"><label for="warteliste-email">E-Mail</label><input type="email" id="warteliste-email" name="warteliste_email" autocomplete="email" inputmode="email"><div class="fehlertext">Bitte geben Sie eine gültige E-Mail-Adresse an.</div></div>
+          </div>
+          <p class="hinweis" id="warteliste-danke" hidden data-text="formular.ausserhalb.danke"></p>
+        </section>
+
+        <!-- Schritt 2 · Gebäude -->
+        <section class="schritt-panel" data-schritt="2" hidden>
+          <h2 tabindex="-1">Was für ein Gebäude ist es?</h2>
+          <fieldset class="feld" id="f-gebaeudetyp">
+            <legend>Gebäudetyp</legend>
+            <div class="wahl-gruppe">
+              <label class="wahl"><input type="radio" name="gebaeudetyp" value="Einfamilienhaus"><span>Einfamilienhaus</span></label>
+              <label class="wahl"><input type="radio" name="gebaeudetyp" value="Mehrfamilienhaus"><span>Mehrfamilienhaus</span></label>
+              <label class="wahl"><input type="radio" name="gebaeudetyp" value="Gewerbe"><span>Gewerbe</span></label>
+              <label class="wahl"><input type="radio" name="gebaeudetyp" value="anderes"><span>anderes</span></label>
+            </div>
+            <div class="fehlertext">Bitte wählen Sie einen Gebäudetyp.</div>
+          </fieldset>
+          <fieldset class="feld" id="f-dachform">
+            <legend>Dachform</legend>
+            <div class="wahl-gruppe" style="grid-template-columns:1fr 1fr 1fr">
+              <label class="wahl"><input type="radio" name="dachform" value="Steildach"><span>Steildach</span></label>
+              <label class="wahl"><input type="radio" name="dachform" value="Flachdach"><span>Flachdach</span></label>
+              <label class="wahl"><input type="radio" name="dachform" value="weiss nicht"><span>weiss nicht</span></label>
+            </div>
+            <div class="fehlertext">Bitte wählen Sie eine Dachform.</div>
+          </fieldset>
+          <fieldset class="feld" id="f-rolle">
+            <legend>Sie sind</legend>
+            <div class="wahl-gruppe" style="grid-template-columns:1fr 1fr 1fr">
+              <label class="wahl"><input type="radio" name="rolle" value="Eigentümer"><span>Eigentümer</span></label>
+              <label class="wahl"><input type="radio" name="rolle" value="Verwaltung"><span>Verwaltung</span></label>
+              <label class="wahl"><input type="radio" name="rolle" value="Mieter"><span>Mieter</span></label>
+            </div>
+            <div class="fehlertext">Bitte wählen Sie aus.</div>
+          </fieldset>
+          <p class="hinweis" id="mieter-hinweis" hidden data-text="formular.mieterHinweis"></p>
+          <div class="feld"><label for="baujahr">Ungefähres Baujahr <span class="optional">(optional)</span></label><input type="number" id="baujahr" name="baujahr" inputmode="numeric" min="1500" max="2100" autocomplete="off"><div class="fehlertext">Bitte ein Jahr wie 1965 angeben.</div></div>
+          <div class="feld"><label for="bemerkung">Bemerkung <span class="optional">(optional)</span></label><textarea id="bemerkung" name="bemerkung" maxlength="1000" autocomplete="off"></textarea></div>
+        </section>
+
+        <!-- Schritt 3 · Kontakt -->
+        <section class="schritt-panel" data-schritt="3" hidden>
+          <h2 tabindex="-1">Wie erreichen wir Sie?</h2>
+          <div class="feld-reihe" style="grid-template-columns:1fr 1fr">
+            <div class="feld"><label for="vorname">Vorname</label><input type="text" id="vorname" name="vorname" autocomplete="given-name" required><div class="fehlertext">Bitte Vorname.</div></div>
+            <div class="feld"><label for="nachname">Name</label><input type="text" id="nachname" name="nachname" autocomplete="family-name" required><div class="fehlertext">Bitte Name.</div></div>
+          </div>
+          <div class="feld"><label for="telefon">Telefon</label><input type="tel" id="telefon" name="telefon" autocomplete="tel" inputmode="tel" required><div class="fehlertext">Bitte geben Sie eine Telefonnummer an.</div></div>
+          <div class="feld"><label for="email">E-Mail</label><input type="email" id="email" name="email" autocomplete="email" inputmode="email" required><div class="fehlertext">Bitte geben Sie eine gültige E-Mail-Adresse an.</div></div>
+          <fieldset class="feld" id="f-kanal">
+            <legend>Den Report möchte ich erhalten per</legend>
+            <div class="wahl-gruppe">
+              <label class="wahl"><input type="radio" name="kanal" value="E-Mail"><span>E-Mail</span></label>
+              <label class="wahl"><input type="radio" name="kanal" value="WhatsApp"><span>WhatsApp</span></label>
+            </div>
+            <div class="fehlertext">Bitte wählen Sie aus.</div>
+          </fieldset>
+        </section>
+
+        <!-- Schritt 4 · Wunschtermin -->
+        <section class="schritt-panel" data-schritt="4" hidden>
+          <h2 tabindex="-1">Wann passt es Ihnen?</h2>
+          <p class="auswahl-zaehler" id="termin-zaehler" aria-live="polite"></p>
+          <div class="feld" id="f-termine"><div id="termine"></div><div class="fehlertext" id="termin-fehler"></div></div>
+          <p class="hinweis" data-text="formular.terminHinweis"></p>
+        </section>
+
+        <!-- Schritt 5 · Einwilligungen -->
+        <section class="schritt-panel" data-schritt="5" hidden>
+          <h2 tabindex="-1">Fast fertig</h2>
+          <div class="zusammenfassung" id="zusammenfassung"></div>
+          <label class="check" id="c-berechtigt"><input type="checkbox" name="einwilligung_berechtigt" value="ja"><span><span data-text="formular.einwilligungBerechtigt"></span><span class="pflicht">Pflichtfeld</span></span></label>
+          <label class="check" id="c-aufnahmen"><input type="checkbox" name="einwilligung_aufnahmen" value="ja"><span><span data-text="formular.einwilligungAufnahmen"></span><span class="pflicht">Pflichtfeld</span></span></label>
+          <label class="check"><input type="checkbox" name="einwilligung_kommunikation" value="ja"><span><span data-text="formular.einwilligungKommunikation"></span><span class="pflicht">freiwillig</span></span></label>
+          <p style="font-size:.92rem;color:var(--text-neben)">Wie wir mit Ihren Daten umgehen, lesen Sie in der <a id="link-datenschutz" target="_blank" rel="noopener">Datenschutzerklärung</a>.</p>
+          <!-- Honeypot: für Menschen unsichtbar -->
+          <div class="honig" aria-hidden="true"><label for="firma_website">Website</label><input type="text" id="firma_website" name="firma_website" tabindex="-1" autocomplete="off"></div>
+        </section>
+
+        <!-- Abschluss -->
+        <section class="schritt-panel danke" data-schritt="danke" hidden>
+          <h2 tabindex="-1" data-text="danke.titel"></h2>
+          <p>Ihre Referenznummer:</p>
+          <div class="danke__ref" id="danke-ref"></div>
+          <p data-text="danke.text"></p>
+          <h3>So geht es weiter</h3>
+          <ol id="danke-schritte"></ol>
+          <p id="danke-kontakt" style="color:var(--text-neben);font-size:.95rem"></p>
+        </section>
+      </div>
+    </form>
+
+    <div class="formular__fuss">
+      <div class="wrap">
+        <button class="btn btn--sekundaer" type="button" id="zurueck">Zurück</button>
+        <button class="btn" type="button" id="weiter">Weiter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<noscript><p style="padding:20px;background:#fff">Bitte aktivieren Sie JavaScript oder rufen Sie uns an: 061 692 03 11.</p></noscript>
+
+<script src="config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
