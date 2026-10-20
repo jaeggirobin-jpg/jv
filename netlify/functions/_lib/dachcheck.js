@@ -1,8 +1,8 @@
-// gemeinsam.js — Hilfsfunktionen für die Drohnen-Check-Functions
+// dachcheck.js — Hilfsfunktionen für die Drohnen-Check-Functions (dachcheck-*.js)
 // Keine npm-Abhängigkeiten: Supabase (PostgREST) und Resend werden direkt per fetch angesprochen.
 
 const crypto = require('crypto');
-const config = require('../../public/config.js');
+const config = require('../../../public/dachcheck/config.js');
 
 const HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -88,12 +88,5 @@ function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-const WOCHENTAGE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-function terminLabel(wert) {
-  const [datum, teil] = String(wert).split('_');
-  const d = new Date(datum + 'T12:00:00Z');
-  if (isNaN(d)) return String(wert);
-  return WOCHENTAGE[d.getUTCDay()] + ' ' + d.getUTCDate() + '.' + (d.getUTCMonth() + 1) + '.' + d.getUTCFullYear() + ' ' + (teil === 'vm' ? 'Vormittag' : 'Nachmittag');
-}
 
-module.exports = { config, antwort, ipHash, rpc, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc, terminLabel };
+module.exports = { config, antwort, ipHash, rpc, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc };

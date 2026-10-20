@@ -64,13 +64,12 @@
     },
 
     // ── E-Mail ─────────────────────────────────────────────────────────────
-    // Die Empfänger-Adresse kann zusätzlich per Environment Variable
-    // DC_EMPFAENGER überschrieben werden (z. B. für Tests).
+    // Nur eine Info-Mail an uns (ohne Personendaten), keine Bestätigung an Kunden.
+    // Die Empfänger-Adresse kann per Environment Variable DC_EMPFAENGER überschrieben werden.
     email: {
       empfaengerIntern: 'info@jaeggivollmer.ch',
       absenderName: 'Jäggi Vollmer',
       absenderAdresse: 'dachcheck@jaeggivollmer.ch',  // Domain muss beim Versanddienst verifiziert sein
-      betreffKunde: 'Ihre Anfrage für den Gratis Drohnen-Check',
       betreffIntern: 'Neue Drohnen-Check-Anfrage'
     },
 
@@ -198,7 +197,7 @@
 
       danke: {
         titel: 'Danke für Ihre Anfrage',
-        text: 'Wir haben Ihre Anfrage erhalten. Eine Bestätigung ist per E-Mail unterwegs.',
+        text: 'Wir haben Ihre Anfrage erhalten. Bitte notieren Sie sich die Referenznummer, falls Sie uns kontaktieren möchten.',
         naechsteSchritte: [
           'Wir rufen Sie innert zwei Arbeitstagen an und bestätigen den Termin.',
           'Am Termin fliegen wir ca. 15 Minuten über Ihr Dach.',

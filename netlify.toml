@@ -4,11 +4,36 @@
   # Quellcode der Functions bleiben damit privat.
   publish = "public"
 
+# Drohnen-Check: Subdomain dachcheck.jaeggivollmer.ch zeigt auf public/dachcheck/.
+# Muss VOR der allgemeinen /api/*-Regel stehen (erste passende Regel gewinnt).
+# Auf dieser Subdomain ist nur der Drohnen-Check erreichbar, nicht Admin oder Katalog.
+[[redirects]]
+  from = "https://dachcheck.jaeggivollmer.ch/api/dachcheck-anfrage"
+  to = "/.netlify/functions/dachcheck-anfrage"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://dachcheck.jaeggivollmer.ch/api/dachcheck-warteliste"
+  to = "/.netlify/functions/dachcheck-warteliste"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://dachcheck.jaeggivollmer.ch/*"
+  to = "/dachcheck/:splat"
+  status = 200
+  force = true
+
 # Redirects: saubere URLs für die Functions
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
+
+# Drohnen-Check: Anfragen ohne Auftrag täglich nach 60 Tagen löschen
+[functions."dachcheck-loeschroutine"]
+  schedule = "@daily"
 
 # Sicherheits-Header für alle Seiten
 [[headers]]

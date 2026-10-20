@@ -1,6 +1,6 @@
-// loeschroutine.js — Geplante Function (täglich, siehe netlify.toml)
+// dachcheck-loeschroutine.js — Geplante Function (täglich, siehe netlify.toml)
 // Löscht Anfragen ohne Auftrag nach der Löschfrist aus config.js (Standard 60 Tage).
-const { config, rpc } = require('../lib/gemeinsam');
+const { config, rpc } = require('./_lib/dachcheck');
 
 exports.handler = async () => {
   try {
