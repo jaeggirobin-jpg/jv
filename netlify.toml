@@ -1,6 +1,8 @@
 [build]
   functions = "netlify/functions"
-  publish = "."
+  # Nur der Ordner public/ wird ausgeliefert. Doku, SQL-Migrationen und
+  # Quellcode der Functions bleiben damit privat.
+  publish = "public"
 
 # Redirects: saubere URLs für die Functions
 [[redirects]]
@@ -8,26 +10,22 @@
   to = "/.netlify/functions/:splat"
   status = 200
 
+# Sicherheits-Header für alle Seiten
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    # Tokens stehen in der URL: nie als Referrer weitergeben
+    Referrer-Policy = "no-referrer"
+    Content-Security-Policy = "frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
 # Cache-Header für HTML-Dateien (nie cachen, sofort neue Version)
 [[headers]]
   for = "/*.html"
   [headers.values]
     Cache-Control = "no-store"
-
-# Sicherheits-Header für den Kunden-Viewer
-[[headers]]
-  for = "/view.html"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "no-referrer"
-
-# Sicherheits-Header für die Inspiration-Seite
-[[headers]]
-  for = "/inspiration.html"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
 
 # PDFs sollen nie indexiert werden
 [[headers]]

@@ -1,6 +1,7 @@
 // list-punkte.js — Alle Inspirations-Punkte für das Admin-Panel auflisten
 
 const { createClient } = require('@supabase/supabase-js');
+const { checkAuth } = require('./_lib/auth');
 
 function respond(statusCode, body) {
   return {
@@ -14,12 +15,6 @@ function respond(statusCode, body) {
     },
     body: JSON.stringify(body),
   };
-}
-
-function checkAuth(event) {
-  const header = event.headers.authorization || event.headers.Authorization || '';
-  const token = header.replace(/^Bearer\s+/i, '');
-  return token && token === process.env.ADMIN_PASSWORD;
 }
 
 exports.handler = async (event) => {

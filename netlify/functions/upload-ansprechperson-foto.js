@@ -3,6 +3,7 @@
 // und aktualisiert das foto_url-Feld in der Tabelle.
 
 const { createClient } = require('@supabase/supabase-js');
+const { checkAuth } = require('./_lib/auth');
 
 function respond(statusCode, body) {
   return {
@@ -15,12 +16,6 @@ function respond(statusCode, body) {
     },
     body: JSON.stringify(body),
   };
-}
-
-function checkAuth(event) {
-  const header = event.headers.authorization || event.headers.Authorization || '';
-  const token = header.replace(/^Bearer\s+/i, '');
-  return token && token === process.env.ADMIN_PASSWORD;
 }
 
 // Content-Type anhand Dateiendung bestimmen

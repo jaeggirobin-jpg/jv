@@ -1,7 +1,9 @@
 // delete-kunde.js — Kunde löschen (Admin)
-// CASCADE in der DB räumt kunden_interessen und aktivitaet_log auf
+// Löscht auch die verknüpften Dokumente (doc_links + PDFs im Storage).
+// CASCADE in der DB räumt kunden_interessen auf, aktivitaet_log wird anonymisiert.
 
 const { createClient } = require('@supabase/supabase-js');
+const { checkAuth } = require('./_lib/auth');
 
 function respond(statusCode, body) {
   return {
@@ -14,12 +16,6 @@ function respond(statusCode, body) {
     },
     body: JSON.stringify(body),
   };
-}
-
-function checkAuth(event) {
-  const header = event.headers.authorization || event.headers.Authorization || '';
-  const token = header.replace(/^Bearer\s+/i, '');
-  return token && token === process.env.ADMIN_PASSWORD;
 }
 
 exports.handler = async (event) => {
@@ -55,7 +51,7 @@ exports.handler = async (event) => {
   // Prüfen ob Kunde existiert
   const { data: kunde, error: fetchError } = await supabase
     .from('kunden')
-    .select('id')
+    .select('id, access_token')
     .eq('id', id)
     .maybeSingle();
 
@@ -67,7 +63,39 @@ exports.handler = async (event) => {
     return respond(404, { error: 'Kunde nicht gefunden' });
   }
 
-  // Löschen (CASCADE räumt Abhängigkeiten auf)
+  // Verknüpfte Dokumente löschen. doc_links hat keinen Fremdschlüssel auf
+  // kunden, CASCADE greift hier also nicht. Ohne diesen Schritt blieben die
+  // PDFs im Storage liegen und über den alten Link abrufbar.
+  const { data: dokumente, error: docsError } = await supabase
+    .from('doc_links')
+    .select('id, file_path')
+    .eq('kunde_token', kunde.access_token);
+
+  if (docsError) {
+    return respond(500, { error: 'Datenbankfehler: ' + docsError.message });
+  }
+
+  if (dokumente && dokumente.length > 0) {
+    const paths = dokumente.map((d) => d.file_path).filter(Boolean);
+    if (paths.length > 0) {
+      const { error: storageError } = await supabase.storage.from('pdfs').remove(paths);
+      if (storageError) {
+        // Abbrechen, damit keine verwaisten PDFs ohne DB-Eintrag entstehen
+        return respond(500, { error: 'PDFs konnten nicht gelöscht werden: ' + storageError.message });
+      }
+    }
+
+    const { error: docsDeleteError } = await supabase
+      .from('doc_links')
+      .delete()
+      .eq('kunde_token', kunde.access_token);
+
+    if (docsDeleteError) {
+      return respond(500, { error: 'Dokumente konnten nicht gelöscht werden: ' + docsDeleteError.message });
+    }
+  }
+
+  // Kunde löschen (CASCADE räumt Interessen auf, Log wird anonymisiert)
   const { error: deleteError } = await supabase
     .from('kunden')
     .delete()

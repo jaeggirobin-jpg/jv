@@ -18,6 +18,13 @@ function respond(statusCode, body) {
   };
 }
 
+// Anzeigename wie im Admin-Panel: «Frau Anna Muster», «Familie Muster»
+function kundenName(k) {
+  const anrede = { frau: 'Frau', herr: 'Herr', familie: 'Familie' }[k.anrede_typ] || '';
+  const vorname = k.anrede_typ !== 'familie' && k.vorname ? k.vorname : '';
+  return [anrede, vorname, k.nachname].filter(Boolean).join(' ');
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return respond(200, { ok: true });
@@ -41,10 +48,9 @@ exports.handler = async (event) => {
 
   // Alle Dokumente des Kunden suchen (verknüpft über kunde_token).
   // Ein Token kann mehrere Dokumente haben (mehrere Visualisierungen).
-  // customer_name wird nicht an den Client zurückgegeben.
   const { data: links, error: dbError } = await supabase
     .from('doc_links')
-    .select('id, note, file_path, is_active, view_count, created_at')
+    .select('id, customer_name, note, file_path, is_active, view_count, created_at')
     .eq('kunde_token', token)
     .order('created_at', { ascending: true });
 
@@ -56,12 +62,37 @@ exports.handler = async (event) => {
     return respond(404, { error: 'Link nicht gefunden' });
   }
 
+  // Gehört der Token zu einem Kunden, muss auch der Kunde aktiv sein.
+  // Sonst blieben PDFs nach dem Deaktivieren des Kunden weiter abrufbar.
+  // Eigenständige Dokumente (ohne Kunde) prüfen nur doc_links.is_active.
+  const { data: kunde, error: kundeError } = await supabase
+    .from('kunden')
+    .select('anrede_typ, vorname, nachname, status')
+    .eq('access_token', token)
+    .maybeSingle();
+
+  if (kundeError) {
+    return respond(500, { error: 'Datenbankfehler' });
+  }
+
+  const deaktiviert = { error: 'Dieser Link wurde deaktiviert. Bitte kontaktieren Sie Jäggi Vollmer.' };
+
+  if (kunde && kunde.status !== 'aktiv') {
+    return respond(403, deaktiviert);
+  }
+
   // Nur aktive Dokumente ausliefern
   const activeLinks = links.filter((l) => l.is_active);
 
   if (activeLinks.length === 0) {
-    return respond(403, { error: 'Dieser Link wurde deaktiviert. Bitte kontaktieren Sie Jäggi Vollmer.' });
+    return respond(403, deaktiviert);
   }
+
+  // Text für das Wasserzeichen: Kundenname, sonst die beim Dokument
+  // hinterlegte Objektadresse. Es sind die eigenen Daten des Kunden.
+  const watermark = kunde
+    ? kundenName(kunde)
+    : (activeLinks[0].customer_name || '');
 
   // Für jedes aktive Dokument eine signierte URL (60s TTL) erzeugen
   const documents = [];
@@ -95,6 +126,7 @@ exports.handler = async (event) => {
 
   return respond(200, {
     ok: true,
+    watermark,
     documents,
     // Rückwärtskompatibel: erste URL auch einzeln
     signed_url: documents[0].signed_url,

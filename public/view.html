@@ -205,6 +205,10 @@
       el.style.display = 'block';
     }
 
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+    }
+
     function hideStatus() {
       $('status').style.display = 'none';
     }
@@ -225,17 +229,27 @@
       });
     }
 
-    // Wasserzeichen über Canvas legen: Logo, diagonal, halbtransparent,
-    // mehrfach über die ganze Seite gekachelt.
+    // Text-Wasserzeichen: «Vertraulich – Kundenname · Datum».
+    // Macht weitergegebene Screenshots einem Kunden zuordenbar.
+    let watermarkText = '';
+    function setWatermarkText(name) {
+      const datum = new Date().toLocaleDateString('de-CH');
+      watermarkText = name
+        ? '«Vertraulich – ' + name + '» · ' + datum
+        : '«Vertraulich» · ' + datum;
+    }
+
+    // Wasserzeichen über Canvas legen: Logo und Kundenname, diagonal,
+    // halbtransparent, mehrfach über die ganze Seite gekachelt.
     function drawWatermark(canvas) {
-      if (!logoImage || !logoImage.width) return;
       const ctx = canvas.getContext('2d');
       const w = canvas.width;
       const h = canvas.height;
+      const hasLogo = !!(logoImage && logoImage.width);
 
       // Logo-Grösse relativ zur Seitenbreite
       const logoW = w / 3.2;
-      const logoH = logoW * (logoImage.height / logoImage.width);
+      const logoH = hasLogo ? logoW * (logoImage.height / logoImage.width) : logoW / 4;
 
       ctx.save();
       ctx.globalAlpha = 0.22;
@@ -252,15 +266,31 @@
       const cols = Math.ceil(diag / stepX) + 2;
       const rows = Math.ceil(diag / stepY) + 2;
 
-      for (let r = -rows; r <= rows; r++) {
-        for (let c = -cols; c <= cols; c++) {
-          ctx.drawImage(
-            logoImage,
-            c * stepX - logoW / 2,
-            r * stepY - logoH / 2,
-            logoW,
-            logoH,
-          );
+      if (hasLogo) {
+        for (let r = -rows; r <= rows; r++) {
+          for (let c = -cols; c <= cols; c++) {
+            ctx.drawImage(
+              logoImage,
+              c * stepX - logoW / 2,
+              r * stepY - logoH / 2,
+              logoW,
+              logoH,
+            );
+          }
+        }
+      }
+
+      // Kundenname jeweils zwischen zwei Logo-Reihen, versetzt
+      if (watermarkText) {
+        ctx.globalAlpha = 0.28;
+        ctx.fillStyle = '#4B575D';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = Math.max(12, Math.round(w / 55)) + 'px sans-serif';
+        for (let r = -rows; r <= rows; r++) {
+          for (let c = -cols; c <= cols; c++) {
+            ctx.fillText(watermarkText, c * stepX + stepX / 2, r * stepY + stepY / 2);
+          }
         }
       }
       ctx.restore();
@@ -270,6 +300,8 @@
     async function renderSinglePdf(signedUrl, containerEl, containerWidth) {
       const loadingTask = pdfjsLib.getDocument({
         url: signedUrl,
+        // Schutz gegen präparierte PDFs (CVE-2024-4367): kein eval im Worker
+        isEvalSupported: false,
         disableRange: false,
         disableStream: false,
       });
@@ -304,7 +336,7 @@
           transform,
         }).promise;
 
-        // Wasserzeichen (Logo) überlagern, nachdem die Seite gerendert wurde
+        // Wasserzeichen (Logo + Kundenname) überlagern, nachdem die Seite gerendert wurde
         drawWatermark(canvas);
 
         wrap.appendChild(canvas);
@@ -380,6 +412,7 @@
         }
 
         hideStatus();
+        setWatermarkText(data.watermark || '');
         // Neue API liefert data.documents (Array). Fallback auf einzelne URL.
         const documents = (data.documents && data.documents.length)
           ? data.documents
@@ -388,7 +421,7 @@
       } catch (e) {
         showStatus(
           `<h2>Fehler beim Laden</h2>
-           <p>${(e && e.message) ? e.message : 'Unbekannter Fehler'}</p>
+           <p>${escapeHtml((e && e.message) ? e.message : 'Unbekannter Fehler')}</p>
            <button id="retryBtn">Erneut versuchen</button>`,
           true,
         );
