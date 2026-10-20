@@ -23,17 +23,18 @@
 
   <h2>2. Welche Daten wir bearbeiten</h2>
   <ul>
-    <li><strong>Angaben im Formular:</strong> Adresse des Gebäudes, Gebäudetyp, Dachform, Ihre Rolle (Eigentümer, Verwaltung, Mieter), freiwillig Baujahr und Bemerkung, Vorname, Name, Telefon, E-Mail, gewünschter Kanal für den Report, Wunschtermine und Ihre Einwilligungen.</li>
+    <li><strong>Angaben im Formular:</strong> Vorname, Name, E-Mail-Adresse, Telefonnummer, Adresse des Gebäudes und Ihre Einwilligungen.</li>
     <li><strong>Herkunft der Anfrage:</strong> Kampagnen-Parameter aus dem Link (z. B. utm_source, utm_campaign), die Einstiegsseite und die verweisende Seite. Damit sehen wir, welche Werbung zu Anfragen führt. Wir erstellen daraus keine Profile.</li>
     <li><strong>Technische Daten:</strong> Ihre IP-Adresse wird nur in verschlüsselter Form (Hashwert) gespeichert, um Missbrauch zu verhindern, und nach 7 Tagen gelöscht.</li>
-    <li><strong>Drohnenaufnahmen:</strong> Fotos und Videos Ihres Daches, die beim Flug entstehen.</li>
+    <li><strong>Drohnenaufnahmen:</strong> Fotos und Videos Ihres Daches, die beim Flug entstehen. Die Fotos für Ihren Bericht speichern wir verkleinert und ohne Standortdaten in einem geschützten, nicht öffentlichen Speicher.</li>
+    <li><strong>Bericht:</strong> Flugdatum, Ampel-Bewertung, Befund, Empfehlung und die ausgewählten Fotos. Sie sehen den Bericht über einen persönlichen Link, den nur Sie erhalten.</li>
     <li><strong>Warteliste:</strong> Liegt Ihre Postleitzahl ausserhalb unseres Gebiets, speichern wir auf Wunsch Ihre E-Mail-Adresse, Postleitzahl und Ort.</li>
   </ul>
 
   <h2>3. Wofür wir die Daten verwenden</h2>
   <ul>
-    <li>Um Ihre Anfrage zu bearbeiten, den Termin mit Ihnen zu vereinbaren und den Flug durchzuführen.</li>
-    <li>Um Ihnen den Kurzreport zu senden, per E-Mail oder WhatsApp, wie Sie es gewählt haben.</li>
+    <li>Um Ihre Anfrage zu bearbeiten, den Flug per E-Mail anzukündigen und durchzuführen.</li>
+    <li>Um Ihnen den Kurzbericht als persönlichen Link per E-Mail zu senden.</li>
     <li>Falls Sie es wünschen: für einen Dachkontroll-Bericht oder eine Offerte.</li>
     <li>Um zu messen, welche Werbung Anfragen bringt (zusammengefasst, nicht pro Person ausgewertet).</li>
     <li>Nur mit Ihrer ausdrücklichen Einwilligung: anonymisierte Aufnahmen Ihres Daches für unsere Kommunikation, ohne Adresse und ohne erkennbare Personen, Hausnummern oder Fahrzeugkennzeichen.</li>
@@ -45,7 +46,7 @@
 
   <h2>5. Wie lange wir die Daten aufbewahren</h2>
   <ul>
-    <li><strong>Anfragen und Aufnahmen ohne Auftrag:</strong> Löschung 60 Tage nach der Anfrage. Die Anfragen löscht unser System automatisch. Die Aufnahmen löschen wir in derselben Frist von unseren Geräten und Ablagen.</li>
+    <li><strong>Anfragen, Berichte und Aufnahmen ohne Auftrag:</strong> Löschung 60 Tage nach der Anfrage. Anfrage, Bericht und die Fotos im Bericht löscht unser System automatisch, danach funktioniert auch der Link zum Bericht nicht mehr. Weitere Aufnahmen löschen wir in derselben Frist von unseren Geräten und Ablagen.</li>
     <li><strong>Mit Auftrag:</strong> Wir bewahren die Daten so lange auf, wie es für den Auftrag, Garantieansprüche und die gesetzlichen Aufbewahrungspflichten nötig ist (Geschäftsunterlagen in der Regel 10 Jahre).</li>
     <li><strong>Warteliste:</strong> bis wir Sie benachrichtigt haben, höchstens 24 Monate.</li>
     <li><strong>Anonymisierte Aufnahmen für unsere Kommunikation:</strong> bis Sie Ihre Einwilligung widerrufen. Bereits veröffentlichte Beiträge passen wir an, soweit uns das möglich ist.</li>
@@ -55,9 +56,8 @@
   <p>Wir verkaufen keine Daten. Wir setzen folgende Dienstleister ein, die Daten in unserem Auftrag bearbeiten:</p>
   <ul>
     <li><strong>Netlify, Inc.</strong> (USA): Betrieb der Webseite und der Formularverarbeitung.</li>
-    <li><strong>Supabase, Inc.</strong> (USA), Datenbank mit Serverstandort in der EU [___ Region bestätigen]: Speicherung der Anfragen.</li>
+    <li><strong>Supabase, Inc.</strong> (USA), Datenbank und Dateispeicher mit Serverstandort in der EU [___ Region bestätigen]: Speicherung der Anfragen, Berichte und Fotos.</li>
     <li><strong>Meta Platforms Ireland Ltd.</strong>: nur wenn Sie dem Tracking zustimmen (siehe Ziffer 8).</li>
-    <li><strong>WhatsApp</strong> (Meta): nur wenn Sie den Report per WhatsApp wünschen.</li>
   </ul>
   <p>Einzelne Dienstleister haben ihren Sitz in den USA oder können von dort auf Daten zugreifen. Wir übermitteln Daten in Länder ohne angemessenes Datenschutzniveau nur mit geeigneten Garantien, etwa einer Zertifizierung nach dem Swiss-U.S. Data Privacy Framework oder den vom EDÖB anerkannten Standardvertragsklauseln [___ pro Anbieter prüfen].</p>
 
@@ -66,7 +66,7 @@
 
   <h2>8. Cookies und Tracking</h2>
   <p>Die Seite funktioniert ohne Tracking-Cookies. Schriften und alle Dateien laden wir von unserem eigenen Server, nicht von Google. Damit wir sehen, welche Werbung auf Instagram und Facebook zu Anfragen führt, können wir das Meta Pixel einsetzen. Es wird erst geladen, wenn Sie im Hinweis «Einverstanden» wählen. Ihre Wahl speichern wir in Ihrem Browser. Sie können sie ändern, indem Sie die Website-Daten in Ihrem Browser löschen.</p>
-  <p>Im Formular speichern wir Ihre Eingaben vorübergehend in Ihrem Browser (sessionStorage), damit sie beim Zurückgehen erhalten bleiben. Diese Daten werden beim Schliessen des Browserfensters gelöscht.</p>
+  <p>Im Formular speichern wir Ihre Eingaben vorübergehend in Ihrem Browser (sessionStorage), damit sie erhalten bleiben, wenn Sie das Formular kurz schliessen. Diese Daten werden beim Schliessen des Browserfensters gelöscht.</p>
 
   <p style="margin-top:2em;color:var(--text-neben)">Stand: Oktober 2026</p>
   <p><a href="./">Zurück zum Drohnen-Check</a></p>

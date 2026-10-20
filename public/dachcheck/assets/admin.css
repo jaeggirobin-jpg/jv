@@ -72,6 +72,37 @@
 .dc-verwaltung textarea { min-height: 90px; resize: vertical; }
 .dc-gespeichert { font-size: .88rem; color: var(--dc-gut); }
 
+/* Bericht-Editor */
+.dc-bericht__stand { margin: 0 0 12px; padding: 10px 12px; border-radius: 8px; background: #F4F2EF; font-size: .9rem; }
+.dc-bericht__stand.ist-live { background: #E6F1E9; color: #22603A; }
+.dc-optional { font-weight: 400; color: var(--dc-neben); }
+.dc-ampelwahl { border: 0; padding: 0; margin: 0; min-width: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.dc-ampelwahl legend { font-weight: 600; font-size: .88rem; margin-bottom: 4px; padding: 0; }
+.dc-ampel { position: relative; }
+.dc-ampel input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.dc-ampel span { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px; border: 1.5px solid var(--dc-linie); border-radius: 999px; background: var(--dc-weiss); cursor: pointer; font-weight: 500; font-size: .9rem; }
+.dc-ampel span::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: currentColor; }
+.dc-ampel.s-gut span::before { background: #2F7A46; }
+.dc-ampel.s-beobachten span::before { background: #A86A00; }
+.dc-ampel.s-handlung span::before { background: #B3332B; }
+.dc-ampel input:checked + span { border-color: var(--dc-kupfer-dunkel); background: var(--dc-kupfer-hell); font-weight: 600; }
+.dc-ampel input:focus-visible + span { outline: 3px solid var(--dc-kupfer-dunkel); outline-offset: 2px; }
+.dc-bilder { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin: 16px 0 10px; }
+.dc-bild { border: 1px solid var(--dc-linie); border-radius: 10px; overflow: hidden; background: var(--dc-weiss); display: grid; }
+.dc-bild img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: #ECEAE6; }
+.dc-bild__fehlt { aspect-ratio: 4 / 3; display: grid; place-items: center; color: var(--dc-neben); background: #ECEAE6; font-size: .85rem; }
+.dc-bild input, .dc-link input { width: 100%; max-width: 100%; min-height: 40px; padding: 8px 10px; font-size: 16px; font-family: inherit; border: 0; border-top: 1px solid var(--dc-linie); background: var(--dc-weiss); color: var(--dc-text); }
+.dc-bild__knoepfe { display: flex; gap: 4px; padding: 6px; border-top: 1px solid var(--dc-linie); }
+.dc-bild__knoepfe .dc-btn { min-height: 34px; padding: 0 10px; font-size: .82rem; }
+.dc-bild__knoepfe .dc-btn:last-child { margin-left: auto; }
+.dc-btn[disabled] { opacity: .45; cursor: not-allowed; }
+.dc-upload { position: relative; overflow: hidden; }
+.dc-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
+.dc-link { margin-top: 14px; padding: 12px; border: 1px solid var(--dc-linie); border-radius: 10px; background: #FBFAF8; }
+.dc-link label { display: block; font-weight: 600; font-size: .88rem; margin-bottom: 4px; }
+.dc-link input { border: 1.5px solid #CFC9C1; border-radius: 8px; }
+.dc-meldung-fehler { color: var(--dc-rot); }
+
 .dc-hinweis { color: var(--dc-neben); font-size: .92rem; }
 .dc-tabelle { overflow-x: auto; margin-top: 12px; }
 .dc-tabelle table { width: 100%; border-collapse: collapse; background: var(--dc-weiss); border: 1px solid var(--dc-linie); font-size: .9rem; }
