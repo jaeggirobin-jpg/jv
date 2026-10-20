@@ -1,0 +1,47 @@
+/* bericht.css — Kundenansicht des Berichts (bericht.html), ergänzt styles.css */
+
+.bericht { max-width: 820px; padding-top: 32px; padding-bottom: 56px; }
+.bericht h1 { font-size: clamp(2rem, 7vw, 2.8rem); margin-bottom: .3em; }
+.bericht h2 { font-size: 1.45rem; margin-top: 1.4em; }
+.bericht__ref { color: var(--text-neben); font-size: .92rem; margin-bottom: .4em; letter-spacing: .02em; }
+.bericht__adresse { color: var(--text-neben); }
+.bericht__drucken { min-height: 40px; font-size: .9rem; }
+.bericht__fehler { background: var(--weiss); border: 1px solid var(--linie); border-radius: var(--radius); padding: 16px; }
+
+.bericht__ampel {
+  display: grid; grid-template-columns: 22px 1fr; gap: 14px; align-items: start;
+  background: var(--weiss); border: 1px solid var(--linie); border-left-width: 6px;
+  border-radius: var(--radius); padding: 18px; margin: 20px 0 8px; color: var(--text);
+}
+.bericht__ampel .ampel__punkt { width: 22px; height: 22px; margin-top: 3px; }
+.bericht__ampel strong { font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 600; display: block; line-height: 1.2; }
+.bericht__ampel p { margin: 4px 0 0; color: var(--text-neben); }
+.bericht__ampel.stufe-gut { border-left-color: var(--gut); }
+.bericht__ampel.stufe-beobachten { border-left-color: var(--beobachten); }
+.bericht__ampel.stufe-handlung { border-left-color: var(--handlung); }
+
+.bericht__text { margin-top: 18px; }
+.bericht__fotos { display: grid; gap: 16px; }
+.bericht__fotos figure { margin: 0; background: var(--weiss); border: 1px solid var(--linie); border-radius: var(--radius); overflow: hidden; }
+.bericht__fotos img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; background: #e9e6e1; }
+.bericht__fotos figcaption { padding: 10px 14px; font-size: .95rem; }
+
+.bericht__kontakt { margin-top: 36px; background: var(--kupfer-hell); border-radius: var(--radius); padding: 20px; }
+.bericht__knoepfe { display: flex; flex-wrap: wrap; gap: 10px; }
+.bericht__fuss { margin-top: 24px; }
+
+@media (min-width: 700px) {
+  .bericht__fotos { grid-template-columns: 1fr 1fr; }
+}
+
+/* Drucken / als PDF speichern */
+@media print {
+  .kopf { position: static; border: 0; }
+  .bericht__drucken, .bericht__kontakt .bericht__knoepfe, .fuss__links { display: none !important; }
+  body { background: #fff; font-size: 12pt; }
+  .bericht { padding-top: 0; }
+  .bericht__fotos { grid-template-columns: 1fr 1fr; }
+  .bericht__fotos figure { break-inside: avoid; }
+  .fuss { background: #fff; color: #25292E; padding: 12px 0 0; border-top: 1px solid #ccc; }
+  .fuss a { color: #25292E; }
+}

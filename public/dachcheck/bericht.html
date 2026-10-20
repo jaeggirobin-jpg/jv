@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Ihr Rinnen-Check | Jäggi Vollmer</title>
+<link rel="preload" href="assets/fonts/oswald-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/bericht.css">
+<link rel="icon" href="assets/logo-jaeggi-vollmer.svg" type="image/svg+xml">
+</head>
+<body class="textseite bericht-seite">
+
+<header class="kopf">
+  <div class="wrap">
+    <a class="kopf__logo" href="./"><img src="assets/logo-jaeggi-vollmer.svg" alt="Jäggi Vollmer" width="138" height="44"></a>
+    <button class="btn btn--sekundaer bericht__drucken" type="button" id="drucken" hidden>Als PDF speichern</button>
+  </div>
+</header>
+
+<main class="wrap bericht" id="bericht" aria-live="polite">
+  <p class="klein" id="laden">Bericht wird geladen …</p>
+</main>
+
+<footer class="fuss">
+  <div class="wrap fuss__grid">
+    <address id="fuss-kontakt" style="font-style:normal"></address>
+    <nav class="fuss__links" aria-label="Rechtliches" id="fuss-links"></nav>
+  </div>
+</footer>
+
+<noscript><p style="padding:20px;background:#fff">Bitte aktivieren Sie JavaScript, um den Bericht anzuzeigen.</p></noscript>
+
+<script src="config.js"></script>
+<script src="assets/bericht.js"></script>
+</body>
+</html>

@@ -33,6 +33,18 @@
   force = true
 
 [[redirects]]
+  from = "https://dachcheck.jaeggivollmer.ch/api/dachcheck-bericht"
+  to = "/.netlify/functions/dachcheck-bericht"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://dachcheck.jaeggivollmer.ch/api/dachcheck-bericht-ansehen"
+  to = "/.netlify/functions/dachcheck-bericht-ansehen"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "https://dachcheck.jaeggivollmer.ch/*"
   to = "/dachcheck/:splat"
   status = 200
@@ -44,7 +56,7 @@
   to = "/.netlify/functions/:splat"
   status = 200
 
-# Drohnen-Check: Anfragen ohne Auftrag täglich nach 60 Tagen löschen
+# Drohnen-Check: Anfragen ohne Auftrag (mit Bericht und Bildern) täglich nach 60 Tagen löschen
 [functions."dachcheck-loeschroutine"]
   schedule = "@daily"
 

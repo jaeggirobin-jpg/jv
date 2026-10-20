@@ -1,57 +1,38 @@
 // dachcheck-anfrage.js — Neue Drohnen-Check-Anfrage entgegennehmen, speichern und Info-Mail senden
 const { config, antwort, ipHash, rpc, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc } = require('./_lib/dachcheck');
 
-const GEBAEUDETYPEN = ['Einfamilienhaus', 'Mehrfamilienhaus', 'Gewerbe', 'anderes'];
-const DACHFORMEN = ['Steildach', 'Flachdach', 'weiss nicht'];
-const ROLLEN = ['Eigentümer', 'Verwaltung', 'Mieter'];
-const KANAELE = ['E-Mail', 'WhatsApp'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const TERMIN_RE = /^\d{4}-\d{2}-\d{2}_(vm|nm)$/;
 
 function text(v, max) {
   return typeof v === 'string' ? v.trim().slice(0, max) : '';
 }
 
 // Eingaben serverseitig prüfen. Gibt { fehler } oder { daten } zurück.
+// Das Formular fragt nur Name, E-Mail, Telefon und Adresse ab.
 function pruefen(b) {
   const d = {
     strasse: text(b.strasse, 120),
     hausnummer: text(b.hausnummer, 20),
     plz: text(b.plz, 4),
     ort: text(b.ort, 80),
-    gebaeudetyp: text(b.gebaeudetyp, 40),
-    dachform: text(b.dachform, 40),
-    rolle: text(b.rolle, 40),
-    baujahr: b.baujahr ? String(b.baujahr).trim() : '',
-    bemerkung: text(b.bemerkung, 1000) || null,
     vorname: text(b.vorname, 80),
     nachname: text(b.nachname, 80),
     telefon: text(b.telefon, 40),
     email: text(b.email, 200).toLowerCase(),
-    kanal: text(b.kanal, 20),
-    wunschtermine: Array.isArray(b.termine) ? b.termine.filter((t) => TERMIN_RE.test(t)).slice(0, config.termine.maxAuswahl) : [],
-    einwilligung_berechtigt: b.einwilligung_berechtigt === true,
-    einwilligung_aufnahmen: b.einwilligung_aufnahmen === true,
+    bemerkung: text(b.bemerkung, 1000) || null,
+    // Eine Pflicht-Checkbox deckt Berechtigung und Aufnahmen ab
+    einwilligung_berechtigt: b.einwilligung === true,
+    einwilligung_aufnahmen: b.einwilligung === true,
     einwilligung_kommunikation: b.einwilligung_kommunikation === true
   };
 
+  if (!d.vorname || !d.nachname) return { fehler: 'Bitte geben Sie Ihren Namen an.' };
+  if (!EMAIL_RE.test(d.email)) return { fehler: 'Bitte geben Sie eine gültige E-Mail-Adresse an.' };
   if (!d.strasse || !d.hausnummer || !d.ort) return { fehler: 'Bitte geben Sie die vollständige Adresse an.' };
   if (!/^\d{4}$/.test(d.plz)) return { fehler: 'Bitte geben Sie eine gültige Postleitzahl an.' };
   if (!imEinzugsgebiet(d.plz)) return { fehler: 'Diese Postleitzahl liegt ausserhalb unseres Einzugsgebiets.' };
-  if (!GEBAEUDETYPEN.includes(d.gebaeudetyp) || !DACHFORMEN.includes(d.dachform) || !ROLLEN.includes(d.rolle)) {
-    return { fehler: 'Bitte machen Sie die Angaben zum Gebäude.' };
-  }
-  if (d.baujahr && !/^\d{4}$/.test(d.baujahr)) return { fehler: 'Bitte geben Sie das Baujahr als Jahreszahl an.' };
-  if (!d.vorname || !d.nachname) return { fehler: 'Bitte geben Sie Ihren Namen an.' };
   if (d.telefon.replace(/\D/g, '').length < 9) return { fehler: 'Bitte geben Sie eine gültige Telefonnummer an.' };
-  if (!EMAIL_RE.test(d.email)) return { fehler: 'Bitte geben Sie eine gültige E-Mail-Adresse an.' };
-  if (!KANAELE.includes(d.kanal)) return { fehler: 'Bitte wählen Sie, wie Sie den Report erhalten möchten.' };
-  if (d.wunschtermine.length < config.termine.minAuswahl) {
-    return { fehler: 'Bitte wählen Sie mindestens ' + config.termine.minAuswahl + ' Wunschtermine.' };
-  }
-  if (!d.einwilligung_berechtigt || !d.einwilligung_aufnahmen) {
-    return { fehler: 'Bitte bestätigen Sie die beiden Pflicht-Einwilligungen.' };
-  }
+  if (!d.einwilligung_berechtigt) return { fehler: 'Bitte bestätigen Sie die Einwilligung.' };
 
   const utm = b.utm && typeof b.utm === 'object' ? b.utm : {};
   d.utm_source = text(utm.utm_source, 200) || null;

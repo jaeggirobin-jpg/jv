@@ -89,6 +89,60 @@ async function mailSenden({ an, betreff, html, text, antwortAn }) {
   }
 }
 
+// ── Storage (privater Bucket «drohnencheck» für die Bilder der Berichte) ──
+// Direkt über die Storage-REST-API, damit keine npm-Abhängigkeit nötig ist.
+const BUCKET = 'drohnencheck';
+
+async function storage(pfad, { method = 'POST', body } = {}) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  if (!url || !key) throw new Error('SUPABASE_URL oder SUPABASE_SERVICE_KEY fehlt');
+  const res = await fetch(url.replace(/\/$/, '') + '/storage/v1/' + pfad, {
+    method,
+    headers: { 'Content-Type': 'application/json', apikey: key, Authorization: 'Bearer ' + key },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error('Storage ' + method + ' ' + pfad + ' fehlgeschlagen: ' + res.status + ' ' + text);
+  return text ? JSON.parse(text) : null;
+}
+
+function storageBasis() {
+  return process.env.SUPABASE_URL.replace(/\/$/, '') + '/storage/v1';
+}
+
+// Signierte Upload-URL: der Browser lädt die Datei per PUT direkt in den Bucket
+async function uploadUrl(pfad) {
+  const r = await storage('object/upload/sign/' + BUCKET + '/' + pfad);
+  return storageBasis() + r.url;
+}
+
+// Signierte Lese-URLs für mehrere Bilder: { pfad: url }
+async function signierteUrls(pfade, sekunden) {
+  if (!pfade.length) return {};
+  const r = await storage('object/sign/' + BUCKET, { body: { expiresIn: sekunden, paths: pfade } });
+  const urls = {};
+  (r || []).forEach((e) => { if (e.signedURL && !e.error) urls[e.path] = storageBasis() + e.signedURL; });
+  return urls;
+}
+
+// Dateien eines Ordners auflisten (Ordner = anfrage_id)
+async function ordnerListe(ordner) {
+  const r = await storage('object/list/' + BUCKET, { body: { prefix: ordner, limit: 1000, offset: 0 } });
+  return (r || []).filter((o) => o.id).map((o) => ({ pfad: ordner + '/' + o.name, metadata: o.metadata || {} }));
+}
+
+async function bilderLoeschen(pfade) {
+  if (!pfade.length) return;
+  await storage('object/' + BUCKET, { method: 'DELETE', body: { prefixes: pfade } });
+}
+
+async function ordnerLoeschen(ordner) {
+  const dateien = await ordnerListe(ordner);
+  await bilderLoeschen(dateien.map((d) => d.pfad));
+  return dateien.length;
+}
+
 function imEinzugsgebiet(plz) {
   const n = parseInt(plz, 10);
   if (!n) return false;
@@ -104,4 +158,7 @@ function esc(s) {
 }
 
 
-module.exports = { config, antwort, ipHash, rpc, rest, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc };
+module.exports = {
+  config, antwort, ipHash, rpc, rest, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc,
+  uploadUrl, signierteUrls, ordnerListe, bilderLoeschen, ordnerLoeschen
+};
