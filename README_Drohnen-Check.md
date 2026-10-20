@@ -10,11 +10,14 @@ public/dachcheck/                      → Landingpage (wird ausgeliefert)
 │   ├── index.html                     → Landingpage + Formular
 │   ├── datenschutz.html               → Entwurf Datenschutz (juristisch prüfen)
 │   ├── impressum.html
+│   ├── admin.html                     → Übersicht der Anfragen (Passwort = ADMIN_PASSWORD)
 │   └── assets/                        → app.js, styles.css, Logo (Original-SVG), Schriften (selbst gehostet)
 netlify/functions/
 │   ├── dachcheck-anfrage.js           → prüft, speichert, sendet Info-Mail
 │   ├── dachcheck-warteliste.js        → E-Mail für Regionen ausserhalb des Gebiets
 │   ├── dachcheck-loeschroutine.js     → läuft täglich, löscht nach 60 Tagen
+│   ├── dachcheck-admin-liste.js       → Anfragen + Warteliste für die Übersicht (Admin)
+│   ├── dachcheck-admin-update.js      → Status, Termin, Notiz ändern (Admin)
 │   └── _lib/dachcheck.js              → Supabase- und Mail-Helfer (ohne npm-Abhängigkeiten)
 supabase/migration_010_drohnencheck.sql → Tabellen, RLS, Funktionen
 netlify.toml                           → Subdomain-Rewrite und Zeitplan der Löschroutine
@@ -25,7 +28,8 @@ netlify.toml                           → Subdomain-Rewrite und Zeitplan der L�
 | Frage | Entscheid |
 |---|---|
 | Wo läuft die Seite? | Subdomain `dachcheck.jaeggivollmer.ch` auf der bestehenden Netlify-Site (keine zweite Site) |
-| E-Mail | Nur eine **Info-Mail ohne Personendaten** an `info@jaeggivollmer.ch` (Referenz, Zeitpunkt, Link zu Supabase). **Keine** Bestätigungsmail an Kunden |
+| E-Mail | Nur eine **Info-Mail ohne Personendaten** an `info@jaeggivollmer.ch` (Referenz, Zeitpunkt, Link zur Anfrage in der Übersicht). **Keine** Bestätigungsmail an Kunden |
+| Übersicht | Anfragen-Übersicht unter `dachcheck.jaeggivollmer.ch/admin.html` **und** als Tab «Drohnen-Check» im Admin-Panel, gleiches Passwort |
 | Speicherung | Eigene Tabellen im bestehenden Supabase-Projekt, nur via service_role |
 
 Weitere Annahmen (nicht explizit entschieden):
@@ -76,8 +80,9 @@ Alles steht in **`public/dachcheck/config.js`**: Texte aller Abschnitte, FAQ, Pr
 
 ## Wo landen die Anfragen?
 
-- **Info-Mail intern** an `email.empfaengerIntern`: nur Referenz, Zeitpunkt und Link zum Supabase-Table-Editor, **keine Personendaten**. Der Kunde erhält keine Mail, nur die Danke-Seite mit Referenznummer.
-- **Supabase-Tabelle `drohnencheck_anfragen`** mit Status `neu`. Status im Table Editor nachführen: `neu → termin → geflogen → report → auftrag | abgeschlossen | abgesagt`. Die Spalte `mail_intern_ok` zeigt, ob die Info-Mail versendet wurde. Die UTM-Parameter stehen in den Spalten `utm_*`.
+- **Info-Mail intern** an `email.empfaengerIntern`: nur Referenz, Zeitpunkt und Link `…/admin.html#DC-…` direkt zur Anfrage, **keine Personendaten**. Der Kunde erhält keine Mail, nur die Danke-Seite mit Referenznummer.
+- **Übersicht** (`admin.html` bzw. Tab «Drohnen-Check» im Admin-Panel): Liste mit Suche und Statusfilter, Detail mit allen Angaben, Knöpfe für Anrufen, WhatsApp, E-Mail und Karte, Status, bestätigter Termin und interne Notiz änderbar, Warteliste, CSV-Export. Zeigt pro Anfrage, wann sie automatisch gelöscht wird.
+- **Supabase-Tabelle `drohnencheck_anfragen`** mit Status `neu`. Status in der Übersicht nachführen: `neu → termin → geflogen → report → auftrag | abgeschlossen | abgesagt`. Die Spalte `mail_intern_ok` zeigt, ob die Info-Mail versendet wurde. Die UTM-Parameter stehen in den Spalten `utm_*`.
 - **Warteliste** (PLZ ausserhalb): Tabelle `drohnencheck_warteliste`.
 - **Referenznummer:** `DC-<Jahr>-<laufende Nr.>`, Zähler pro Jahr in `drohnencheck_zaehler`.
 

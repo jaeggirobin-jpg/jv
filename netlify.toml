@@ -6,7 +6,8 @@
 
 # Drohnen-Check: Subdomain dachcheck.jaeggivollmer.ch zeigt auf public/dachcheck/.
 # Muss VOR der allgemeinen /api/*-Regel stehen (erste passende Regel gewinnt).
-# Auf dieser Subdomain ist nur der Drohnen-Check erreichbar, nicht Admin oder Katalog.
+# Auf dieser Subdomain ist nur der Drohnen-Check erreichbar (Seite, Anfrage-Übersicht admin.html
+# und die dachcheck-Functions), nicht das Admin-Panel oder der Katalog.
 [[redirects]]
   from = "https://dachcheck.jaeggivollmer.ch/api/dachcheck-anfrage"
   to = "/.netlify/functions/dachcheck-anfrage"
@@ -16,6 +17,18 @@
 [[redirects]]
   from = "https://dachcheck.jaeggivollmer.ch/api/dachcheck-warteliste"
   to = "/.netlify/functions/dachcheck-warteliste"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://dachcheck.jaeggivollmer.ch/api/dachcheck-admin-liste"
+  to = "/.netlify/functions/dachcheck-admin-liste"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://dachcheck.jaeggivollmer.ch/api/dachcheck-admin-update"
+  to = "/.netlify/functions/dachcheck-admin-update"
   status = 200
   force = true
 

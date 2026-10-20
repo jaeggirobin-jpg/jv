@@ -64,12 +64,13 @@
     },
 
     // ── E-Mail ─────────────────────────────────────────────────────────────
-    // Nur eine Info-Mail an uns (ohne Personendaten), keine Bestätigung an Kunden.
+    // Nur eine Info-Mail an uns (ohne Personendaten, mit Link zur Übersicht), keine Bestätigung an Kunden.
     // Die Empfänger-Adresse kann per Environment Variable DC_EMPFAENGER überschrieben werden.
     email: {
       empfaengerIntern: 'info@jaeggivollmer.ch',
       absenderName: 'Jäggi Vollmer',
       absenderAdresse: 'dachcheck@jaeggivollmer.ch',  // Domain muss beim Versanddienst verifiziert sein
+      uebersichtUrl: 'https://dachcheck.jaeggivollmer.ch/admin.html',  // Link in der Info-Mail
       betreffIntern: 'Neue Drohnen-Check-Anfrage'
     },
 

@@ -49,6 +49,21 @@ async function anfrageAktualisieren(referenz, felder) {
   if (!res.ok) console.error('Update fehlgeschlagen', res.status, await res.text());
 }
 
+// Direkter PostgREST-Aufruf (für die Übersicht). pfad z. B. 'drohnencheck_anfragen?select=*'
+async function rest(pfad, { method = 'GET', body } = {}) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  if (!url || !key) throw new Error('SUPABASE_URL oder SUPABASE_SERVICE_KEY fehlt');
+  const res = await fetch(url.replace(/\/$/, '') + '/rest/v1/' + pfad, {
+    method,
+    headers: { 'Content-Type': 'application/json', apikey: key, Authorization: 'Bearer ' + key, Prefer: 'return=representation' },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error('REST ' + method + ' ' + pfad + ' fehlgeschlagen: ' + res.status + ' ' + text);
+  return text ? JSON.parse(text) : null;
+}
+
 // E-Mail via Resend (EU-Region empfohlen). Gibt true/false zurück, wirft nie.
 async function mailSenden({ an, betreff, html, text, antwortAn }) {
   const key = process.env.RESEND_API_KEY;
@@ -89,4 +104,4 @@ function esc(s) {
 }
 
 
-module.exports = { config, antwort, ipHash, rpc, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc };
+module.exports = { config, antwort, ipHash, rpc, rest, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc };

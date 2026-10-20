@@ -68,25 +68,18 @@ function pruefen(b) {
 }
 
 // ── Info-Mail intern ───────────────────────────────────────────────────
-// Bewusst OHNE Personendaten: nur Referenz, Zeitpunkt und Link zur Datenbank.
-// Die Angaben stehen ausschliesslich in Supabase (Tabelle drohnencheck_anfragen).
-function supabaseLink() {
-  const m = /^https:\/\/([a-z0-9]+)\.supabase\.co/.exec(process.env.SUPABASE_URL || '');
-  return m ? 'https://supabase.com/dashboard/project/' + m[1] + '/editor' : 'https://supabase.com/dashboard';
-}
-
+// Bewusst OHNE Personendaten: nur Referenz, Zeitpunkt und Link zur Übersicht.
+// Die Angaben sieht man nach dem Login in der Übersicht (admin.html).
 function mailInfo(ref) {
   const zeit = new Date().toLocaleString('de-CH', { timeZone: 'Europe/Zurich', dateStyle: 'short', timeStyle: 'short' });
-  const link = supabaseLink();
+  const link = (process.env.DC_UEBERSICHT_URL || config.email.uebersichtUrl) + '#' + ref;
   const text = 'Neue Drohnen-Check-Anfrage ' + ref + ' (' + zeit + ').\n\n' +
-    'Die Angaben sind in Supabase, Tabelle drohnencheck_anfragen:\n' + link;
+    'Anfrage ansehen:\n' + link;
   const html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#25292E">' +
     '<p>Neue Drohnen-Check-Anfrage <strong>' + esc(ref) + '</strong> (' + esc(zeit) + ').</p>' +
-    '<p>Die Angaben sind in Supabase, Tabelle <code>drohnencheck_anfragen</code>:<br>' +
-    '<a href="' + esc(link) + '">Supabase öffnen</a></p></div>';
+    '<p><a href="' + esc(link) + '" style="display:inline-block;padding:10px 18px;background:#94621F;color:#fff;text-decoration:none;border-radius:6px">Anfrage ansehen</a></p></div>';
   return { text, html };
 }
-
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return antwort(405, { error: 'Methode nicht erlaubt' });
