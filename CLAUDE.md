@@ -28,30 +28,37 @@ Internes Tool für Jäggi Vollmer GmbH (Basel) zur sicheren Weitergabe von Badez
 
 ```
 docs.jaeggivollmer.ch/
-├── index.html              → Admin-Panel (passwortgeschützt)
-├── view.html               → Kunden-Viewer (Token-basiert)
-├── netlify.toml            → Routing + Function-Config
+├── public/                 → EINZIGER ausgelieferter Ordner (publish = "public")
+│   ├── index.html          → Admin-Panel (Kunden, Katalog, Ansprechpersonen, Dokumente)
+│   ├── view.html           → Kunden-Viewer für PDFs (Token-basiert)
+│   ├── inspiration.html    → Kunden-Inspirationsseite (Token, Supabase-RPCs)
+│   ├── swipe.html          → Inspiration als Swipe-Karten (Token, Supabase-RPCs)
+│   └── assets/, logo.png
+├── netlify.toml            → Routing, Function-Config, Sicherheits-Header
+├── supabase/               → SQL-Migrationen (manuell im SQL-Editor ausführen)
 └── netlify/functions/
-    ├── get-pdf.js          → Sichere PDF-Auslieferung (signierte URL)
-    ├── create-link.js      → Link erstellen (Admin)
-    ├── toggle-link.js      → Link aktivieren/deaktivieren (Admin)
-    ├── delete-link.js      → Link löschen inkl. Datei (Admin)
-    └── list-links.js       → Alle Links auflisten (Admin)
+    ├── _lib/auth.js        → Gemeinsame Admin-Passwortprüfung (zeitkonstant)
+    ├── get-pdf.js          → Sichere PDF-Auslieferung (signierte URL, prüft Kundenstatus)
+    ├── create-link.js      → PDF-Upload in 2 Schritten (prepare/finalize, Admin)
+    ├── ...                 → weitere Admin-Functions für Kunden, Katalog, Medien
 ```
+
+Dateien ausserhalb von `public/` (Doku, Migrationen, Function-Quellcode) werden nie ausgeliefert. Neue öffentliche Dateien gehören nach `public/`.
 
 ### Datenfluss
 
 ```
 Admin lädt PDF hoch
-→ create-link.js speichert Datei in Supabase Storage
-→ generiert einmaligen Token (UUID-basiert)
+→ create-link.js (action 'prepare') erzeugt Dokument-Token + signierte Upload-URL
+→ Browser lädt das PDF direkt in den privaten Bucket (kein 6-MB-Limit der Functions)
+→ create-link.js (action 'finalize') prüft Datei (PDF, max. 25 MB)
 → speichert Eintrag in doc_links Tabelle
 → gibt shareable URL zurück: docs.jaeggivollmer.ch/view.html?t=TOKEN
 
 Kunde öffnet Link
 → view.html liest Token aus URL
 → ruft get-pdf.js auf mit Token
-→ get-pdf.js prüft is_active in Supabase
+→ get-pdf.js prüft is_active in Supabase und, falls der Token einem Kunden gehört, kunden.status = 'aktiv'
 → falls aktiv: generiert signierte Supabase-URL (60 Sekunden gültig)
 → PDF.js rendert PDF als Canvas (seitenweise)
 → Wasserzeichen wird via Canvas-API überlagert
@@ -88,13 +95,18 @@ CREATE TABLE doc_links (
 
 ### Row Level Security (RLS)
 
-RLS auf `doc_links` deaktiviert — Zugriff ausschliesslich via `service_role` Key in Netlify Functions. Kein direkter Client-Zugriff auf Supabase.
+RLS ist auf **allen** Tabellen aktiv (inkl. `doc_links`, siehe `migration_009_rls_haertung.sql`). Es gibt bewusst **keine** Policies für `anon`/`authenticated` auf Personendaten:
+- Admin-Zugriff läuft ausschliesslich über Netlify Functions mit `service_role` (umgeht RLS)
+- Kundenseiten greifen nur über SECURITY-DEFINER-RPCs zu, die den Token selbst prüfen (`get_inspiration_data`, `upsert_interesse`, `update_kommentar`)
+- Einzige anon-Policies: Lesezugriff auf Katalogdaten (`anon_punkte_select`, `anon_kategorien_select`, `anon_medien_select`)
+- **Nie** eine Policy mit `USING (true)` für `authenticated` anlegen: Mit dem öffentlichen anon-Key kann sich sonst jeder ein Konto anlegen und alles lesen.
+- Supabase Auth wird nicht genutzt, Selbstregistrierung muss in Supabase ausgeschaltet bleiben.
 
 ---
 
 ## Netlify Functions
 
-Alle Functions verwenden den `service_role` Key (aus Environment Variable), niemals den `anon` Key. Der `anon` Key wird nur im Frontend für nichts verwendet — alle Supabase-Calls laufen serverseitig.
+Alle Functions verwenden den `service_role` Key (aus Environment Variable), niemals den `anon` Key. Der `anon` Key steht öffentlich in `inspiration.html`/`swipe.html` und darf dort nur die Token-RPCs aufrufen; alle Admin-Calls laufen serverseitig.
 
 ### Environment Variables (in Netlify setzen)
 
@@ -108,7 +120,7 @@ ADMIN_PASSWORD=...             ← selbst gewählt, mind. 16 Zeichen
 
 Kein JWT, kein OAuth. Einfaches Passwort-Vergleich:
 - Frontend sendet Passwort im `Authorization: Bearer PASSWORT` Header
-- Jede Function prüft `process.env.ADMIN_PASSWORD` gegen den Header
+- Jede Function nutzt `checkAuth` aus `netlify/functions/_lib/auth.js` (zeitkonstanter Vergleich mit `process.env.ADMIN_PASSWORD`)
 - Bei Misserfolg: 401
 
 ---
@@ -133,7 +145,7 @@ Kein JWT, kein OAuth. Einfaches Passwort-Vergleich:
 - PDF.js lädt PDF über temporäre signierte URL
 - Rendering: jede Seite als `<canvas>` Element
 - Wasserzeichen (Canvas-API, nach dem Rendern überlagert):
-  - Text: `«Vertraulich – [Kundenname]»` + aktuelles Datum
+  - Logo plus Text `«Vertraulich – [Kundenname]»` + aktuelles Datum (Name kommt von `get-pdf.js` als `watermark`)
   - Diagonal, halbtransparent, auf jeder Seite
 - Schutzmassnahmen:
   - `contextmenu` Event deaktiviert
@@ -149,23 +161,7 @@ Kein JWT, kein OAuth. Einfaches Passwort-Vergleich:
 
 ## netlify.toml
 
-```toml
-[build]
-  functions = "netlify/functions"
-  publish = "."
-
-[[headers]]
-  for = "/view.html"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Cache-Control = "no-store"
-
-[[headers]]
-  for = "/*.pdf"
-  [headers.values]
-    X-Robots-Tag = "noindex"
-```
+Siehe `netlify.toml` im Repo: `publish = "public"`, globale Sicherheits-Header (`X-Frame-Options`, `nosniff`, `Referrer-Policy: no-referrer`, CSP mit `frame-ancestors 'none'`), `Cache-Control: no-store` für HTML.
 
 ---
 

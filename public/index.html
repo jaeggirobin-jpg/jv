@@ -621,6 +621,42 @@
       });
     }
 
+    // PDF direkt in den privaten Bucket hochladen (ohne Grössenlimit der
+    // Netlify Functions): 1. Upload-URL holen, 2. Datei hochladen,
+    // 3. Eintrag in doc_links anlegen lassen.
+    async function uploadPdf(file, label, kundeToken) {
+      if (file.type && file.type !== 'application/pdf') throw new Error('Nur PDF-Dateien erlaubt');
+      if (file.size > 25 * 1024 * 1024) throw new Error('Datei zu gross (max. 25 MB)');
+
+      var prep = await apiCall('/create-link', { method:'POST', body: JSON.stringify({
+        action: 'prepare',
+        file_name: file.name,
+        file_size: file.size,
+      }) });
+
+      // Gleicher Request wie supabase-js uploadToSignedUrl() mit Roh-Body;
+      // die Berechtigung steckt im Token der signierten URL.
+      var res = await fetch(prep.upload_url, {
+        method: 'PUT',
+        headers: {
+          'content-type': 'application/pdf',
+          'cache-control': 'max-age=3600',
+          'x-upsert': 'false',
+        },
+        body: file,
+      });
+      if (!res.ok) throw new Error('Upload fehlgeschlagen (' + res.status + ')');
+
+      return apiCall('/create-link', { method:'POST', body: JSON.stringify({
+        action: 'finalize',
+        doc_token: prep.doc_token,
+        file_path: prep.file_path,
+        customer_name: label,
+        note: label,
+        token: kundeToken,
+      }) });
+    }
+
     // ============================================================
     // LOGIN
     // ============================================================
@@ -766,7 +802,7 @@
         return;
       }
       if (action === 'delete') {
-        if (!confirm('Kunde wirklich loeschen? Alle Interessen und Logs werden entfernt.')) return;
+        if (!confirm('Kunde wirklich loeschen? Alle Interessen, Logs und Dokumente (PDFs) werden entfernt.')) return;
         btn.disabled = true;
         try {
           await apiCall('/delete-kunde', { method:'POST', body: JSON.stringify({ id:btn.dataset.id }) });
@@ -1171,14 +1207,7 @@
           this.disabled = true; this.textContent = 'Laedt hoch...';
           showMsg('detailDocMsg','','');
           try {
-            var base64 = await fileToBase64(file);
-            await apiCall('/create-link', { method:'POST', body: JSON.stringify({
-              customer_name: label,
-              note: label,
-              file_name: file.name,
-              file_base64: base64,
-              token: detailKundeToken,
-            }) });
+            await uploadPdf(file, label, detailKundeToken);
             showMsg('detailDocMsg','Hochgeladen!','success');
             setTimeout(function() { openKundeDetail(id); }, 600);
           } catch(e) { showMsg('detailDocMsg','Fehler: '+e.message,'error'); this.disabled=false; this.textContent='PDF hochladen'; }
