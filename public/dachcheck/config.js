@@ -1,6 +1,6 @@
 // config.js — Zentrale Konfiguration «Gratis Drohnen-Rinnen-Check»
 //
-// Alle Texte, die PLZ-Liste, das Titelvideo und die Empfänger-Adresse stehen hier.
+// Alle Texte, die PLZ-Liste und die Empfänger-Adresse stehen hier. Das Titelvideo wird im Admin importiert.
 // Die Datei wird vom Browser (window.DC_CONFIG) UND von der Netlify Function
 // (require) gelesen. Deshalb: nur reines JS-Objekt, keine Funktionen, keine Geheimnisse.
 // API-Keys gehören in die Netlify Environment Variables, nicht hierher.
@@ -65,15 +65,6 @@
     // ── Tracking (leer = kein Pixel, kein Cookie-Hinweis) ──────────────────
     tracking: {
       metaPixelId: ''
-    },
-
-    // ── Titelvideo (null = ruhiger dunkler Hintergrund, die Seite braucht keine Bilder) ──
-    // Datei nach public/dachcheck/assets/video/ legen, z. B. 'assets/video/hero.mp4'
-    // Empfehlung: 10–20 s Drohnenflug über ein Dach, ohne Ton, H.264, 1080p, unter 5 MB.
-    // Das Standbild (poster) erscheint, bis das Video lädt, und bei «Bewegung reduzieren».
-    medien: {
-      heroVideo: null,
-      heroPoster: null
     },
 
     // ── Links im Footer ────────────────────────────────────────────────────

@@ -45,6 +45,18 @@
   force = true
 
 [[redirects]]
+  from = "https://dachcheck.jaeggivollmer.ch/api/dachcheck-medien"
+  to = "/.netlify/functions/dachcheck-medien"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://dachcheck.jaeggivollmer.ch/api/dachcheck-admin-medien"
+  to = "/.netlify/functions/dachcheck-admin-medien"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "https://dachcheck.jaeggivollmer.ch/*"
   to = "/dachcheck/:splat"
   status = 200

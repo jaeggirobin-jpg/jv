@@ -6,7 +6,7 @@ Läuft auf **derselben Netlify-Site** wie Katalog und Docs, aber unter einer eig
 
 ```
 public/dachcheck/                      → Landingpage (wird ausgeliefert)
-│   ├── config.js                      → ALLE Texte, PLZ-Liste, Titelvideo, Empfänger-Adresse
+│   ├── config.js                      → ALLE Texte, PLZ-Liste, Empfänger-Adresse
 │   ├── index.html                     → Landingpage + Formular (eine Seite)
 │   ├── bericht.html                   → Kundenansicht des Berichts (bericht.html?t=TOKEN)
 │   ├── datenschutz.html               → Entwurf Datenschutz (juristisch prüfen)
@@ -21,9 +21,12 @@ netlify/functions/
 │   ├── dachcheck-admin-update.js      → Status, Termin, Notiz ändern (Admin)
 │   ├── dachcheck-bericht.js           → Bericht erstellen, Bilder hochladen, veröffentlichen (Admin)
 │   ├── dachcheck-bericht-ansehen.js   → veröffentlichten Bericht für den Kunden ausliefern
+│   ├── dachcheck-admin-medien.js      → Titelvideo importieren, ersetzen, entfernen (Admin)
+│   ├── dachcheck-medien.js            → aktuelles Titelvideo für die Landingpage
 │   └── _lib/dachcheck.js              → Supabase-, Storage- und Mail-Helfer (ohne npm-Abhängigkeiten)
 supabase/migration_010_drohnencheck.sql → Tabellen, RLS, Funktionen
 supabase/migration_011_drohnencheck_bericht.sql → Berichte, Storage-Bucket «drohnencheck», kurzes Formular
+supabase/migration_012_drohnencheck_medien.sql → Titelvideo: Tabelle drohnencheck_einstellungen, öffentlicher Bucket «drohnencheck-medien»
 netlify.toml                           → Subdomain-Rewrite und Zeitplan der Löschroutine
 ```
 
@@ -61,7 +64,7 @@ Für lokale Tests eine Datei `.env` im Repo-Root mit den Variablen unten anlegen
 
 ## Einrichten und deployen
 
-1. **Datenbank:** `supabase/migration_010_drohnencheck.sql` und danach `supabase/migration_011_drohnencheck_bericht.sql` im Supabase SQL-Editor ausführen. Beide sind idempotent und fassen keine bestehenden Tabellen an. Migration 011 legt auch den privaten Storage-Bucket `drohnencheck` an (nur JPG/PNG/WebP, max. 10 MB).
+1. **Datenbank:** `supabase/migration_010_drohnencheck.sql`, danach `migration_011_drohnencheck_bericht.sql` und `migration_012_drohnencheck_medien.sql` im Supabase SQL-Editor ausführen. Alle sind idempotent und fassen keine bestehenden Tabellen an. Migration 011 legt den privaten Storage-Bucket `drohnencheck` an (nur JPG/PNG/WebP, max. 10 MB), Migration 012 den öffentlichen Bucket `drohnencheck-medien` für das Titelvideo (nur MP4/WebM/JPG, max. 50 MB).
 2. **Resend:** Konto mit Region EU anlegen, Domain `jaeggivollmer.ch` verifizieren (DNS-Einträge bei Hostpoint), API-Key erstellen.
 3. **Netlify (bestehende Site):** Unter *Domain management* die Domain `dachcheck.jaeggivollmer.ch` als **Domain alias** hinzufügen. Bei Hostpoint einen CNAME `dachcheck` → `<site>.netlify.app` setzen (gleiches Ziel wie `docs`). SSL kommt automatisch.
 4. **Environment Variables** in der bestehenden Site ergänzen (`SUPABASE_URL` und `SUPABASE_SERVICE_KEY` sind schon gesetzt):
@@ -80,7 +83,7 @@ Für lokale Tests eine Datei `.env` im Repo-Root mit den Variablen unten anlegen
 
 ## Konfiguration ändern
 
-Alles steht in **`public/dachcheck/config.js`**: Texte aller Abschnitte, FAQ, PLZ-Liste, Titelvideo, Empfänger- und Absender-Adresse, Meta Pixel ID. Nach dem Ändern committen und pushen, Netlify deployt automatisch.
+Alles steht in **`public/dachcheck/config.js`**: Texte aller Abschnitte, FAQ, PLZ-Liste, Empfänger- und Absender-Adresse, Meta Pixel ID. Nach dem Ändern committen und pushen, Netlify deployt automatisch.
 
 - **Einzugsgebiet:** `einzugsgebiet.plz`, Bereiche als `'4000-4099'`, einzelne PLZ als Zahl. Wird im Browser und nochmals auf dem Server geprüft.
 - **Meta Pixel:** `tracking.metaPixelId` setzen. Erst dann erscheint der Cookie-Hinweis, und das Pixel lädt nur nach «Einverstanden». Bei erfolgreicher Anfrage wird `Lead` gesendet.
@@ -125,11 +128,19 @@ Der Kunde sieht den Bericht unter `dachcheck.jaeggivollmer.ch/bericht.html?t=…
 | `config.js` → `tracking.metaPixelId` | Meta Pixel ID (leer = kein Tracking) |
 | `config.js` → `email.absenderAdresse` | Absender bestätigen, Domain bei Resend verifizieren |
 | `config.js` → `einzugsgebiet.plz` | Startliste BS/BL prüfen (Grenzgemeinden zu SO/AG) |
-| `config.js` → `medien.heroVideo` | optional: kurzes Drohnenvideo (ohne Video bleibt ein ruhiger dunkler Hintergrund) |
+| Admin → Tab «Landingpage» | optional: Titelvideo importieren (ohne Video bleibt ein ruhiger dunkler Hintergrund) |
 | `impressum.html` | UID, vertretungsberechtigte Person |
 | `datenschutz.html` | Link zur allgemeinen Datenschutzerklärung, Supabase-Region, Garantien pro Anbieter; Entwurf-Hinweis nach der juristischen Prüfung entfernen |
 | Einwilligungstext Kommunikation | Steht im Briefing in Du-Form («Ihr dürft …»), der Rest der Seite siezt. Bei Bedarf in `config.js` anpassen |
 
-## Titelvideo einsetzen
+## Titelvideo importieren
 
-Video nach `public/dachcheck/assets/video/` legen und in `config.js` unter `medien` eintragen, z. B. `heroVideo: 'assets/video/hero.mp4'`, optional `heroPoster: 'assets/video/hero.jpg'` (Standbild). Empfehlung: 10 bis 20 Sekunden Flug über ein Dach, ohne Ton, MP4 (H.264), 1080p, unter 5 MB. Das Video läuft stumm in Schleife. Bei «Bewegung reduzieren» oder im Datensparmodus erscheint nur das Standbild.
+Im Admin (Admin-Panel → Drohnen-Check oder `dachcheck.jaeggivollmer.ch/admin.html`) im Tab **«Landingpage»** auf **«Video importieren»** klicken und das Originalvideo der Drohne wählen. Start und Länge wählen (max. 20 Sekunden), dann **«Verkleinern und hochladen»**.
+
+- Das Video wird direkt im Browser verkleinert: 1280 px Breite, 30 Bilder pro Sekunde, ca. 2,5 Mbit/s, ohne Ton. Aus einer Drohnendatei von mehreren hundert MB werden so typischerweise 3 bis 6 MB. Das Original wird nie hochgeladen.
+- Die Umwandlung läuft in Echtzeit (15 Sekunden Video dauern rund 15 Sekunden). Das Fenster dabei offen und sichtbar lassen.
+- Am besten mit **Chrome oder Edge**: Sie erzeugen MP4 (H.264), das auf allen Handys läuft. Andere Browser erzeugen WebM; ältere iPhones zeigen dann nur das Standbild.
+- Drohnenvideos in H.265/HEVC kann nicht jeder Browser lesen. Erscheint eine Fehlermeldung, das Video in der Drohnen-App als H.264 (MP4) exportieren.
+- Ein neuer Import ersetzt das alte Video, «Video entfernen» löscht es. Das Standbild (erstes Bild) wird automatisch erzeugt.
+- Bei «Bewegung reduzieren» oder im Datensparmodus zeigt die Landingpage nur das Standbild.
+- Keine erkennbaren Personen, Hausnummern oder Autokennzeichen im Video: Der Bucket ist öffentlich.

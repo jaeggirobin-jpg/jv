@@ -79,28 +79,31 @@
     $('danke-kontakt').innerHTML = 'Fragen? <a href="tel:' + esc(F.telefonLink) + '">' + esc(F.telefon) + '</a> oder <a href="mailto:' + esc(F.email) + '">' + esc(F.email) + '</a>';
   }
 
-  // Titelvideo, sobald in config.js hinterlegt. Ohne Video bleibt der ruhige Hintergrund.
-  // Bei «Bewegung reduzieren» oder Datensparmodus nur das Standbild.
+  // Titelvideo: wird im Admin importiert (Tab «Landingpage») und hier nachgeladen.
+  // Ohne Video bleibt der ruhige Hintergrund. Bei «Bewegung reduzieren» oder Datensparmodus nur das Standbild.
   function heroMedien() {
-    var M = C.medien || {};
-    var box = $('hero-medien');
-    var ruhig = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var sparen = navigator.connection && navigator.connection.saveData;
-    if (M.heroVideo && !ruhig && !sparen) {
-      var v = document.createElement('video');
-      v.muted = true; v.autoplay = true; v.loop = true; v.playsInline = true;
-      v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
-      v.preload = 'auto';
-      if (M.heroPoster) v.poster = M.heroPoster;
-      v.src = M.heroVideo;
-      box.appendChild(v);
-      var p = v.play();
-      if (p && p.catch) p.catch(function () { /* Autoplay blockiert: Standbild bleibt */ });
-    } else if (M.heroPoster) {
-      var img = document.createElement('img');
-      img.src = M.heroPoster; img.alt = '';
-      box.appendChild(img);
-    }
+    fetch('/api/dachcheck-medien').then(function (res) { return res.ok ? res.json() : {}; }).then(function (M) {
+      var box = $('hero-medien');
+      var ruhig = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var sparen = navigator.connection && navigator.connection.saveData;
+      // WebM (Fallback des Imports) können ältere iPhones nicht abspielen: dann nur das Standbild
+      var abspielbar = M.video && (!/\.webm$/.test(M.video) || document.createElement('video').canPlayType('video/webm') !== '');
+      if (abspielbar && !ruhig && !sparen) {
+        var v = document.createElement('video');
+        v.muted = true; v.autoplay = true; v.loop = true; v.playsInline = true;
+        v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+        v.preload = 'auto';
+        if (M.poster) v.poster = M.poster;
+        v.src = M.video;
+        box.appendChild(v);
+        var p = v.play();
+        if (p && p.catch) p.catch(function () { /* Autoplay blockiert: Standbild bleibt */ });
+      } else if (M.poster) {
+        var img = document.createElement('img');
+        img.src = M.poster; img.alt = '';
+        box.appendChild(img);
+      }
+    }).catch(function () { /* ohne Video weiter */ });
   }
 
   // ════════════════════════════════════════════════════════════════════

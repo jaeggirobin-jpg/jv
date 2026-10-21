@@ -103,6 +103,14 @@
 .dc-link input { border: 1.5px solid #CFC9C1; border-radius: 8px; }
 .dc-meldung-fehler { color: var(--dc-rot); }
 
+/* Titelvideo (Tab Landingpage) */
+.dc-hero { max-width: 720px; }
+.dc-hero h3 { margin: 0 0 6px; font-size: 1.2rem; }
+.dc-hero__video { display: block; width: 100%; max-height: 360px; background: #25292E; border-radius: 10px; margin: 10px 0 6px; }
+.dc-hero__zuschnitt { margin-top: 16px; padding: 14px; border: 1px solid var(--dc-linie); border-radius: 10px; background: #FBFAF8; }
+.dc-hero__felder { grid-template-columns: 1fr 1fr; margin-top: 10px; }
+.dc-hero .dc-upload { margin-top: 8px; }
+
 .dc-hinweis { color: var(--dc-neben); font-size: .92rem; }
 .dc-tabelle { overflow-x: auto; margin-top: 12px; }
 .dc-tabelle table { width: 100%; border-collapse: collapse; background: var(--dc-weiss); border: 1px solid var(--dc-linie); font-size: .9rem; }

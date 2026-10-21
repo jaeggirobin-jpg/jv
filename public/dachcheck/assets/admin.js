@@ -63,6 +63,90 @@
   }
 
   // ════════════════════════════════════════════════════════════════════
+  // Video im Browser verkleinern: Ausschnitt abspielen, auf ein Canvas mit
+  // HERO_BREITE zeichnen und mit MediaRecorder neu aufnehmen (ohne Ton).
+  // Läuft in Echtzeit, ein 15-Sekunden-Ausschnitt dauert also rund 15 Sekunden.
+  // ════════════════════════════════════════════════════════════════════
+  var HERO_MAX_SEKUNDEN = 20;
+  var HERO_BREITE = 1280;
+  var HERO_BITRATE = 2500000;   // ca. 4.5 MB für 15 Sekunden
+  var HERO_FPS = 30;
+
+  function aufnahmeFormat() {
+    // MP4 nur mit H.264 (läuft auf allen Handys inkl. iPhone). Ein blosses 'video/mp4' kann in
+    // Browsern ohne H.264-Encoder VP9 in MP4 liefern, das Safari nicht abspielt: dann lieber WebM.
+    var kandidaten = ['video/mp4;codecs=avc1.640028', 'video/mp4;codecs=avc1.4d002a', 'video/mp4;codecs=avc1',
+      'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return null;
+    for (var i = 0; i < kandidaten.length; i++) if (MediaRecorder.isTypeSupported(kandidaten[i])) return kandidaten[i];
+    return null;
+  }
+
+  function videoVerkleinern(url, start, laenge, fortschritt) {
+    return new Promise(function (ok, fehler) {
+      var format = aufnahmeFormat();
+      if (!format) { fehler(new Error('Dieser Browser kann keine Videos umwandeln. Bitte Chrome oder Edge verwenden.')); return; }
+      var v = document.createElement('video');
+      v.muted = true; v.playsInline = true; v.preload = 'auto';
+      v.src = url;
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext('2d');
+      var ende = start + laenge;
+      var fertig = false;
+      var rec, stueckeListe = [], poster;
+
+      function zeichnen() {
+        ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+      }
+      function stopp() {
+        if (fertig) return;
+        fertig = true;
+        v.pause();
+        if (rec && rec.state !== 'inactive') rec.stop();
+      }
+      function schleife() {
+        if (fertig) return;
+        zeichnen();
+        fortschritt(v.currentTime - start);
+        if (v.currentTime >= ende || v.ended) { stopp(); return; }
+        if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(schleife);
+        else requestAnimationFrame(schleife);
+      }
+
+      v.onerror = function () { fehler(new Error('Video konnte nicht gelesen werden')); };
+      v.onloadedmetadata = function () {
+        var f = Math.min(1, HERO_BREITE / v.videoWidth);
+        // gerade Masse, sonst lehnen manche Encoder ab
+        canvas.width = Math.round(v.videoWidth * f / 2) * 2;
+        canvas.height = Math.round(v.videoHeight * f / 2) * 2;
+        v.onseeked = function () {
+          v.onseeked = null;
+          zeichnen();
+          canvas.toBlob(function (b) {
+            poster = b;
+            var stream = canvas.captureStream(HERO_FPS);
+            rec = new MediaRecorder(stream, { mimeType: format, videoBitsPerSecond: HERO_BITRATE });
+            rec.ondataavailable = function (e) { if (e.data && e.data.size) stueckeListe.push(e.data); };
+            rec.onstop = function () {
+              stream.getTracks().forEach(function (t) { t.stop(); });
+              var typ = format.split(';')[0];
+              var video = new Blob(stueckeListe, { type: typ });
+              if (!video.size) { fehler(new Error('Die Aufnahme ist leer')); return; }
+              ok({ video: video, poster: poster, typ: typ, breite: canvas.width, hoehe: canvas.height });
+            };
+            v.onended = stopp;
+            // Absicherung, falls die Zeichenschleife im Hintergrund pausiert
+            v.ontimeupdate = function () { if (v.currentTime >= ende) stopp(); };
+            rec.start(1000);
+            v.play().then(schleife, function () { fehler(new Error('Video konnte nicht abgespielt werden')); });
+          }, 'image/jpeg', 0.8);
+        };
+        v.currentTime = start;
+      };
+    });
+  }
+
+  // ════════════════════════════════════════════════════════════════════
   // Übersicht in ein Element einhängen
   // ════════════════════════════════════════════════════════════════════
   function mount(root, opts) {
@@ -83,7 +167,8 @@
           '<button type="button" class="dc-btn" data-a="csv">CSV exportieren</button></div></div>' +
         '<div class="dc-tabs" role="tablist">' +
           '<button type="button" role="tab" data-tab="anfragen" aria-selected="true">Anfragen <span data-anz="anfragen"></span></button>' +
-          '<button type="button" role="tab" data-tab="warteliste" aria-selected="false">Warteliste <span data-anz="warteliste"></span></button></div>' +
+          '<button type="button" role="tab" data-tab="warteliste" aria-selected="false">Warteliste <span data-anz="warteliste"></span></button>' +
+          '<button type="button" role="tab" data-tab="landingpage" aria-selected="false">Landingpage</button></div>' +
         '<section data-panel="anfragen">' +
           '<div class="dc-filter"><input type="search" data-a="suche" placeholder="Suchen: Name, Ort, Referenz, E-Mail …" autocomplete="off" aria-label="Anfragen durchsuchen">' +
           '<div class="dc-chips" data-a="chips" role="group" aria-label="Nach Status filtern"></div></div>' +
@@ -94,9 +179,32 @@
           '<button type="button" class="dc-btn" data-a="emails">Alle E-Mail-Adressen kopieren</button>' +
           '<div class="dc-tabelle"><table><thead><tr><th>Datum</th><th>E-Mail</th><th>PLZ</th><th>Ort</th></tr></thead><tbody data-a="warteliste"></tbody></table></div>' +
         '</section>' +
+        '<section data-panel="landingpage" class="dc-hero" hidden>' +
+          '<h3>Titelvideo</h3>' +
+          '<p class="dc-hinweis">Das Drohnenvideo direkt importieren: Es wird beim Import automatisch auf ' + HERO_BREITE + ' px Breite und höchstens ' + HERO_MAX_SEKUNDEN + ' Sekunden verkleinert, ohne Ton. ' +
+            'Bitte keine erkennbaren Personen, Hausnummern oder Autokennzeichen. Am besten mit Chrome oder Edge.</p>' +
+          '<div data-a="hero-aktuell"><p class="dc-hinweis">Wird geladen …</p></div>' +
+          '<label class="dc-btn dc-btn--primaer dc-upload">Video importieren<input type="file" accept="video/*" data-a="hero-datei"></label>' +
+          '<div class="dc-hero__zuschnitt" data-a="hero-zuschnitt" hidden>' +
+            '<video class="dc-hero__video" data-a="hero-quelle" muted playsinline controls preload="metadata"></video>' +
+            '<p class="dc-meta" data-a="hero-info"></p>' +
+            '<div class="dc-verwaltung dc-hero__felder">' +
+              '<div><label for="dc-hero-start">Start bei Sekunde</label><input type="number" id="dc-hero-start" data-a="hero-start" min="0" step="1" value="0" inputmode="numeric"></div>' +
+              '<div><label for="dc-hero-laenge">Länge in Sekunden (max. ' + HERO_MAX_SEKUNDEN + ')</label><input type="number" id="dc-hero-laenge" data-a="hero-laenge" min="1" max="' + HERO_MAX_SEKUNDEN + '" step="1" value="15" inputmode="numeric"></div>' +
+            '</div>' +
+            '<div class="dc-knoepfe"><button type="button" class="dc-btn" data-a="hero-hier">Aktuelle Stelle als Start</button>' +
+              '<button type="button" class="dc-btn dc-btn--primaer" data-a="hero-los">Verkleinern und hochladen</button></div>' +
+          '</div>' +
+          '<p class="dc-gespeichert" data-a="hero-status" aria-live="polite"></p>' +
+        '</section>' +
         '<p class="dc-fehler" data-a="fehler" role="alert" hidden></p>';
 
       root.addEventListener('click', klick);
+      root.querySelector('[data-a="hero-datei"]').addEventListener('change', function (e) {
+        var datei = e.target.files && e.target.files[0];
+        e.target.value = '';
+        if (datei) heroDateiGewaehlt(datei);
+      });
       root.querySelector('[data-a="suche"]').addEventListener('input', function (e) {
         zustand.suche = e.target.value.trim().toLowerCase();
         liste();
@@ -558,6 +666,144 @@
       return 'mailto:' + a.email + '?subject=' + encodeURIComponent('Ihr Drohnen-Check ' + a.referenz + ': Kurzbericht') + '&body=' + encodeURIComponent(text);
     }
 
+    // ════════════════════════════════════════════════════════════════
+    // Titelvideo der Landingpage: importieren, im Browser verkleinern, hochladen
+    // ════════════════════════════════════════════════════════════════
+    // zustand.hero = { geladen, aktuell (vom Server), quelle: { datei, url, dauer, breite, hoehe }, laeuft }
+
+    function heroAufruf(action, daten) {
+      var body = Object.assign({ action: action }, daten || {});
+      return aufruf('/dachcheck-admin-medien', { method: 'POST', body: JSON.stringify(body) });
+    }
+
+    function heroLaden() {
+      zustand.hero = zustand.hero || { geladen: false, aktuell: null, quelle: null, laeuft: false };
+      heroAufruf('laden').then(function (r) {
+        zustand.hero.geladen = true;
+        zustand.hero.aktuell = r.hero;
+        heroZeigen();
+      }).catch(function (e) { heroStatus('Titelvideo konnte nicht geladen werden: ' + e.message, true); });
+    }
+
+    function heroStatus(text, istFehler) {
+      var s = el('hero-status');
+      if (!s) return;
+      s.textContent = text || '';
+      s.classList.toggle('dc-meldung-fehler', !!istFehler);
+    }
+
+    function heroZeigen() {
+      var h = zustand.hero;
+      var box = el('hero-aktuell');
+      if (!box || !h) return;
+      var a = h.aktuell;
+      box.innerHTML = a
+        ? '<video class="dc-hero__video" src="' + esc(a.video_url) + '"' + (a.poster_url ? ' poster="' + esc(a.poster_url) + '"' : '') + ' muted loop playsinline controls preload="metadata"></video>' +
+          '<p class="dc-meta">Aktuell auf der Landingpage' +
+            (a.breite ? ' · ' + a.breite + '×' + a.hoehe : '') + (a.dauer ? ' · ' + a.dauer + ' s' : '') +
+            (a.groesse ? ' · ' + mb(a.groesse) : '') + ' · seit ' + datum(a.updated_at, true) + '</p>' +
+          '<button type="button" class="dc-btn" data-a="hero-entfernen">Video entfernen</button>'
+        : '<p class="dc-hinweis">Zurzeit kein Titelvideo. Die Landingpage zeigt einen ruhigen dunklen Hintergrund.</p>';
+
+      var q = h.quelle;
+      var zs = el('hero-zuschnitt');
+      zs.hidden = !q;
+      if (q) {
+        zs.querySelector('[data-a="hero-info"]').textContent = q.datei.name + ' · ' + mb(q.datei.size) + ' · ' + q.breite + '×' + q.hoehe + ' · ' + Math.round(q.dauer) + ' s';
+      }
+      el('hero-start').disabled = el('hero-laenge').disabled = el('hero-los').disabled = h.laeuft;
+      el('hero-datei').disabled = h.laeuft;
+    }
+
+    function mb(bytes) {
+      return (bytes / 1024 / 1024).toFixed(bytes < 10 * 1024 * 1024 ? 1 : 0).replace('.', ',') + ' MB';
+    }
+
+    // Datei gewählt: Vorschau zeigen, Ausschnitt wählen lassen
+    function heroDateiGewaehlt(datei) {
+      var h = zustand.hero;
+      if (h.quelle) URL.revokeObjectURL(h.quelle.url);
+      h.quelle = null;
+      heroStatus('Video wird gelesen …');
+      var url = URL.createObjectURL(datei);
+      var v = el('hero-quelle');
+      v.onerror = null;
+      v.onloadedmetadata = function () {
+        if (!v.videoWidth) { v.onerror(); return; }
+        h.quelle = { datei: datei, url: url, dauer: v.duration, breite: v.videoWidth, hoehe: v.videoHeight };
+        el('hero-start').value = 0;
+        el('hero-start').max = Math.max(0, Math.floor(v.duration) - 1);
+        el('hero-laenge').value = Math.min(HERO_MAX_SEKUNDEN, Math.max(1, Math.floor(v.duration)));
+        heroStatus('');
+        heroZeigen();
+      };
+      v.onerror = function () {
+        URL.revokeObjectURL(url);
+        h.quelle = null;
+        heroZeigen();
+        heroStatus('Dieses Video kann der Browser nicht lesen (oft H.265/HEVC). Bitte in Chrome oder Edge versuchen oder das Video in der Drohnen-App als H.264 (MP4) exportieren.', true);
+      };
+      v.src = url;
+    }
+
+    function heroLos() {
+      var h = zustand.hero;
+      var q = h.quelle;
+      if (!q || h.laeuft) return;
+      var start = Math.max(0, Math.min(Number(el('hero-start').value) || 0, q.dauer - 0.5));
+      var laenge = Math.max(1, Math.min(Number(el('hero-laenge').value) || HERO_MAX_SEKUNDEN, HERO_MAX_SEKUNDEN, q.dauer - start));
+      h.laeuft = true;
+      heroZeigen();
+      var ergebnis;
+      videoVerkleinern(q.url, start, laenge, function (sek) {
+        heroStatus('Video wird verkleinert: ' + Math.min(Math.round(sek), Math.round(laenge)) + ' von ' + Math.round(laenge) + ' Sekunden. Bitte dieses Fenster offen und sichtbar lassen.');
+      }).then(function (r) {
+        ergebnis = r;
+        heroStatus('Wird hochgeladen (' + mb(r.video.size) + ') …');
+        return Promise.all([
+          heroHochladen('video', r.video, r.typ),
+          heroHochladen('poster', r.poster, 'image/jpeg')
+        ]);
+      }).then(function (pfade) {
+        return heroAufruf('setzen', { video: pfade[0], poster: pfade[1], dauer: laenge, breite: ergebnis.breite, hoehe: ergebnis.hoehe });
+      }).then(function (r) {
+        h.aktuell = r.hero;
+        URL.revokeObjectURL(q.url);
+        h.quelle = null;
+        el('hero-quelle').removeAttribute('src');
+        h.laeuft = false;
+        heroZeigen();
+        heroStatus('Fertig. Das Video ist jetzt auf der Landingpage (' + mb(ergebnis.video.size) + ' statt ' + mb(q.datei.size) + ').' +
+          (/webm/.test(ergebnis.typ) ? ' Hinweis: Dieser Browser konnte kein MP4 erzeugen. Ältere iPhones zeigen dann nur das Standbild. Für MP4 den Import in Chrome oder Edge wiederholen.' : ''));
+      }).catch(function (e) {
+        h.laeuft = false;
+        heroZeigen();
+        heroStatus('Import fehlgeschlagen: ' + e.message, true);
+      });
+    }
+
+    function heroHochladen(art, blob, typ) {
+      return heroAufruf('upload-url', { art: art, typ: typ, groesse: blob.size }).then(function (u) {
+        return fetch(u.upload_url, {
+          method: 'PUT',
+          headers: { 'content-type': typ, 'cache-control': 'max-age=31536000', 'x-upsert': 'false' },
+          body: blob
+        }).then(function (res) {
+          if (!res.ok) throw new Error('Upload fehlgeschlagen (' + res.status + ')');
+          return u.pfad;
+        });
+      });
+    }
+
+    function heroEntfernen() {
+      if (!window.confirm('Titelvideo von der Landingpage entfernen?')) return;
+      heroAufruf('entfernen').then(function () {
+        zustand.hero.aktuell = null;
+        heroZeigen();
+        heroStatus('Titelvideo entfernt.');
+      }).catch(function (e) { heroStatus('Entfernen fehlgeschlagen: ' + e.message, true); });
+    }
+
     function warteliste() {
       el('warteliste').innerHTML = zustand.warteliste.length
         ? zustand.warteliste.map(function (w) {
@@ -598,6 +844,7 @@
         zustand.tab = t.dataset.tab;
         root.querySelectorAll('[data-tab]').forEach(function (b) { b.setAttribute('aria-selected', String(b === t)); });
         root.querySelectorAll('[data-panel]').forEach(function (p) { p.hidden = p.dataset.panel !== zustand.tab; });
+        if (zustand.tab === 'landingpage' && !(zustand.hero && zustand.hero.geladen)) heroLaden();
         return;
       }
       switch (t.dataset.a) {
@@ -605,6 +852,9 @@
         case 'csv': csv(); break;
         case 'speichern': speichern(); break;
         case 'bericht-speichern': berichtSpeichern(false); break;
+        case 'hero-los': heroLos(); break;
+        case 'hero-entfernen': heroEntfernen(); break;
+        case 'hero-hier': el('hero-start').value = Math.floor(el('hero-quelle').currentTime || 0); break;
         case 'bericht-freigabe':
           if (zustand.bericht.daten && zustand.bericht.daten.veroeffentlicht_at) {
             if (window.confirm('Kundenlink sperren? Der Kunde sieht den Bericht dann nicht mehr.')) freigabe(false);
