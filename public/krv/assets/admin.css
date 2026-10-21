@@ -1,7 +1,7 @@
 /* admin.css — Ergänzungen der KRV-Übersicht. Grundlage: /dachcheck/assets/admin.css (Klassen dc-*) */
-.krv-admin .dc-badge.s-beurteilt { background: #E7EEF6; color: #24496B; }
+.krv-admin .dc-badge.s-beurteilt { background: #E6E9EA; color: #4B575D; }
 .krv-admin .dc-badge.s-offerte { background: #FBF0DD; color: #7A4D00; }
-.krv-admin .dc-badge.krv-iwb { background: #E7EFF7; color: #2F6FA8; }
+.krv-admin .dc-badge.krv-iwb { background: #F4EADD; color: #94621F; }
 .krv-admin .dc-badge.krv-iwb::before { display: none; }
 .krv-b.b-vorhanden { color: #22603A; }
 .krv-b.b-fehlt { color: #B3332B; }

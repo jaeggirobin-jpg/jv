@@ -95,44 +95,100 @@
     var ruhig = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var hero = window.KRVSzene.erstellen($('hero-bild'), { start: 1 });
     if (!ruhig) hero.start(3800);
-    anleitungSzene = window.KRVSzene.erstellen($('szene'), {
-      onSchritt: function (i) {
-        document.querySelectorAll('[data-anleitung]').forEach(function (b) {
-          b.setAttribute('aria-current', String(Number(b.getAttribute('data-anleitung')) === i));
-        });
-      }
-    });
-    // Automatisch weiterschalten, sobald die Anleitung sichtbar ist, bis jemand selbst tippt
-    if (!ruhig && 'IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (e) {
-        if (e[0].isIntersecting) { anleitungSzene.start(5000); io.disconnect(); }
-      }, { threshold: 0.4 });
-      io.observe($('szene'));
-    }
+    // Anleitung: Erklärvideo (läuft automatisch, stumm, in Schleife). Fällt das Video aus, bleibt die Skizze.
+    anleitungSzene = window.KRVSzene.erstellen($('szene'), { onSchritt: schrittMarkieren });
+    anleitungsVideo(ruhig);
     $('anleitung-schritte').addEventListener('click', function (e) {
       var b = e.target.closest('[data-anleitung]');
       if (!b) return;
+      var i = Number(b.getAttribute('data-anleitung'));
+      if (anleitungVideo && anleitungVideo.springe(i)) return;
       anleitungSzene.stopp();
-      anleitungSzene.zeige(Number(b.getAttribute('data-anleitung')));
+      anleitungSzene.zeige(i);
     });
-
-    anleitungsVideo();
   }
 
-  // Anleitungsvideo (im Admin importiert). Ohne Video bleibt nur die Skizze.
-  function anleitungsVideo() {
+  function schrittMarkieren(i) {
+    document.querySelectorAll('[data-anleitung]').forEach(function (b) {
+      b.setAttribute('aria-current', String(Number(b.getAttribute('data-anleitung')) === i));
+    });
+  }
+
+  // Startzeiten der Schritte im mitgelieferten Video assets/anleitung.mp4/.webm (je 5 s, danach 4 s Schlussbild).
+  // Quelle des Videos: Projektordner krv-check/video-quelle/web.html
+  var VIDEO_SCHRITTE = [0, 5, 10, 15];
+  var VIDEO_ENDE = 20;
+  var anleitungVideo = null;
+
+  function anleitungsVideo(ruhig) {
+    var box = $('anleitung-video');
+    var v = document.createElement('video');
+    var eigenes = true; // true = mitgeliefertes Video, dessen Zeiten wir kennen
+    v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true;
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+    v.preload = 'metadata';
+    v.poster = 'assets/anleitung.jpg';
+    // MP4 (H.264) für fast alle Browser, WebM als Ersatz (z. B. Chromium ohne H.264)
+    v.src = v.canPlayType('video/mp4; codecs="avc1.42E01E"') ? 'assets/anleitung.mp4' : 'assets/anleitung.webm';
+    v.setAttribute('aria-label', 'Erklärvideo: wo und wie Sie die Armatur beim Wasserzähler fotografieren');
+    if (ruhig) v.controls = true;
+    box.appendChild(v);
+    box.hidden = false;
+    $('szene').hidden = true;
+
+    function skizzeStatt() {
+      box.hidden = true;
+      $('szene').hidden = false;
+      anleitungVideo = null;
+      if (!ruhig && 'IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (e) {
+          if (e[0].isIntersecting) { anleitungSzene.start(5000); io.disconnect(); }
+        }, { threshold: 0.4 });
+        io.observe($('szene'));
+      }
+    }
+    v.addEventListener('error', function () { if (eigenes) skizzeStatt(); });
+
+    // Schritt in der Liste mitlaufen lassen
+    v.addEventListener('timeupdate', function () {
+      if (!eigenes) return;
+      var t = v.currentTime, i = -1;
+      if (t < VIDEO_ENDE) VIDEO_SCHRITTE.forEach(function (s, k) { if (t >= s) i = k; });
+      schrittMarkieren(i);
+    });
+
+    // Erst abspielen, wenn das Video sichtbar ist; ausserhalb anhalten
+    if (!ruhig) {
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (e) {
+          if (e[0].isIntersecting) { var p = v.play(); if (p && p.catch) p.catch(function () { v.controls = true; }); }
+          else v.pause();
+        }, { threshold: 0.35 }).observe(box);
+      } else {
+        v.autoplay = true;
+      }
+    }
+
+    anleitungVideo = {
+      springe: function (i) {
+        if (!eigenes || box.hidden) return false;
+        v.currentTime = VIDEO_SCHRITTE[i] || 0;
+        var p = v.play(); if (p && p.catch) p.catch(function () {});
+        return true;
+      }
+    };
+
+    // Im Admin importiertes Video ersetzt das mitgelieferte
     fetch('/api/krv-medien').then(function (res) { return res.ok ? res.json() : {}; }).then(function (M) {
       if (!M.video) return;
-      if (/\.webm$/.test(M.video) && document.createElement('video').canPlayType('video/webm') === '') return;
-      var box = $('anleitung-video');
-      var v = document.createElement('video');
-      v.controls = true; v.playsInline = true; v.preload = 'metadata'; v.muted = true;
-      v.setAttribute('playsinline', '');
-      if (M.poster) v.poster = M.poster;
+      if (/\.webm$/.test(M.video) && v.canPlayType('video/webm') === '') return;
+      eigenes = false;
+      schrittMarkieren(-1);
+      v.controls = true;
+      v.poster = M.poster || '';
       v.src = M.video;
-      box.appendChild(v);
-      box.hidden = false;
-    }).catch(function () { /* ohne Video weiter */ });
+      if (!ruhig && !v.paused) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+    }).catch(function () { /* mitgeliefertes Video bleibt */ });
   }
 
   // ════════════════════════════════════════════════════════════════════
