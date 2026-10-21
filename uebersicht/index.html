@@ -122,6 +122,19 @@
       <dl><dt>Adresse</dt><dd><code>dachcheck.jaeggivollmer.ch</code> (Subdomain der bestehenden Site)</dd><dt>Ordner</dt><dd><code>public/dachcheck/</code>, Functions <code>dachcheck-*</code></dd><dt>Daten</dt><dd>Tabellen <code>drohnencheck_*</code>, Storage <code>drohnencheck</code> (privat), <code>drohnencheck-medien</code> (öffentlich)</dd></dl>
     </article>
 
+    <article class="karte neu" data-status="aufbau">
+      <div class="kopfzeile"><div><div class="tag">Neu</div><h3>Gratis KRV-Check (Rückflussverhinderer)</h3></div><span class="status aufbau">Im Aufbau</span></div>
+      <p class="beschreibung">Landingpage für die Instagram-Kampagne: Hauseigentümer im IWB-Gebiet laden Fotos vom Wasserzähler hoch, wir beurteilen, ob ein Rückflussverhinderer eingebaut ist, und offerieren sonst den Einbau.</p>
+      <ul>
+        <li>Gezeichnete, animierte Anleitung «wo und wie fotografieren», optional eigenes Anleitungsvideo (Import im Admin)</li>
+        <li>Formular in zwei Schritten: Fotos (im Handy verkleinert, ohne Standortdaten), dann Angaben; Option «bitte anrufen»</li>
+        <li>Nur Basel, Riehen, Bettingen (PLZ-Prüfung); Referenz <code>KRV-2026-0001</code>, Info-Mail ohne Personendaten</li>
+        <li>Admin: Fotos ansehen, Beurteilung (vorhanden / fehlt / unklar), fertiger E-Mail-Entwurf an den Kunden, auch als Tab im Admin-Panel</li>
+        <li>Löschung nach 90 Tagen automatisch (inkl. Fotos), Meta Pixel nur nach Zustimmung</li>
+      </ul>
+      <dl><dt>Adresse</dt><dd><code>krv.jaeggivollmer.ch</code> (Subdomain der bestehenden Site)</dd><dt>Ordner</dt><dd><code>public/krv/</code>, Functions <code>krv-*</code></dd><dt>Daten</dt><dd>Tabellen <code>krvcheck_*</code>, Storage <code>krvcheck</code> (privat), <code>krvcheck-medien</code> (öffentlich)</dd></dl>
+    </article>
+
   </div>
 
   <h2>Für das Team</h2>
@@ -136,6 +149,7 @@
         <li><strong>Katalog:</strong> Kategorien, Punkte, Reihenfolge, Bilder und Videos, Hero-Hintergrundbild</li>
         <li><strong>Ansprechpersonen:</strong> mit Foto</li>
         <li><strong>Drohnen-Check:</strong> Anfragen, Berichte und Warteliste bearbeiten</li>
+        <li><strong>KRV-Check:</strong> Fotos beurteilen, Antwort-Mail an Kunden</li>
       </ul>
       <dl><dt>Adresse</dt><dd><code>docs.jaeggivollmer.ch/</code> (passwortgeschützt)</dd><dt>Datei</dt><dd><code>public/index.html</code> + 29 Netlify Functions</dd></dl>
     </article>
@@ -183,7 +197,7 @@
     <table>
       <thead><tr><th>Baustein</th><th>Wofür</th><th>Details</th></tr></thead>
       <tbody>
-        <tr><td>Netlify, Site «JV Docs»</td><td>Admin, Viewer, Katalog, Swipe, Drohnen-Check</td><td><code>docs.jaeggivollmer.ch</code>, <code>inspiration.jaeggivollmer.ch</code> und <code>dachcheck.jaeggivollmer.ch</code> (Rewrite auf <code>public/dachcheck/</code>), Functions unter <code>/api/*</code></td></tr>
+        <tr><td>Netlify, Site «JV Docs»</td><td>Admin, Viewer, Katalog, Swipe, Drohnen-Check</td><td><code>docs.jaeggivollmer.ch</code>, <code>inspiration.jaeggivollmer.ch</code> und <code>dachcheck.jaeggivollmer.ch</code> (Rewrite auf <code>public/dachcheck/</code>), <code>krv.jaeggivollmer.ch</code> (Rewrite auf <code>public/krv/</code>), Functions unter <code>/api/*</code></td></tr>
         <tr><td>Supabase <code>jaeggivollmer</code></td><td>Datenbank und Dateien</td><td>Tabellen <code>kunden</code>, <code>doc_links</code>, <code>ansprechpersonen</code>, <code>kunden_interessen</code>, <code>aktivitaet_log</code>, <code>inspiration_kategorien</code>, <code>inspiration_punkte</code>, <code>punkt_medien</code>, <code>drohnencheck_*</code>; Storage <code>pdfs</code> (privat), <code>drohnencheck</code> (privat), <code>drohnencheck-medien</code> (öffentlich, Titelvideo), <code>inspiration-medien</code></td></tr>
         <tr><td>GEMA</td><td>separates Repository</td><td>nutzt dieselbe Supabase-Datenbank, hier nicht enthalten</td></tr>
         <tr><td>Resend</td><td>E-Mail-Versand</td><td>Info-Mail Drohnen-Check, geplant auch für Link-Notifikationen</td></tr>
@@ -193,7 +207,7 @@
 
 </main>
 
-<footer><div class="wrap">Stand: 20. Oktober 2026 · Pflege: bei jedem neuen Feature eine Karte ergänzen (<code>uebersicht/index.html</code>).</div></footer>
+<footer><div class="wrap">Stand: 21. Oktober 2026 · Pflege: bei jedem neuen Feature eine Karte ergänzen (<code>uebersicht/index.html</code>).</div></footer>
 
 <script>
   // Filter nach Status

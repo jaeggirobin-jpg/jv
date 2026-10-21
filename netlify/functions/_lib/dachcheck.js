@@ -65,13 +65,14 @@ async function rest(pfad, { method = 'GET', body, prefer = 'return=representatio
 }
 
 // E-Mail via Resend (EU-Region empfohlen). Gibt true/false zurück, wirft nie.
-async function mailSenden({ an, betreff, html, text, antwortAn }) {
+// absender: optional, z. B. für den KRV-Check (sonst Drohnen-Check-Absender)
+async function mailSenden({ an, betreff, html, text, antwortAn, absender: absenderVorgabe }) {
   const key = process.env.RESEND_API_KEY;
   if (!key) {
     console.warn('RESEND_API_KEY fehlt – Mail an ' + an + ' nicht versendet');
     return false;
   }
-  const absender = config.email.absenderName + ' <' + (process.env.DC_ABSENDER || config.email.absenderAdresse) + '>';
+  const absender = absenderVorgabe || config.email.absenderName + ' <' + (process.env.DC_ABSENDER || config.email.absenderAdresse) + '>';
   try {
     const res = await fetch(process.env.RESEND_API_URL || 'https://api.resend.com/emails', {
       method: 'POST',
@@ -120,9 +121,9 @@ async function uploadUrl(pfad, bucket = BUCKET) {
 }
 
 // Signierte Lese-URLs für mehrere Bilder: { pfad: url }
-async function signierteUrls(pfade, sekunden) {
+async function signierteUrls(pfade, sekunden, bucket = BUCKET) {
   if (!pfade.length) return {};
-  const r = await storage('object/sign/' + BUCKET, { body: { expiresIn: sekunden, paths: pfade } });
+  const r = await storage('object/sign/' + bucket, { body: { expiresIn: sekunden, paths: pfade } });
   const urls = {};
   (r || []).forEach((e) => { if (e.signedURL && !e.error) urls[e.path] = storageBasis() + e.signedURL; });
   return urls;
@@ -140,13 +141,13 @@ async function bilderLoeschen(pfade, bucket = BUCKET) {
 }
 
 // Öffentliche URL (nur für den öffentlichen Medien-Bucket)
-function oeffentlicheUrl(pfad) {
-  return storageBasis() + '/object/public/' + BUCKET_MEDIEN + '/' + pfad;
+function oeffentlicheUrl(pfad, bucket = BUCKET_MEDIEN) {
+  return storageBasis() + '/object/public/' + bucket + '/' + pfad;
 }
 
-async function ordnerLoeschen(ordner) {
-  const dateien = await ordnerListe(ordner);
-  await bilderLoeschen(dateien.map((d) => d.pfad));
+async function ordnerLoeschen(ordner, bucket = BUCKET) {
+  const dateien = await ordnerListe(ordner, bucket);
+  await bilderLoeschen(dateien.map((d) => d.pfad), bucket);
   return dateien.length;
 }
 
@@ -166,6 +167,6 @@ function esc(s) {
 
 
 module.exports = {
-  config, antwort, ipHash, rpc, rest, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc,
+  config, antwort, ipHash, rpc, rest, storage, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc,
   uploadUrl, signierteUrls, ordnerListe, bilderLoeschen, ordnerLoeschen, oeffentlicheUrl, BUCKET_MEDIEN
 };

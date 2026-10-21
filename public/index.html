@@ -6,6 +6,7 @@
   <meta name="robots" content="noindex, nofollow" />
   <title>JV Admin</title>
   <link rel="stylesheet" href="/dachcheck/assets/admin.css" />
+  <link rel="stylesheet" href="/krv/assets/admin.css" />
   <style>
     * { box-sizing: border-box; }
     html, body {
@@ -381,6 +382,7 @@
         <button class="active" data-tab="kunden">Kunden</button>
         <button data-tab="katalog">Katalog</button>
         <button data-tab="dachcheck">Drohnen-Check</button>
+        <button data-tab="krv">KRV-Check</button>
       </div>
 
       <!-- ============ Tab: Kunden ============ -->
@@ -549,6 +551,10 @@
       <div class="tab-panel" id="tab-dachcheck">
         <div class="card"><div id="dc-admin-root"></div></div>
       </div>
+      <!-- ============ Tab: KRV-Check (Anfragen von krv.jaeggivollmer.ch) ============ -->
+      <div class="tab-panel" id="tab-krv">
+        <div class="card"><div id="krv-admin-root"></div></div>
+      </div>
     </main>
   </div>
 
@@ -564,6 +570,8 @@
 
   <script src="/dachcheck/config.js"></script>
   <script src="/dachcheck/assets/admin.js"></script>
+  <script src="/krv/config.js"></script>
+  <script src="/krv/assets/admin.js"></script>
   <script>
     var STORAGE_KEY = 'jv_admin_pwd';
     var API = '/.netlify/functions';
@@ -712,7 +720,7 @@
     }
 
     // ============================================================
-    // TABS (Kunden, Katalog, Drohnen-Check)
+    // TABS (Kunden, Katalog, Drohnen-Check, KRV-Check)
     // ============================================================
     document.querySelector('.tabs').addEventListener('click', function(ev) {
       var btn = ev.target.closest('button[data-tab]');
@@ -727,6 +735,14 @@
       if (tab === 'dachcheck') {
         // Übersicht aus public/dachcheck/assets/admin.js
         window.DCAdmin.mount($('dc-admin-root'), {
+          getPwd: getPwd,
+          api: API,
+          onUnauthorized: function() { clearPwd(); showLogin(); }
+        });
+      }
+      if (tab === 'krv') {
+        // Übersicht aus public/krv/assets/admin.js
+        window.KRVAdmin.mount($('krv-admin-root'), {
           getPwd: getPwd,
           api: API,
           onUnauthorized: function() { clearPwd(); showLogin(); }

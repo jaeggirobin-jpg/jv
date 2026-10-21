@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gratis KRV-Check: Rückflussverhinderer per Foto prüfen | Jäggi Vollmer Basel</title>
+<meta name="description" content="Hat Ihr Haus schon einen Rückflussverhinderer, wie ihn IWB verlangt? Zwei Fotos vom Wasserzähler genügen. Gratis Beurteilung durch Sanitärfachleute aus Basel. Für Basel, Riehen und Bettingen.">
+<meta name="theme-color" content="#F7F5F2">
+<meta property="og:title" content="Gratis KRV-Check: Rückflussverhinderer per Foto prüfen">
+<meta property="og:description" content="Zwei Fotos vom Wasserzähler genügen. Wir sagen Ihnen gratis, ob ein Rückflussverhinderer eingebaut ist.">
+<meta property="og:type" content="website">
+<link rel="preload" href="/dachcheck/assets/fonts/oswald-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/dachcheck/assets/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<!-- Grundgestaltung und Schriften teilt sich der KRV-Check mit dem Drohnen-Check -->
+<link rel="stylesheet" href="/dachcheck/assets/styles.css">
+<link rel="stylesheet" href="assets/krv.css">
+<link rel="icon" href="/dachcheck/assets/logo-jaeggi-vollmer.svg" type="image/svg+xml">
+</head>
+<body>
+
+<a class="nur-sr" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="kopf">
+  <div class="wrap">
+    <a class="kopf__logo" href="./" aria-label="Jäggi Vollmer, zur Startseite">
+      <img src="/dachcheck/assets/logo-jaeggi-vollmer.svg" alt="Jäggi Vollmer" width="138" height="44">
+    </a>
+    <button class="btn kopf__cta" type="button" data-cta></button>
+  </div>
+</header>
+
+<main id="inhalt">
+
+  <section class="hero krv-hero" aria-labelledby="hero-titel">
+    <div class="wrap hero__inhalt krv-hero__inhalt">
+      <div>
+        <p class="krv-kicker" data-text="hero.kicker"></p>
+        <h1 id="hero-titel" data-text="hero.titel"></h1>
+        <p data-text="hero.unterzeile"></p>
+        <ul class="krv-haken" id="hero-punkte"></ul>
+        <button class="btn btn--gross" type="button" data-cta></button>
+      </div>
+      <div class="krv-hero__bild" aria-hidden="true" id="hero-bild"></div>
+    </div>
+  </section>
+
+  <section class="abschnitt abschnitt--weiss" aria-labelledby="pflicht-titel">
+    <div class="wrap krv-pflicht">
+      <div>
+        <h2 id="pflicht-titel" data-text="pflicht.titel"></h2>
+        <p class="einleitung" data-text="pflicht.text"></p>
+      </div>
+      <div>
+        <p class="krv-frist"><strong>1.1.2027</strong><span data-text="pflicht.frist"></span></p>
+        <p class="klein" data-text="pflicht.quelle"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="abschnitt" aria-labelledby="ablauf-titel">
+    <div class="wrap">
+      <h2 id="ablauf-titel" data-text="ablauf.titel"></h2>
+      <ol class="schritte" id="schritte"></ol>
+    </div>
+  </section>
+
+  <section class="abschnitt abschnitt--weiss" id="anleitung" aria-labelledby="anleitung-titel">
+    <div class="wrap">
+      <h2 id="anleitung-titel" data-text="anleitung.titel"></h2>
+      <p class="einleitung" data-text="anleitung.text"></p>
+      <div class="krv-anleitung">
+        <div class="krv-buehne">
+          <div class="krv-video" id="anleitung-video" hidden></div>
+          <div class="krv-szene" id="szene" data-schritt="0"></div>
+        </div>
+        <ol class="krv-schritte" id="anleitung-schritte"></ol>
+      </div>
+      <p class="hinweis krv-nichtgefunden" data-text="anleitung.nichtGefunden"></p>
+      <div class="fakten" id="fakten"></div>
+    </div>
+  </section>
+
+  <section class="abschnitt" aria-labelledby="faq-titel">
+    <div class="wrap">
+      <h2 id="faq-titel" data-text="faq.titel"></h2>
+      <div class="faq" id="faq"></div>
+    </div>
+  </section>
+
+  <section class="abschnitt abschnitt--weiss abschluss" aria-labelledby="abschluss-titel">
+    <div class="wrap">
+      <h2 id="abschluss-titel" data-text="abschluss.titel"></h2>
+      <p data-text="abschluss.text"></p>
+      <button class="btn" type="button" data-cta></button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="fuss">
+  <div class="wrap fuss__grid">
+    <div>
+      <div class="fuss__logo"><img src="/dachcheck/assets/logo-jaeggi-vollmer.svg" alt="Jäggi Vollmer" width="106" height="34" loading="lazy"></div>
+    </div>
+    <address id="fuss-kontakt" style="font-style:normal"></address>
+    <nav class="fuss__links" aria-label="Rechtliches" id="fuss-links"></nav>
+  </div>
+</footer>
+
+<div class="cta-leiste"><button class="btn btn--gross" type="button" data-cta></button></div>
+
+<!-- Cookie-Hinweis: erscheint nur, wenn in config.js ein Meta Pixel hinterlegt ist -->
+<div class="cookie" id="cookie" role="dialog" aria-live="polite" aria-label="Zustimmung Tracking" hidden>
+  <p id="cookie-text" style="margin:0"></p>
+  <div class="cookie__knoepfe">
+    <button class="btn btn--sekundaer" type="button" id="cookie-nein"></button>
+    <button class="btn" type="button" id="cookie-ja"></button>
+  </div>
+</div>
+
+<!-- ── Formular: 1. Fotos, 2. Angaben ─────────────────────────────────── -->
+<div class="formular" id="formular" role="dialog" aria-modal="true" aria-labelledby="formular-titel">
+  <div class="formular__karte">
+    <div class="formular__kopf">
+      <div class="formular__zeile">
+        <p class="formular__titel" id="formular-titel"></p>
+        <button class="schliessen" type="button" id="formular-schliessen" aria-label="Formular schliessen">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="krv-fortschritt" id="fortschritt" aria-hidden="true"><span></span><span></span></div>
+    </div>
+
+    <form class="formular__body" id="anfrage" novalidate autocomplete="on">
+      <div class="wrap">
+        <div class="formular-fehler" id="formular-fehler" role="alert" hidden></div>
+
+        <!-- Schritt 1: Fotos -->
+        <section class="schritt-panel" data-schritt="fotos">
+          <h2 tabindex="-1" data-text="formular.fotosTitel"></h2>
+          <p class="klein" data-text="formular.fotosText"></p>
+          <div class="krv-fotos" id="fotos"></div>
+          <label class="btn btn--sekundaer krv-foto-knopf" id="foto-knopf">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+            <span data-text="formular.fotoKnopf"></span>
+            <input type="file" id="foto-input" accept="image/*" multiple>
+          </label>
+          <p class="klein krv-foto-status" id="foto-status" aria-live="polite"></p>
+          <p class="klein"><a href="#anleitung" id="link-anleitung">Anleitung ansehen: Wo und wie fotografieren?</a></p>
+          <label class="check" id="c-keine-fotos"><input type="checkbox" name="keine_fotos" value="ja"><span data-text="formular.keineFotos"></span></label>
+        </section>
+
+        <!-- Schritt 2: Angaben -->
+        <section class="schritt-panel" data-schritt="kontakt" hidden>
+          <h2 tabindex="-1" data-text="formular.kontaktTitel"></h2>
+          <div class="feld-reihe feld-reihe--halb">
+            <div class="feld"><label for="vorname">Vorname</label><input type="text" id="vorname" name="vorname" autocomplete="given-name" required><div class="fehlertext">Bitte Vorname.</div></div>
+            <div class="feld"><label for="nachname">Name</label><input type="text" id="nachname" name="nachname" autocomplete="family-name" required><div class="fehlertext">Bitte Name.</div></div>
+          </div>
+          <div class="feld"><label for="email">E-Mail</label><input type="email" id="email" name="email" autocomplete="email" inputmode="email" required><div class="fehlertext">Bitte geben Sie eine gültige E-Mail-Adresse an.</div></div>
+          <div class="feld"><label for="telefon">Telefon</label><input type="tel" id="telefon" name="telefon" autocomplete="tel" inputmode="tel" required><div class="fehlertext">Bitte geben Sie eine Telefonnummer an.</div></div>
+          <p class="feld-titel">Adresse der Liegenschaft</p>
+          <div class="feld-reihe">
+            <div class="feld"><label for="strasse">Strasse</label><input type="text" id="strasse" name="strasse" autocomplete="address-line1" required><div class="fehlertext">Bitte Strasse.</div></div>
+            <div class="feld"><label for="hausnummer">Nr.</label><input type="text" id="hausnummer" name="hausnummer" autocomplete="off" required><div class="fehlertext">Bitte Nr.</div></div>
+          </div>
+          <div class="feld-reihe feld-reihe--plz">
+            <div class="feld"><label for="plz">PLZ</label><input type="text" id="plz" name="plz" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="postal-code" required><div class="fehlertext">4 Ziffern</div></div>
+            <div class="feld"><label for="ort">Ort</label><input type="text" id="ort" name="ort" autocomplete="address-level2" required><div class="fehlertext">Bitte Ort.</div></div>
+          </div>
+          <fieldset class="feld" id="f-rolle">
+            <legend>Ich bin</legend>
+            <div class="wahl-gruppe krv-rollen" id="rollen"></div>
+            <div class="fehlertext">Bitte wählen.</div>
+          </fieldset>
+          <label class="check"><input type="checkbox" name="iwb_brief" value="ja"><span data-text="formular.iwbBrief"></span></label>
+          <div class="feld"><label for="bemerkung">Bemerkung <span class="optional">(freiwillig)</span></label><textarea id="bemerkung" name="bemerkung" autocomplete="off" maxlength="1000" placeholder="z. B. Mehrfamilienhaus, Zähler im Schacht vor dem Haus"></textarea></div>
+          <label class="check" id="c-einwilligung"><input type="checkbox" name="einwilligung" value="ja"><span><span data-text="formular.einwilligung"></span><span class="pflicht">Pflichtfeld</span></span></label>
+          <p class="klein">Wie wir mit Ihren Daten umgehen, lesen Sie in der <a id="link-datenschutz" target="_blank" rel="noopener">Datenschutzerklärung</a>.</p>
+          <!-- Honeypot: für Menschen unsichtbar -->
+          <div class="honig" aria-hidden="true"><label for="firma_website">Website</label><input type="text" id="firma_website" name="firma_website" tabindex="-1" autocomplete="off"></div>
+        </section>
+
+        <!-- PLZ ausserhalb des IWB-Gebiets -->
+        <section class="schritt-panel" data-schritt="ausserhalb" hidden>
+          <h2 tabindex="-1" data-text="formular.ausserhalb.titel"></h2>
+          <p data-text="formular.ausserhalb.text"></p>
+          <p id="ausserhalb-kontakt"></p>
+        </section>
+
+        <!-- Senden mit Fortschritt -->
+        <section class="schritt-panel" data-schritt="senden" hidden>
+          <h2 tabindex="-1">Wird gesendet …</h2>
+          <div class="krv-balken" aria-hidden="true"><span id="balken"></span></div>
+          <p id="senden-text" aria-live="polite"></p>
+        </section>
+
+        <!-- Abschluss -->
+        <section class="schritt-panel danke" data-schritt="danke" hidden>
+          <h2 tabindex="-1" data-text="danke.titel"></h2>
+          <p>Ihre Referenznummer:</p>
+          <div class="danke__ref" id="danke-ref"></div>
+          <p data-text="danke.text"></p>
+          <h3>So geht es weiter</h3>
+          <ol id="danke-schritte"></ol>
+          <p class="klein" data-text="danke.nachfrage"></p>
+          <p id="danke-kontakt" class="klein"></p>
+        </section>
+      </div>
+    </form>
+
+    <div class="formular__fuss">
+      <div class="wrap">
+        <button class="btn btn--sekundaer" type="button" id="zurueck" hidden>Zurück</button>
+        <button class="btn" type="button" id="weiter"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<noscript><p style="padding:20px;background:#fff">Bitte aktivieren Sie JavaScript oder rufen Sie uns an: 061 692 03 11.</p></noscript>
+
+<script src="config.js"></script>
+<script src="assets/szene.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
