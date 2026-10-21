@@ -82,7 +82,9 @@
     return null;
   }
 
-  function videoVerkleinern(url, start, laenge, fortschritt) {
+  // optionen (für den KRV-Check): { maxKante, bitrate } statt Breite HERO_BREITE und HERO_BITRATE
+  function videoVerkleinern(url, start, laenge, fortschritt, optionen) {
+    optionen = optionen || {};
     return new Promise(function (ok, fehler) {
       var format = aufnahmeFormat();
       if (!format) { fehler(new Error('Dieser Browser kann keine Videos umwandeln. Bitte Chrome oder Edge verwenden.')); return; }
@@ -115,7 +117,9 @@
 
       v.onerror = function () { fehler(new Error('Video konnte nicht gelesen werden')); };
       v.onloadedmetadata = function () {
-        var f = Math.min(1, HERO_BREITE / v.videoWidth);
+        var f = optionen.maxKante
+          ? Math.min(1, optionen.maxKante / Math.max(v.videoWidth, v.videoHeight))
+          : Math.min(1, HERO_BREITE / v.videoWidth);
         // gerade Masse, sonst lehnen manche Encoder ab
         canvas.width = Math.round(v.videoWidth * f / 2) * 2;
         canvas.height = Math.round(v.videoHeight * f / 2) * 2;
@@ -125,7 +129,7 @@
           canvas.toBlob(function (b) {
             poster = b;
             var stream = canvas.captureStream(HERO_FPS);
-            rec = new MediaRecorder(stream, { mimeType: format, videoBitsPerSecond: HERO_BITRATE });
+            rec = new MediaRecorder(stream, { mimeType: format, videoBitsPerSecond: optionen.bitrate || HERO_BITRATE });
             rec.ondataavailable = function (e) { if (e.data && e.data.size) stueckeListe.push(e.data); };
             rec.onstop = function () {
               stream.getTracks().forEach(function (t) { t.stop(); });
@@ -885,7 +889,8 @@
     return laden();
   }
 
-  window.DCAdmin = { mount: mount };
+  // videoVerkleinern nutzt auch der KRV-Check (public/krv/assets/admin.js)
+  window.DCAdmin = { mount: mount, videoVerkleinern: videoVerkleinern };
 
   // ════════════════════════════════════════════════════════════════════
   // Eigenständige Seite admin.html (Login + Übersicht)

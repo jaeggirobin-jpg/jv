@@ -62,6 +62,57 @@
   status = 200
   force = true
 
+# KRV-Check: Subdomain krv.jaeggivollmer.ch zeigt auf public/krv/ (gleiches Muster wie der Drohnen-Check).
+# Erreichbar sind nur die KRV-Seiten, die krv-Functions und die gemeinsamen Dateien des Drohnen-Checks
+# (Schriften, Grundgestaltung, Logo, Video-Verkleinerung unter /dachcheck/assets/).
+[[redirects]]
+  from = "https://krv.jaeggivollmer.ch/api/krv-anfrage"
+  to = "/.netlify/functions/krv-anfrage"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://krv.jaeggivollmer.ch/api/krv-fotos"
+  to = "/.netlify/functions/krv-fotos"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://krv.jaeggivollmer.ch/api/krv-medien"
+  to = "/.netlify/functions/krv-medien"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://krv.jaeggivollmer.ch/api/krv-admin-liste"
+  to = "/.netlify/functions/krv-admin-liste"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://krv.jaeggivollmer.ch/api/krv-admin-anfrage"
+  to = "/.netlify/functions/krv-admin-anfrage"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://krv.jaeggivollmer.ch/api/krv-admin-medien"
+  to = "/.netlify/functions/krv-admin-medien"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://krv.jaeggivollmer.ch/dachcheck/assets/*"
+  to = "/dachcheck/assets/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://krv.jaeggivollmer.ch/*"
+  to = "/krv/:splat"
+  status = 200
+  force = true
+
 # Redirects: saubere URLs für die Functions
 [[redirects]]
   from = "/api/*"
@@ -70,6 +121,10 @@
 
 # Drohnen-Check: Anfragen ohne Auftrag (mit Bericht und Bildern) täglich nach 60 Tagen löschen
 [functions."dachcheck-loeschroutine"]
+  schedule = "@daily"
+
+# KRV-Check: Anfragen ohne Auftrag (mit Fotos) täglich nach 90 Tagen löschen, verpasste Info-Mails nachholen
+[functions."krv-loeschroutine"]
   schedule = "@daily"
 
 # Sicherheits-Header für alle Seiten

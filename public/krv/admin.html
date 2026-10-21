@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Anfragen KRV-Check | Jäggi Vollmer</title>
+<link rel="stylesheet" href="/dachcheck/assets/styles.css">
+<link rel="stylesheet" href="/dachcheck/assets/admin.css">
+<link rel="stylesheet" href="assets/admin.css">
+<link rel="icon" href="/dachcheck/assets/logo-jaeggi-vollmer.svg" type="image/svg+xml">
+</head>
+<body class="admin">
+
+<header class="kopf">
+  <div class="wrap">
+    <a class="kopf__logo" href="admin.html"><img src="/dachcheck/assets/logo-jaeggi-vollmer.svg" alt="Jäggi Vollmer" width="138" height="44"></a>
+    <button class="btn btn--sekundaer" style="min-height:40px;font-size:.9rem" type="button" id="abmelden" hidden>Abmelden</button>
+  </div>
+</header>
+
+<!-- Login (gleiches Passwort wie das Admin-Panel) -->
+<main class="wrap a-login" id="login" hidden>
+  <h1>Anfragen KRV-Check</h1>
+  <form id="login-form">
+    <div class="feld">
+      <label for="passwort">Passwort</label>
+      <input type="password" id="passwort" name="passwort" autocomplete="current-password" required>
+      <div class="fehlertext" id="login-fehler"></div>
+    </div>
+    <button class="btn btn--gross" type="submit">Anmelden</button>
+  </form>
+</main>
+
+<main class="wrap a-main" id="app" hidden>
+  <div id="krv-standalone"></div>
+</main>
+
+<script src="config.js"></script>
+<!-- Video-Verkleinerung (DCAdmin.videoVerkleinern) kommt aus dem Drohnen-Check -->
+<script src="/dachcheck/assets/admin.js"></script>
+<script src="assets/admin.js"></script>
+</body>
+</html>
