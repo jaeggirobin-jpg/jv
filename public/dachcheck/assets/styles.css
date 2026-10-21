@@ -156,8 +156,8 @@ a { color: var(--kupfer-dunkel); }
 .fuss { background: #25292E; color: #D5D8DB; padding: 40px 0 32px; font-size: .94rem; }
 .fuss a { color: #F4EADD; }
 .fuss__grid { display: grid; gap: 20px; }
-.fuss__logo { background: var(--weiss); display: inline-block; padding: 10px 12px; border-radius: 6px; }
-.fuss__logo img { height: 34px; width: auto; }
+.fuss__logo { display: inline-block; }
+.fuss__logo img { height: 40px; width: auto; display: block; }
 .fuss__links { display: flex; gap: 18px; flex-wrap: wrap; }
 
 /* ── Formular (Overlay) ────────────────────────────────────────────────── */
