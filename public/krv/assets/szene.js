@@ -25,26 +25,26 @@
       '<rect y="212" width="400" height="28" fill="#CFC7BC"/>' +
       '<path d="M0 212h400" stroke="#B8AFA3" stroke-width="2"/>' +
       // Rohr: aus dem Boden, waagrecht, dann nach oben ins Haus
-      '<path class="sz-rohr" d="M44 240V130H350V0" fill="none" stroke="#A3AAB1" stroke-width="14" stroke-linejoin="round"/>' +
-      '<path class="sz-wasser" d="M44 240V130H350V0" fill="none" stroke="#4B8FC9" stroke-width="4" stroke-linejoin="round" stroke-dasharray="6 14"/>' +
+      '<path class="sz-rohr" d="M44 240V130H350V0" fill="none" stroke="#929A9D" stroke-width="14" stroke-linejoin="round"/>' +
+      '<path class="sz-wasser" d="M44 240V130H350V0" fill="none" stroke="#F7F5F2" stroke-width="4" stroke-linejoin="round" stroke-dasharray="6 14"/>' +
       // Absperrarmatur vor dem Zähler
       '<g class="sz-ventil" transform="translate(88 130)">' +
         '<path d="M-16-12L0 0-16 12zM16-12L0 0 16 12z" fill="url(#sz-messing)" stroke="#7A5019" stroke-width="1.5"/>' +
-        '<rect x="-3" y="-28" width="6" height="16" fill="#7A5019"/><rect x="-14" y="-33" width="28" height="7" rx="3" fill="#B3332B"/>' +
+        '<rect x="-3" y="-28" width="6" height="16" fill="#7A5019"/><rect x="-14" y="-33" width="28" height="7" rx="3" fill="#4B575D"/>' +
       '</g>' +
       // Wasserzähler
       '<g class="sz-zaehler" transform="translate(167 130)">' +
-        '<rect x="-30" y="-26" width="60" height="52" rx="10" fill="#2E3A44" stroke="#1D252C" stroke-width="2"/>' +
+        '<rect x="-30" y="-26" width="60" height="52" rx="10" fill="#4B575D" stroke="#25292E" stroke-width="2"/>' +
         '<circle r="19" fill="#F4F6F7" stroke="#9AA3AA" stroke-width="2"/>' +
         '<rect x="-14" y="-9" width="28" height="9" rx="1.5" fill="#25292E"/>' +
         '<text x="0" y="-2" text-anchor="middle" font-family="monospace" font-size="7.5" fill="#fff" letter-spacing="1">04271</text>' +
         '<text x="0" y="12" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="9" font-weight="600" fill="#25292E">m³</text>' +
-        '<path class="sz-zeiger" d="M0 4l7-3" stroke="#B3332B" stroke-width="1.6" stroke-linecap="round"/>' +
+        '<path class="sz-zeiger" d="M0 4l7-3" stroke="#BD843A" stroke-width="1.6" stroke-linecap="round"/>' +
       '</g>' +
       // Ventile nach dem Zähler: Absperrventil mit Rückflussverhinderer (KRV) und Prüfstutzen
       '<g class="sz-krv" transform="translate(268 130)">' +
         '<path d="M-20-13L0 0-20 13zM20-13L0 0 20 13z" fill="url(#sz-messing)" stroke="#7A5019" stroke-width="1.5"/>' +
-        '<rect x="-3" y="-30" width="6" height="17" fill="#7A5019"/><rect x="-15" y="-35" width="30" height="7" rx="3" fill="#2F6FA8"/>' +
+        '<rect x="-3" y="-30" width="6" height="17" fill="#7A5019"/><rect x="-15" y="-35" width="30" height="7" rx="3" fill="#BD843A"/>' +
         '<rect x="-4" y="12" width="8" height="10" rx="2" fill="#8F5E1F"/>' +
         '<path d="M-8 0h12m-4-4l4 4-4 4" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
         // Anhänger mit Aufschrift

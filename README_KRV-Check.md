@@ -16,6 +16,7 @@ installieren. Angeschriebene Liegenschaften sollen bis 1.1.2027 nachrüsten. Tex
 | Teil | Ort |
 |---|---|
 | Landingpage, Formular, Anleitung | `public/krv/index.html`, `assets/app.js`, `assets/szene.js` (gezeichnete Anleitung), `assets/krv.css` |
+| Erklärvideo auf der Seite | `assets/anleitung.mp4`/`.webm` + `anleitung.jpg` (läuft stumm und in Schleife, sobald sichtbar; Quelle `web.html` im Projektordner krv-check/video-quelle/) |
 | Texte, PLZ, Löschfrist, Pixel | `public/krv/config.js` |
 | Anfragen-Übersicht | `public/krv/admin.html` und Tab «KRV-Check» im Admin-Panel (`public/index.html`), Code `public/krv/assets/admin.js` |
 | Functions | `netlify/functions/krv-*.js`, Hilfen `_lib/krvcheck.js` (nutzt `_lib/dachcheck.js`) |
@@ -49,4 +50,4 @@ Schriften, Grundgestaltung, Logo und die Video-Verkleinerung kommen aus `public/
 - Bestätigen, dass Jäggi Vollmer die Installationsbewilligung von IWB hat (E-Mail-Entwurf «fehlt» sagt, dass wir den Einbau an IWB melden).
 - Datenschutzerklärung prüfen lassen, Entwurfs-Hinweis entfernen; UID im Impressum.
 - Meta Pixel-ID in `config.js` → `tracking.metaPixelId`.
-- Optional: echtes Anleitungsvideo im Admin unter «Anleitungsvideo» importieren (oder das gezeichnete Erklärvideo aus dem Projektordner).
+- Optional: echtes Anleitungsvideo im Admin unter «Anleitungsvideo» importieren. Es ersetzt dann das mitgelieferte gezeichnete Video.

@@ -156,8 +156,6 @@ a { color: var(--kupfer-dunkel); }
 .fuss { background: #25292E; color: #D5D8DB; padding: 40px 0 32px; font-size: .94rem; }
 .fuss a { color: #F4EADD; }
 .fuss__grid { display: grid; gap: 20px; }
-.fuss__logo { background: var(--weiss); display: inline-block; padding: 10px 12px; border-radius: 6px; }
-.fuss__logo img { height: 34px; width: auto; }
 .fuss__links { display: flex; gap: 18px; flex-wrap: wrap; }
 
 /* ── Formular (Overlay) ────────────────────────────────────────────────── */
@@ -255,7 +253,7 @@ legend { font-weight: 600; font-size: .95rem; margin-bottom: 8px; padding: 0; }
   .schritte { grid-template-columns: repeat(3, 1fr); gap: 32px; }
   .schritt { grid-template-columns: 1fr; }
   .report { grid-template-columns: 1fr 1fr; align-items: start; gap: 56px; }
-  .fuss__grid { grid-template-columns: 2fr 1fr 1fr; }
+  .fuss__grid { grid-template-columns: 2fr 1fr; }
   .cookie { left: 24px; bottom: 24px; }
   .formular { align-items: center; justify-content: center; background: rgba(37,41,46,.55); }
   .formular__karte { width: 640px; max-height: 92vh; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; background: var(--bg); box-shadow: 0 24px 60px rgba(0,0,0,.3); }
