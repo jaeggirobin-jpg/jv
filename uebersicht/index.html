@@ -116,9 +116,10 @@
         <li>Referenznummer <code>DC-2026-0001</code>, Info-Mail ohne Personendaten an info@, UTM-Auswertung</li>
         <li>Anfragen-Übersicht mit Status, geplantem Flug, Notiz und CSV-Export, auch als Tab im Admin-Panel</li>
         <li>Kurzbericht im Admin erstellen (Ampel, Befund, Fotos im privaten Bucket), Kunde sieht ihn über einen persönlichen Link</li>
+        <li>Titelvideo der Landingpage im Admin importieren, wird beim Import automatisch verkleinert</li>
         <li>Löschung nach 60 Tagen automatisch (inkl. Bericht und Fotos), Meta Pixel nur nach Zustimmung</li>
       </ul>
-      <dl><dt>Adresse</dt><dd><code>dachcheck.jaeggivollmer.ch</code> (Subdomain der bestehenden Site)</dd><dt>Ordner</dt><dd><code>public/dachcheck/</code>, Functions <code>dachcheck-*</code></dd><dt>Daten</dt><dd>Tabellen <code>drohnencheck_*</code>, Storage <code>drohnencheck</code> (privat)</dd></dl>
+      <dl><dt>Adresse</dt><dd><code>dachcheck.jaeggivollmer.ch</code> (Subdomain der bestehenden Site)</dd><dt>Ordner</dt><dd><code>public/dachcheck/</code>, Functions <code>dachcheck-*</code></dd><dt>Daten</dt><dd>Tabellen <code>drohnencheck_*</code>, Storage <code>drohnencheck</code> (privat), <code>drohnencheck-medien</code> (öffentlich)</dd></dl>
     </article>
 
   </div>
@@ -183,7 +184,7 @@
       <thead><tr><th>Baustein</th><th>Wofür</th><th>Details</th></tr></thead>
       <tbody>
         <tr><td>Netlify, Site «JV Docs»</td><td>Admin, Viewer, Katalog, Swipe, Drohnen-Check</td><td><code>docs.jaeggivollmer.ch</code>, <code>inspiration.jaeggivollmer.ch</code> und <code>dachcheck.jaeggivollmer.ch</code> (Rewrite auf <code>public/dachcheck/</code>), Functions unter <code>/api/*</code></td></tr>
-        <tr><td>Supabase <code>jaeggivollmer</code></td><td>Datenbank und Dateien</td><td>Tabellen <code>kunden</code>, <code>doc_links</code>, <code>ansprechpersonen</code>, <code>kunden_interessen</code>, <code>aktivitaet_log</code>, <code>inspiration_kategorien</code>, <code>inspiration_punkte</code>, <code>punkt_medien</code>, <code>drohnencheck_*</code>; Storage <code>pdfs</code> (privat), <code>drohnencheck</code> (privat), <code>inspiration-medien</code></td></tr>
+        <tr><td>Supabase <code>jaeggivollmer</code></td><td>Datenbank und Dateien</td><td>Tabellen <code>kunden</code>, <code>doc_links</code>, <code>ansprechpersonen</code>, <code>kunden_interessen</code>, <code>aktivitaet_log</code>, <code>inspiration_kategorien</code>, <code>inspiration_punkte</code>, <code>punkt_medien</code>, <code>drohnencheck_*</code>; Storage <code>pdfs</code> (privat), <code>drohnencheck</code> (privat), <code>drohnencheck-medien</code> (öffentlich, Titelvideo), <code>inspiration-medien</code></td></tr>
         <tr><td>GEMA</td><td>separates Repository</td><td>nutzt dieselbe Supabase-Datenbank, hier nicht enthalten</td></tr>
         <tr><td>Resend</td><td>E-Mail-Versand</td><td>Info-Mail Drohnen-Check, geplant auch für Link-Notifikationen</td></tr>
       </tbody>

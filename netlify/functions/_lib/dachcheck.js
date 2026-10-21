@@ -50,13 +50,13 @@ async function anfrageAktualisieren(referenz, felder) {
 }
 
 // Direkter PostgREST-Aufruf (für die Übersicht). pfad z. B. 'drohnencheck_anfragen?select=*'
-async function rest(pfad, { method = 'GET', body } = {}) {
+async function rest(pfad, { method = 'GET', body, prefer = 'return=representation' } = {}) {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_KEY;
   if (!url || !key) throw new Error('SUPABASE_URL oder SUPABASE_SERVICE_KEY fehlt');
   const res = await fetch(url.replace(/\/$/, '') + '/rest/v1/' + pfad, {
     method,
-    headers: { 'Content-Type': 'application/json', apikey: key, Authorization: 'Bearer ' + key, Prefer: 'return=representation' },
+    headers: { 'Content-Type': 'application/json', apikey: key, Authorization: 'Bearer ' + key, Prefer: prefer },
     body: body ? JSON.stringify(body) : undefined
   });
   const text = await res.text();
@@ -89,9 +89,11 @@ async function mailSenden({ an, betreff, html, text, antwortAn }) {
   }
 }
 
-// ── Storage (privater Bucket «drohnencheck» für die Bilder der Berichte) ──
+// ── Storage ────────────────────────────────────────────────────────────
+// «drohnencheck»: privat, Bilder der Berichte. «drohnencheck-medien»: öffentlich, Titelvideo.
 // Direkt über die Storage-REST-API, damit keine npm-Abhängigkeit nötig ist.
 const BUCKET = 'drohnencheck';
+const BUCKET_MEDIEN = 'drohnencheck-medien';
 
 async function storage(pfad, { method = 'POST', body } = {}) {
   const url = process.env.SUPABASE_URL;
@@ -112,8 +114,8 @@ function storageBasis() {
 }
 
 // Signierte Upload-URL: der Browser lädt die Datei per PUT direkt in den Bucket
-async function uploadUrl(pfad) {
-  const r = await storage('object/upload/sign/' + BUCKET + '/' + pfad);
+async function uploadUrl(pfad, bucket = BUCKET) {
+  const r = await storage('object/upload/sign/' + bucket + '/' + pfad);
   return storageBasis() + r.url;
 }
 
@@ -127,14 +129,19 @@ async function signierteUrls(pfade, sekunden) {
 }
 
 // Dateien eines Ordners auflisten (Ordner = anfrage_id)
-async function ordnerListe(ordner) {
-  const r = await storage('object/list/' + BUCKET, { body: { prefix: ordner, limit: 1000, offset: 0 } });
+async function ordnerListe(ordner, bucket = BUCKET) {
+  const r = await storage('object/list/' + bucket, { body: { prefix: ordner, limit: 1000, offset: 0 } });
   return (r || []).filter((o) => o.id).map((o) => ({ pfad: ordner + '/' + o.name, metadata: o.metadata || {} }));
 }
 
-async function bilderLoeschen(pfade) {
+async function bilderLoeschen(pfade, bucket = BUCKET) {
   if (!pfade.length) return;
-  await storage('object/' + BUCKET, { method: 'DELETE', body: { prefixes: pfade } });
+  await storage('object/' + bucket, { method: 'DELETE', body: { prefixes: pfade } });
+}
+
+// Öffentliche URL (nur für den öffentlichen Medien-Bucket)
+function oeffentlicheUrl(pfad) {
+  return storageBasis() + '/object/public/' + BUCKET_MEDIEN + '/' + pfad;
 }
 
 async function ordnerLoeschen(ordner) {
@@ -160,5 +167,5 @@ function esc(s) {
 
 module.exports = {
   config, antwort, ipHash, rpc, rest, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc,
-  uploadUrl, signierteUrls, ordnerListe, bilderLoeschen, ordnerLoeschen
+  uploadUrl, signierteUrls, ordnerListe, bilderLoeschen, ordnerLoeschen, oeffentlicheUrl, BUCKET_MEDIEN
 };
