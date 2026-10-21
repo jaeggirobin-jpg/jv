@@ -5,16 +5,10 @@
 .krv-hero { min-height: 0; align-items: center;
   background: radial-gradient(120% 90% at 85% 0%, #5A666C 0%, #4B575D 45%, #25292E 100%); }
 .krv-hero__inhalt { display: grid; gap: 28px; padding-top: 40px; padding-bottom: 40px; }
-.krv-kicker { display: inline-block; font-size: .85rem !important; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
-  color: #F4EADD !important; background: rgba(189,132,58,.28); border: 1px solid rgba(244,234,221,.35);
-  padding: 4px 12px; border-radius: 999px; margin-bottom: 14px; }
 .krv-haken { list-style: none; padding: 0; margin: 0 0 18px; display: grid; gap: 6px; }
 .krv-haken li { display: flex; gap: 10px; align-items: center; color: rgba(255,255,255,.92); }
 .krv-haken li::before { content: ''; flex: none; width: 20px; height: 20px; border-radius: 50%;
   background: var(--kupfer) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12l4 4 8-8'/%3E%3C/svg%3E") center / 14px no-repeat; }
-/* Skizze als Karte neben dem Titel (nur Desktop) */
-.krv-hero__bild { width: 100%; border-radius: 16px; overflow: hidden; background: #EFEBE5;
-  box-shadow: 0 24px 60px rgba(0,0,0,.45); border: 6px solid rgba(255,255,255,.08); }
 
 /* ── Pflicht / Frist ──────────────────────────────────────────────────── */
 .krv-pflicht { display: grid; gap: 22px; }
@@ -77,14 +71,10 @@
 
 /* ── Desktop ──────────────────────────────────────────────────────────── */
 @media (min-width: 800px) {
-  .krv-hero__inhalt { grid-template-columns: 1.25fr 1fr; align-items: center; padding-top: 72px; padding-bottom: 72px; }
+  .krv-hero__inhalt { max-width: 760px; padding-top: 72px; padding-bottom: 72px; }
   .krv-hero .btn { width: auto; }
   .krv-pflicht { grid-template-columns: 1.4fr 1fr; gap: 48px; align-items: start; }
-  .krv-anleitung { grid-template-columns: 1.3fr 1fr; align-items: start; gap: 32px; }
-}
-@media (max-width: 799px) {
-  /* Auf dem Handy ist die Skizze im Hero zu klein: dort nur Text */
-  .krv-hero__bild { display: none; }
+  .krv-anleitung.mit-liste { grid-template-columns: 1.3fr 1fr; align-items: start; gap: 32px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .szene .sz-wasser, .szene .sz-zeiger, [data-schritt="0"] .sz-puls, .szene.blitzt .sz-blitz { animation: none !important; }
