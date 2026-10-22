@@ -62,7 +62,6 @@
       cta: 'Gratis prüfen lassen',
 
       hero: {
-        kicker: 'Trinkwasser Basel · Frist IWB',
         titel: 'Hat Ihr Haus schon einen Rückflussverhinderer?',
         unterzeile: 'Zwei Fotos vom Wasserzähler genügen. Wir sagen Ihnen gratis, ob er eingebaut ist.',
         punkte: ['Gratis und unverbindlich', 'In 2 Minuten erledigt', 'Antwort per E-Mail']
@@ -70,18 +69,9 @@
 
       pflicht: {
         titel: 'Worum es geht',
-        text: 'Damit kein Wasser aus dem Haus zurück ins öffentliche Trinkwassernetz fliesst, braucht gemäss IWB jede Liegenschaft einen Rückflussverhinderer nach dem Wasserzähler. Einbauen muss ihn die Grund- bzw. Hauseigentümerschaft auf eigene Kosten (§ 28 der Ausführungsbestimmungen von IWB betreffend die Abgabe von Trinkwasser, SG 772.800).',
+        text: 'Gemäss IWB braucht jede Liegenschaft nach dem Wasserzähler einen Rückflussverhinderer, eingebaut auf Kosten der Eigentümerschaft (§ 28 Ausführungsbestimmungen IWB, SG 772.800). Er verhindert, dass Wasser aus dem Haus zurück ins Trinkwassernetz fliesst.',
         frist: 'IWB hat Liegenschaften ohne Rückflussverhinderer angeschrieben und um Nachrüstung bis zum 1. Januar 2027 gebeten.',
         quelle: 'Quelle: IWB, Flyer «Rückflussverhinderung in Trinkwasserinstallationen» und Schreiben an Hauseigentümer. Jäggi Vollmer ist ein unabhängiges Sanitärunternehmen und nicht Teil von IWB.'
-      },
-
-      ablauf: {
-        titel: 'So funktioniert der Gratis-Check',
-        schritte: [
-          { icon: 'kamera', titel: 'Fotos machen', text: 'Zwei, drei Handyfotos vom Wasserzähler und den Ventilen daneben. Die Anleitung unten zeigt, wie.' },
-          { icon: 'pruefen', titel: 'Wir prüfen', text: 'Unsere Sanitärfachleute schauen sich die Fotos an, in der Regel innert weniger Arbeitstage.' },
-          { icon: 'antwort', titel: 'Sie erhalten Bescheid', text: 'Ist ein Rückflussverhinderer da, sagen wir es Ihnen. Fehlt er, erhalten Sie auf Wunsch eine Offerte für den Einbau.' }
-        ]
       },
 
       anleitung: {
@@ -96,25 +86,15 @@
         nichtGefunden: 'Sie finden den Wasserzähler nicht oder er liegt in einem Schacht im Boden? Kein Problem: Kreuzen Sie im Formular «Ich finde den Wasserzähler nicht» an, wir rufen Sie an.'
       },
 
-      vertrauen: {
-        punkte: [
-          { zahl: 'seit 2002', text: 'Sanitär in Basel' },
-          { zahl: 'rund 20', text: 'Fachleute' },
-          { zahl: 'Suissetec', text: 'Mitglied' }
-        ]
-      },
-
       faq: {
         titel: 'Häufige Fragen',
         fragen: [
           { f: 'Was ist ein Rückflussverhinderer (KRV)?', a: 'Eine Armatur nach dem Wasserzähler, die Wasser nur in eine Richtung durchlässt: ins Haus hinein, aber nicht zurück ins öffentliche Netz. Oft ist er mit dem Absperrventil kombiniert, dann spricht man von einem KRV-Ventil.' },
           { f: 'Muss ich einen einbauen?', a: 'Gemäss IWB braucht jede Liegenschaft im Versorgungsgebiet einen kontrollierbaren Rückflussverhinderer nach dem Wasserzähler, eingebaut auf Kosten der Eigentümerschaft. Wurden Sie von IWB angeschrieben, hat IWB bei Ihrer Liegenschaft keinen festgestellt und bittet um Nachrüstung bis zum 1. Januar 2027.' },
           { f: 'Kostet der Check etwas?', a: 'Nein. Die Beurteilung Ihrer Fotos ist kostenlos und unverbindlich. Eine Offerte erhalten Sie nur, wenn ein Rückflussverhinderer fehlt und Sie das möchten.' },
-          { f: 'Wie sicher ist eine Beurteilung per Foto?', a: 'Auf guten Fotos erkennen wir in den meisten Fällen, ob ein Rückflussverhinderer vorhanden ist. Es bleibt eine Einschätzung: Sind die Fotos nicht eindeutig, fragen wir nach oder schlagen einen kurzen Besuch vor. Eine Kontrolle vor Ort ersetzt sie nicht.' },
+          { f: 'Wie sicher ist eine Beurteilung per Foto?', a: 'Auf guten Fotos erkennen wir meist, ob ein Rückflussverhinderer vorhanden ist. Es bleibt eine Einschätzung und ersetzt keine Kontrolle vor Ort. Sind die Fotos nicht eindeutig, fragen wir nach.' },
           { f: 'Ich habe schon einen. Was nun?', a: 'Dann müssen Sie nichts einbauen. Wurden Sie von IWB angeschrieben, melden Sie IWB mit der beigelegten Rückantwortkarte, dass bereits ein Rückflussverhinderer vorhanden ist.' },
-          { f: 'Wer darf den Rückflussverhinderer einbauen?', a: 'Gemäss IWB ein Sanitärunternehmen mit Installationsbewilligung von IWB. Es meldet den Einbau direkt an IWB, Sie müssen sich um nichts kümmern.' },
-          { f: 'Ich bin Mieterin oder Mieter. Kann ich trotzdem prüfen lassen?', a: 'Ja, gerne. Den Einbau muss aber die Eigentümerschaft oder die Verwaltung in Auftrag geben. Wir senden das Ergebnis an Sie, Sie können es weiterleiten.' },
-          { f: 'Was geschieht mit meinen Fotos?', a: 'Wir verwenden sie nur für die Beurteilung und eine allfällige Offerte. Ohne Auftrag löschen wir Anfrage und Fotos nach 90 Tagen.' }
+          { f: 'Wer darf den Rückflussverhinderer einbauen?', a: 'Gemäss IWB ein Sanitärunternehmen mit Installationsbewilligung von IWB. Jäggi Vollmer hat diese Bewilligung und meldet den Einbau direkt an IWB.' },
         ]
       },
 

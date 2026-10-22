@@ -34,13 +34,11 @@
   <section class="hero krv-hero" aria-labelledby="hero-titel">
     <div class="wrap hero__inhalt krv-hero__inhalt">
       <div>
-        <p class="krv-kicker" data-text="hero.kicker"></p>
         <h1 id="hero-titel" data-text="hero.titel"></h1>
         <p data-text="hero.unterzeile"></p>
         <ul class="krv-haken" id="hero-punkte"></ul>
         <button class="btn btn--gross" type="button" data-cta></button>
       </div>
-      <div class="krv-hero__bild" aria-hidden="true" id="hero-bild"></div>
     </div>
   </section>
 
@@ -57,26 +55,18 @@
     </div>
   </section>
 
-  <section class="abschnitt" aria-labelledby="ablauf-titel">
-    <div class="wrap">
-      <h2 id="ablauf-titel" data-text="ablauf.titel"></h2>
-      <ol class="schritte" id="schritte"></ol>
-    </div>
-  </section>
-
   <section class="abschnitt abschnitt--weiss" id="anleitung" aria-labelledby="anleitung-titel">
     <div class="wrap">
       <h2 id="anleitung-titel" data-text="anleitung.titel"></h2>
       <p class="einleitung" data-text="anleitung.text"></p>
-      <div class="krv-anleitung">
+      <div class="krv-anleitung" id="anleitung-box">
         <div class="krv-buehne">
           <div class="krv-video" id="anleitung-video" hidden></div>
-          <div class="krv-szene" id="szene" data-schritt="0"></div>
+          <div class="krv-szene" id="szene" data-schritt="0" hidden></div>
         </div>
-        <ol class="krv-schritte" id="anleitung-schritte"></ol>
+        <ol class="krv-schritte" id="anleitung-schritte" hidden></ol>
       </div>
       <p class="hinweis krv-nichtgefunden" data-text="anleitung.nichtGefunden"></p>
-      <div class="fakten" id="fakten"></div>
     </div>
   </section>
 

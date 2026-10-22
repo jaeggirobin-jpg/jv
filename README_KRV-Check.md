@@ -15,7 +15,7 @@ installieren. Angeschriebene Liegenschaften sollen bis 1.1.2027 nachrüsten. Tex
 
 | Teil | Ort |
 |---|---|
-| Landingpage, Formular, Anleitung | `public/krv/index.html`, `assets/app.js`, `assets/szene.js` (gezeichnete Anleitung), `assets/krv.css` |
+| Landingpage, Formular, Anleitung | `public/krv/index.html`, `assets/app.js`, `assets/szene.js` (gezeichnete Skizze, nur Ersatz, falls das Video nicht lädt), `assets/krv.css` |
 | Erklärvideo auf der Seite | `assets/anleitung.mp4`/`.webm` + `anleitung.jpg` (läuft stumm und in Schleife, sobald sichtbar; Quelle `web.html` im Projektordner krv-check/video-quelle/) |
 | Texte, PLZ, Löschfrist, Pixel | `public/krv/config.js` |
 | Anfragen-Übersicht | `public/krv/admin.html` und Tab «KRV-Check» im Admin-Panel (`public/index.html`), Code `public/krv/assets/admin.js` |

@@ -55,18 +55,9 @@
 
     $('hero-punkte').innerHTML = T.hero.punkte.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('');
 
-    $('schritte').innerHTML = T.ablauf.schritte.map(function (s, i) {
-      return '<li class="schritt"><div class="schritt__icon">' + (ICONS[s.icon] || '') + '</div>' +
-        '<div><h3><span>' + (i + 1) + '</span>' + esc(s.titel) + '</h3><p>' + esc(s.text) + '</p></div></li>';
-    }).join('');
-
     $('anleitung-schritte').innerHTML = T.anleitung.schritte.map(function (s, i) {
       return '<li><button type="button" data-anleitung="' + i + '"><span class="nr">' + (i + 1) + '</span>' +
         '<span><strong>' + esc(s.titel) + '</strong><span class="t">' + esc(s.text) + '</span></span></button></li>';
-    }).join('');
-
-    $('fakten').innerHTML = T.vertrauen.punkte.map(function (p) {
-      return '<div class="fakt"><strong>' + esc(p.zahl) + '</strong><span>' + esc(p.text) + '</span></div>';
     }).join('');
 
     $('faq').innerHTML = T.faq.fragen.map(function (q) {
@@ -91,11 +82,9 @@
     $('danke-schritte').innerHTML = T.danke.naechsteSchritte.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
     $('danke-kontakt').innerHTML = 'Fragen? ' + kontakt;
 
-    // Skizzen: Hero läuft automatisch, die Anleitung folgt den Schritten
+    // Anleitung: Erklärvideo (läuft automatisch, stumm, in Schleife). Fällt das Video aus,
+    // erscheinen stattdessen die gezeichnete Skizze und die Schritte als Liste.
     var ruhig = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var hero = window.KRVSzene.erstellen($('hero-bild'), { start: 1 });
-    if (!ruhig) hero.start(3800);
-    // Anleitung: Erklärvideo (läuft automatisch, stumm, in Schleife). Fällt das Video aus, bleibt die Skizze.
     anleitungSzene = window.KRVSzene.erstellen($('szene'), { onSchritt: schrittMarkieren });
     anleitungsVideo(ruhig);
     $('anleitung-schritte').addEventListener('click', function (e) {
@@ -139,6 +128,8 @@
     function skizzeStatt() {
       box.hidden = true;
       $('szene').hidden = false;
+      $('anleitung-schritte').hidden = false;
+      $('anleitung-box').classList.add('mit-liste');
       anleitungVideo = null;
       if (!ruhig && 'IntersectionObserver' in window) {
         var io = new IntersectionObserver(function (e) {
