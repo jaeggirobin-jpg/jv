@@ -71,6 +71,7 @@
         titel: 'Worum es geht',
         text: 'Gemäss IWB braucht jede Liegenschaft nach dem Wasserzähler einen Rückflussverhinderer, eingebaut auf Kosten der Eigentümerschaft (§ 28 Ausführungsbestimmungen IWB, SG 772.800). Er verhindert, dass Wasser aus dem Haus zurück ins Trinkwassernetz fliesst.',
         frist: 'IWB hat Liegenschaften ohne Rückflussverhinderer angeschrieben und um Nachrüstung bis zum 1. Januar 2027 gebeten.',
+        gebiet: 'Versorgungsgebiet IWB: Basel, Riehen und Bettingen',
         quelle: 'Quelle: IWB, Flyer «Rückflussverhinderung in Trinkwasserinstallationen» und Schreiben an Hauseigentümer. Jäggi Vollmer ist ein unabhängiges Sanitärunternehmen und nicht Teil von IWB.'
       },
 
