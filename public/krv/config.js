@@ -84,6 +84,24 @@
           { titel: 'Foto 2: nach dem Zähler', text: 'Näher ran an die Ventile direkt nach dem Zähler, also auf der Seite, wo die Leitung ins Haus weitergeht.' },
           { titel: 'Foto 3: Beschriftung (wenn vorhanden)', text: 'Gibt es auf einem Ventil eine Aufschrift, ein Schild oder einen Pfeil? Dann davon ein Nahfoto. Freiwillig.' }
         ],
+        zaehler: {
+          titel: 'So sieht ein Wasserzähler aus',
+          text: 'Ein Messinggehäuse direkt in der Leitung, mit Zahlenrolle oder Display und der Einheit «m³». Oft unter einem Klappdeckel.',
+          bilder: [
+            { bild: 'assets/zaehler-1.jpg', text: 'Elektronisch, mit Display' },
+            { bild: 'assets/zaehler-2.jpg', text: 'Mechanisch, mit Deckel' },
+            { bild: 'assets/zaehler-3.jpg', text: 'Für senkrechte Leitung' }
+          ]
+        },
+        ventile: {
+          titel: 'So sehen die Ventile nach dem Zähler aus',
+          text: 'Direkt nach dem Zähler sitzt meist ein Ventil mit Handrad, oft schräg. Bitte genau diese Stelle fotografieren, mit Aufschriften und Pfeilen auf dem Gehäuse.',
+          bilder: [
+            { bild: 'assets/ventil-1.jpg', text: 'Schräg, blaues Handrad' },
+            { bild: 'assets/ventil-2.jpg', text: 'Schräg, grünes Handrad' },
+            { bild: 'assets/ventil-3.jpg', text: 'Gerade, mit Handrad' }
+          ]
+        },
         nichtGefunden: 'Sie finden den Wasserzähler nicht oder er liegt in einem Schacht im Boden? Kein Problem: Kreuzen Sie im Formular «Ich finde den Wasserzähler nicht» an, wir rufen Sie an.'
       },
 
