@@ -60,6 +60,10 @@
         '<span><strong>' + esc(s.titel) + '</strong><span class="t">' + esc(s.text) + '</span></span></button></li>';
     }).join('');
 
+    $('zaehler-bilder').innerHTML = T.anleitung.zaehler.bilder.map(function (z) {
+      return '<li><img src="' + esc(z.bild) + '" alt="' + esc(z.text) + '" width="480" height="480" loading="lazy"><span>' + esc(z.text) + '</span></li>';
+    }).join('');
+
     $('faq').innerHTML = T.faq.fragen.map(function (q) {
       return '<details><summary>' + esc(q.f) + '</summary><p>' + esc(q.a) + '</p></details>';
     }).join('');
@@ -122,6 +126,36 @@
     v.setAttribute('aria-label', 'Erklärvideo: wo und wie Sie die Armatur beim Wasserzähler fotografieren');
     if (ruhig) v.controls = true;
     box.appendChild(v);
+
+    // Fortschrittsbalken über dem Video: einer pro Schritt, anklickbar
+    var leiste = document.createElement('div');
+    leiste.className = 'krv-video__balken';
+    leiste.innerHTML = VIDEO_SCHRITTE.map(function (s, i) {
+      return '<button type="button" data-video-schritt="' + i + '" aria-label="Schritt ' + (i + 1) + ': ' +
+        esc(T.anleitung.schritte[i].titel) + '"><span><i></i></span></button>';
+    }).join('');
+    box.appendChild(leiste);
+    var fuellungen = leiste.querySelectorAll('i');
+    leiste.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-video-schritt]');
+      if (b) anleitungVideo.springe(Number(b.getAttribute('data-video-schritt')));
+    });
+    function balkenZeichnen() {
+      var t = v.currentTime;
+      for (var k = 0; k < fuellungen.length; k++) {
+        var ende = k + 1 < VIDEO_SCHRITTE.length ? VIDEO_SCHRITTE[k + 1] : VIDEO_ENDE;
+        var anteil = t >= VIDEO_ENDE ? 1 : Math.max(0, Math.min(1, (t - VIDEO_SCHRITTE[k]) / (ende - VIDEO_SCHRITTE[k])));
+        fuellungen[k].style.transform = 'scaleX(' + anteil + ')';
+      }
+    }
+    function schleife() {
+      balkenZeichnen();
+      if (!v.paused && !v.ended) requestAnimationFrame(schleife);
+    }
+    v.addEventListener('play', function () { requestAnimationFrame(schleife); });
+    v.addEventListener('seeked', balkenZeichnen);
+    balkenZeichnen();
+
     box.hidden = false;
     $('szene').hidden = true;
 
@@ -164,6 +198,7 @@
       springe: function (i) {
         if (!eigenes || box.hidden) return false;
         v.currentTime = VIDEO_SCHRITTE[i] || 0;
+        balkenZeichnen();
         var p = v.play(); if (p && p.catch) p.catch(function () {});
         return true;
       }
@@ -175,6 +210,7 @@
       if (/\.webm$/.test(M.video) && v.canPlayType('video/webm') === '') return;
       eigenes = false;
       schrittMarkieren(-1);
+      leiste.hidden = true;
       v.controls = true;
       v.poster = M.poster || '';
       v.src = M.video;

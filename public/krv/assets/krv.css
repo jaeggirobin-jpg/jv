@@ -20,6 +20,14 @@
 .krv-anleitung { display: grid; gap: 20px; margin-top: 8px; }
 .krv-buehne { display: grid; gap: 12px; }
 .krv-szene { border-radius: 12px; overflow: hidden; border: 1px solid var(--linie); background: #EFEBE5; }
+/* Balken liegen in der Höhe der Zone, die im Video dafür frei ist (unten, 80 px von 1350 px Videohöhe) */
+.krv-video { position: relative; width: fit-content; max-width: 100%; margin: 0 auto; }
+.krv-video__balken { position: absolute; left: 7.4%; right: 7.4%; bottom: 4.2%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.3%; }
+.krv-video__balken[hidden] { display: none; }
+.krv-video__balken button { background: none; border: 0; padding: 10px 0; cursor: pointer; display: block; }
+.krv-video__balken span { display: block; height: 6px; border-radius: 3px; background: #E6DED2; overflow: hidden; }
+.krv-video__balken i { display: block; height: 100%; background: var(--kupfer); transform: scaleX(0); transform-origin: left; }
+.krv-video__balken button:hover span, .krv-video__balken button:focus-visible span { background: #D9CBB6; }
 .krv-video video { display: block; width: auto; max-width: 100%; height: auto; max-height: 78vh; margin: 0 auto; border-radius: 12px; border: 1px solid var(--linie); background: #F7F5F2; }
 .krv-schritte { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; counter-reset: k; }
 .krv-schritte button { width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer;
@@ -32,6 +40,14 @@
 .krv-schritte strong { display: block; font-weight: 600; margin-bottom: 2px; }
 .krv-schritte span.t { color: var(--text-neben); font-size: .95rem; }
 .krv-nichtgefunden { margin-top: 20px; }
+/* Beispiele Wasserzähler */
+.krv-zaehler { margin-top: 32px; }
+.krv-zaehler h3 { margin: 0 0 4px; }
+.krv-zaehler p { margin: 0 0 14px; color: var(--text-neben); }
+.krv-zaehler__bilder { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 720px; }
+.krv-zaehler__bilder li { background: #fff; border: 1px solid var(--linie); border-radius: 12px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
+.krv-zaehler__bilder img { width: 100%; height: auto; display: block; }
+.krv-zaehler__bilder span { padding: 8px 10px 10px; font-size: .85rem; line-height: 1.35; color: var(--text-neben); border-top: 1px solid var(--linie); }
 
 /* Skizze: Animationen */
 .szene { display: block; width: 100%; height: auto; }
