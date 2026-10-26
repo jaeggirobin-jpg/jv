@@ -1,6 +1,6 @@
 # Gratis KRV-Check (krv.jaeggivollmer.ch)
 
-Hauseigentümer im IWB-Gebiet (Basel, Riehen, Bettingen) laden Fotos der Armatur beim Wasserzähler hoch.
+Hauseigentümer im IWB-Gebiet (Basel, Riehen, Bettingen, Binningen) laden Fotos der Armatur beim Wasserzähler hoch.
 Wir beurteilen im Admin, ob ein Rückflussverhinderer (KRV) eingebaut ist, und offerieren sonst den Einbau.
 Gleiches Muster wie der Drohnen-Check (`README_Drohnen-Check.md`): dieselbe Netlify-Site, Subdomain per Host-Rewrite.
 
