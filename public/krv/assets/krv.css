@@ -47,7 +47,7 @@
 .krv-zaehler__bilder { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 720px; }
 .krv-zaehler__bilder li { background: #fff; border: 1px solid var(--linie); border-radius: 12px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
 .krv-zaehler__bilder img { width: 100%; height: auto; display: block; }
-.krv-zaehler__bilder span { padding: 8px 10px 10px; font-size: .85rem; line-height: 1.35; color: var(--text-neben); border-top: 1px solid var(--linie); }
+.krv-zaehler__bilder span { padding: 8px 10px 10px; font-size: .85rem; line-height: 1.35; color: var(--text-neben); border-top: 1px solid var(--linie); overflow-wrap: anywhere; hyphens: auto; }
 
 /* Skizze: Animationen */
 .szene { display: block; width: 100%; height: auto; }

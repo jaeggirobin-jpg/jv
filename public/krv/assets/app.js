@@ -60,9 +60,12 @@
         '<span><strong>' + esc(s.titel) + '</strong><span class="t">' + esc(s.text) + '</span></span></button></li>';
     }).join('');
 
-    $('zaehler-bilder').innerHTML = T.anleitung.zaehler.bilder.map(function (z) {
-      return '<li><img src="' + esc(z.bild) + '" alt="' + esc(z.text) + '" width="480" height="480" loading="lazy"><span>' + esc(z.text) + '</span></li>';
-    }).join('');
+    // Beispielbilder: so sehen Wasserzähler und Ventile aus
+    [['zaehler-bilder', T.anleitung.zaehler], ['ventil-bilder', T.anleitung.ventile]].forEach(function (b) {
+      $(b[0]).innerHTML = b[1].bilder.map(function (z) {
+        return '<li><img src="' + esc(z.bild) + '" alt="' + esc(z.text) + '" width="480" height="480" loading="lazy"><span>' + esc(z.text) + '</span></li>';
+      }).join('');
+    });
 
     $('faq').innerHTML = T.faq.fragen.map(function (q) {
       return '<details><summary>' + esc(q.f) + '</summary><p>' + esc(q.a) + '</p></details>';
