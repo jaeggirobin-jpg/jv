@@ -21,10 +21,10 @@
       website: 'https://www.jaeggivollmer.ch'
     },
 
-    // ── Einzugsgebiet: Versorgungsgebiet IWB (Basel, Riehen, Bettingen) ───
+    // ── Einzugsgebiet: Versorgungsgebiet IWB (Basel, Riehen, Bettingen, Binningen) ───
     einzugsgebiet: {
-      bezeichnung: 'Basel, Riehen und Bettingen',
-      plz: ['4000-4099', 4125, 4126]
+      bezeichnung: 'Basel, Riehen, Bettingen und Binningen',
+      plz: ['4000-4099', 4102, 4125, 4126]
     },
 
     // ── Fotos ──────────────────────────────────────────────────────────────
@@ -71,7 +71,7 @@
         titel: 'Worum es geht',
         text: 'Gemäss IWB braucht jede Liegenschaft nach dem Wasserzähler einen Rückflussverhinderer, eingebaut auf Kosten der Eigentümerschaft (§ 28 Ausführungsbestimmungen IWB, SG 772.800). Er verhindert, dass Wasser aus dem Haus zurück ins Trinkwassernetz fliesst.',
         frist: 'IWB hat Liegenschaften ohne Rückflussverhinderer angeschrieben und um Nachrüstung bis zum 1. Januar 2027 gebeten.',
-        gebiet: 'Versorgungsgebiet IWB: Basel, Riehen und Bettingen',
+        gebiet: 'Versorgungsgebiet IWB: Basel, Riehen, Bettingen und Binningen',
         quelle: 'Quelle: IWB, Flyer «Rückflussverhinderung in Trinkwasserinstallationen» und Schreiben an Hauseigentümer. Jäggi Vollmer ist ein unabhängiges Sanitärunternehmen und nicht Teil von IWB.'
       },
 
@@ -140,7 +140,7 @@
         absenden: 'Gratis prüfen lassen',
         ausserhalb: {
           titel: 'Ausserhalb des IWB-Gebiets',
-          text: 'Den Gratis-Check per Foto bieten wir zurzeit für Liegenschaften in Basel, Riehen und Bettingen an. Ausserhalb gelten die Vorgaben Ihres Wasserversorgers. Rufen Sie uns an, wir beraten Sie gerne.'
+          text: 'Den Gratis-Check per Foto bieten wir zurzeit für Liegenschaften in Basel, Riehen, Bettingen und Binningen an. Ausserhalb gelten die Vorgaben Ihres Wasserversorgers. Rufen Sie uns an, wir beraten Sie gerne.'
         }
       },
 
