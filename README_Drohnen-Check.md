@@ -51,7 +51,7 @@ Weitere Annahmen (nicht explizit entschieden):
 | Technik | Statisches HTML/CSS/JS ohne Build-Schritt (wie der Rest des Repos) |
 | Bericht an Kunden | Der Link geht über das eigene Mailprogramm raus («Per E-Mail senden» öffnet einen fertigen Entwurf), damit keine Personendaten über Resend laufen |
 | Bilder | Werden im Browser auf max. 2000 px verkleinert und als JPEG hochgeladen (entfernt auch GPS-Daten), max. 12 pro Bericht |
-| Rate-Limit | 5 Anfragen pro Stunde und IP (Env `DC_RATE_LIMIT`) |
+| Rate-Limit | 5 Anfragen pro Stunde und IP (Env `DC_RATE_LIMIT`), zusätzlich höchstens 30 pro Stunde insgesamt (Env `DC_LIMIT_GESAMT`) |
 | Spamschutz | Honeypot + Rate-Limit, kein Captcha (Turnstile kann später ergänzt werden) |
 
 ## Lokal starten
@@ -72,10 +72,11 @@ Für lokale Tests eine Datei `.env` im Repo-Root mit den Variablen unten anlegen
    | Variable | Inhalt |
    |---|---|
    | `RESEND_API_KEY` | API-Key von Resend |
-   | `DC_IP_SALT` | beliebiger langer Zufallswert (für den IP-Hash) |
+   | `DC_IP_SALT` | optional, langer Zufallswert für den IP-Hash (fehlt er, wird ein Schlüssel aus dem Service-Key abgeleitet) |
    | `DC_EMPFAENGER` | optional, überschreibt die interne Empfänger-Adresse |
    | `DC_ABSENDER` | optional, überschreibt die Absender-Adresse |
    | `DC_RATE_LIMIT` | optional, Anfragen pro Stunde und IP (Standard 5) |
+   | `DC_LIMIT_GESAMT` | optional, Anfragen pro Stunde über alle Absender (Standard 30, gilt auch für die Warteliste) |
 
 5. **Werbelinks** mit UTM-Parametern, z. B.
    `https://dachcheck.jaeggivollmer.ch/?utm_source=instagram&utm_medium=paid&utm_campaign=rinnencheck-herbst`

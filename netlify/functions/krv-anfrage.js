@@ -4,7 +4,7 @@
 // (bereits verkleinerten) Fotos direkt in den privaten Bucket «krvcheck» und ruft danach krv-fotos auf.
 // Ohne Fotos («bitte anrufen») ist die Anfrage hier schon abgeschlossen und die Info-Mail geht sofort raus.
 const crypto = require('crypto');
-const { config, antwort, ipHash, rpc, uploadUrl, hash, imEinzugsgebiet, infoMailSenden } = require('./_lib/krvcheck');
+const { config, antwort, ipHash, zuVieleInsgesamt, rpc, uploadUrl, hash, imEinzugsgebiet, infoMailSenden } = require('./_lib/krvcheck');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const ROLLEN = ['eigentuemer', 'verwaltung', 'mieter'];
@@ -86,6 +86,10 @@ exports.handler = async (event) => {
 
   let ergebnis;
   try {
+    if (await zuVieleInsgesamt('krvcheck_anfragen', parseInt(process.env.KRV_LIMIT_GESAMT || '30', 10))) {
+      console.warn('KRV-Check: Gesamtlimit pro Stunde erreicht');
+      return antwort(429, { error: 'Zurzeit gehen sehr viele Anfragen ein. Bitte versuchen Sie es später nochmals oder rufen Sie uns an: ' + config.firma.telefon + '.' });
+    }
     ergebnis = await rpc('krvcheck_anfrage_erfassen', {
       p_daten: {
         ...daten,

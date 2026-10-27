@@ -1,5 +1,5 @@
 // dachcheck-anfrage.js — Neue Drohnen-Check-Anfrage entgegennehmen, speichern und Info-Mail senden
-const { config, antwort, ipHash, rpc, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc } = require('./_lib/dachcheck');
+const { config, antwort, ipHash, zuVieleInsgesamt, rpc, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc } = require('./_lib/dachcheck');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -82,6 +82,10 @@ exports.handler = async (event) => {
 
   let ergebnis;
   try {
+    if (await zuVieleInsgesamt('drohnencheck_anfragen', parseInt(process.env.DC_LIMIT_GESAMT || '30', 10))) {
+      console.warn('Drohnen-Check: Gesamtlimit pro Stunde erreicht');
+      return antwort(429, { error: 'Zurzeit gehen sehr viele Anfragen ein. Bitte versuchen Sie es später nochmals oder rufen Sie uns an: ' + config.firma.telefon + '.' });
+    }
     ergebnis = await rpc('drohnencheck_anfrage_erfassen', {
       p_daten: { ...daten, ip_hash: ipHash(event) },
       p_max_pro_stunde: parseInt(process.env.DC_RATE_LIMIT || '5', 10)

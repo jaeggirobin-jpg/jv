@@ -2,6 +2,8 @@
 <html lang="de-CH">
 <head>
 <meta charset="utf-8">
+<!-- Nur eigene Skripte erlaubt (Schutz gegen eingeschleusten Code); Details in SICHERHEIT_Landingpages.md -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; script-src 'self'; img-src 'self' data:">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Datenschutz KRV-Check | Jäggi Vollmer</title>
 <meta name="robots" content="noindex">
@@ -16,7 +18,7 @@
   <h1>Datenschutz beim KRV-Check</h1>
 
   <!-- ENTWURF: vor der Veröffentlichung juristisch prüfen lassen und diesen Hinweis entfernen. -->
-  <p class="entwurf"><strong>Entwurf.</strong> Dieser Text wird zurzeit juristisch geprüft. Er ergänzt unsere allgemeine Datenschutzerklärung auf <a href="https://www.jaeggivollmer.ch">jaeggivollmer.ch</a> [___ Link einsetzen].</p>
+  <p>Diese Erklärung ergänzt unsere allgemeine Datenschutzerklärung auf <a href="https://www.jaeggivollmer.ch">jaeggivollmer.ch</a>.</p>
 
   <p>Diese Erklärung gilt für die Seite «Gratis KRV-Check» (Prüfung per Foto, ob ein Rückflussverhinderer eingebaut ist). Sie richtet sich nach dem Schweizer Datenschutzgesetz (DSG).</p>
 
@@ -29,7 +31,7 @@
     <li><strong>Fotos:</strong> Die Fotos der Wasserinstallation, die Sie hochladen. Ihr Browser verkleinert sie vor dem Senden und entfernt dabei die Standortdaten. Wir speichern sie in einem geschützten, nicht öffentlichen Speicher. Bitte fotografieren Sie keine Personen.</li>
     <li><strong>Unsere Beurteilung:</strong> ob ein Rückflussverhinderer vorhanden ist, eine kurze Begründung und interne Notizen.</li>
     <li><strong>Herkunft der Anfrage:</strong> Kampagnen-Parameter aus dem Link (z. B. utm_source, utm_campaign), die Einstiegsseite und die verweisende Seite. Damit sehen wir, welche Werbung zu Anfragen führt. Wir erstellen daraus keine Profile.</li>
-    <li><strong>Technische Daten:</strong> Ihre IP-Adresse wird nur in verschlüsselter Form (Hashwert) gespeichert, um Missbrauch zu verhindern, und nach 7 Tagen gelöscht.</li>
+    <li><strong>Technische Daten:</strong> Ihre IP-Adresse speichern wir nur als nicht zurückrechenbaren Prüfwert (Hash), um Missbrauch zu verhindern, und löschen ihn nach 7 Tagen.</li>
   </ul>
 
   <h2>3. Wofür wir die Daten verwenden</h2>
@@ -46,14 +48,15 @@
   </ul>
 
   <h2>5. Wer die Daten erhält</h2>
-  <p>Wir verkaufen keine Daten. Wir setzen folgende Dienstleister ein, die Daten in unserem Auftrag bearbeiten:</p>
+  <p>Wir verkaufen keine Daten. Wir setzen folgende Dienstleister und Dienste ein:</p>
   <ul>
     <li><strong>Netlify, Inc.</strong> (USA): Betrieb der Webseite und der Formularverarbeitung.</li>
-    <li><strong>Supabase, Inc.</strong> (USA), Datenbank und Dateispeicher mit Serverstandort in der EU [___ Region bestätigen]: Speicherung der Anfragen und Fotos.</li>
+    <li><strong>Supabase, Inc.</strong> (USA), Datenbank und Dateispeicher mit Serverstandort in Irland (EU): Speicherung der Anfragen und Fotos.</li>
     <li><strong>Resend</strong> (USA): Versand einer internen Benachrichtigung an uns. Diese enthält nur die Referenznummer, keine Personendaten.</li>
+    <li><strong>Bundesamt für Landestopografie swisstopo</strong> (Schweiz): Adress-Vorschläge, während Sie die Strasse eintippen. Dabei gehen nur die getippten Zeichen der Adresse und technisch bedingt Ihre IP-Adresse an den Adressdienst des Bundes (geo.admin.ch), nicht Ihr Name oder Ihre Kontaktdaten.</li>
     <li><strong>Meta Platforms Ireland Ltd.</strong>: nur wenn Sie dem Tracking zustimmen (siehe Ziffer 7).</li>
   </ul>
-  <p>Einzelne Dienstleister haben ihren Sitz in den USA oder können von dort auf Daten zugreifen. Wir übermitteln Daten in Länder ohne angemessenes Datenschutzniveau nur mit geeigneten Garantien, etwa einer Zertifizierung nach dem Swiss-U.S. Data Privacy Framework oder den vom EDÖB anerkannten Standardvertragsklauseln [___ pro Anbieter prüfen].</p>
+  <p>Ihre Angaben und Fotos speichern wir in Irland. Irland gilt nach Schweizer Recht als Land mit angemessenem Datenschutz. Beim Absenden verarbeitet Netlify das Formular jedoch in den USA, und die genannten Dienstleister haben ihren Sitz in den USA und können von dort auf Daten zugreifen. Die USA gelten nur für Unternehmen als angemessen, die nach dem Swiss-U.S. Data Privacy Framework zertifiziert sind. Wo das nicht der Fall ist, stützen wir uns auf Verträge zur Auftragsbearbeitung mit den Standardvertragsklauseln der EU-Kommission, die der EDÖB anerkennt, ergänzt um die für die Schweiz nötigen Anpassungen.</p>
 
   <h2>6. Ihre Rechte</h2>
   <p>Sie können jederzeit Auskunft über Ihre Daten verlangen, falsche Daten berichtigen und Daten löschen lassen, soweit keine Aufbewahrungspflicht besteht. Ihre Einwilligung können Sie jederzeit für die Zukunft widerrufen. Schreiben Sie uns dazu an <a href="mailto:info@jaeggivollmer.ch">info@jaeggivollmer.ch</a>. Sie können sich zudem beim Eidgenössischen Datenschutz- und Öffentlichkeitsbeauftragten (EDÖB) beschweren.</p>

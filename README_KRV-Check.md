@@ -42,7 +42,7 @@ Schriften, Grundgestaltung, Logo und die Video-Verkleinerung kommen aus `public/
    Kontrolle: Table Editor zeigt `krvcheck_anfragen`, Storage zeigt die Buckets `krvcheck` (privat) und `krvcheck-medien` (öffentlich).
 3. **Netlify:** Site «JV Docs» → Domain management → Production domains → Add domain alias → `krv.jaeggivollmer.ch`.
 4. **Hostpoint DNS:** Domain jaeggivollmer.ch → DNS-Editor → neuer Eintrag Typ `CNAME`, Name `krv`, Ziel `[netlify-site].netlify.app` (gleicher Wert wie beim Eintrag `dachcheck`). Das SSL-Zertifikat erstellt Netlify danach automatisch (bis ca. 1 Stunde).
-5. **Environment Variables:** keine neuen nötig. Die Info-Mail nutzt den bestehenden Absender `DC_ABSENDER`. Optional: `KRV_ABSENDER`, `KRV_EMPFAENGER`, `KRV_RATE_LIMIT` (Standard 5 Anfragen pro Stunde und IP).
+5. **Environment Variables:** keine neuen nötig. Die Info-Mail nutzt den bestehenden Absender `DC_ABSENDER`. Optional: `KRV_ABSENDER`, `KRV_EMPFAENGER`, `KRV_RATE_LIMIT` (Standard 5 Anfragen pro Stunde und IP), `KRV_LIMIT_GESAMT` (Standard 30 Anfragen pro Stunde über alle Absender).
 6. **Test:** `https://krv.jaeggivollmer.ch` auf dem Handy öffnen, Foto hochladen, absenden. Info-Mail an info@ kommt, Link führt zu `krv.jaeggivollmer.ch/admin.html#KRV-…`, Fotos sind sichtbar. Die Testanfrage danach auf «Abgesagt» setzen.
 
 ## Offen

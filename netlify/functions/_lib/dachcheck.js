@@ -13,13 +13,25 @@ function antwort(status, body) {
   return { statusCode: status, headers: HEADERS, body: JSON.stringify(body) };
 }
 
-// Client-IP gesalzen hashen (nur für Rate-Limit, wird nach 7 Tagen gelöscht)
+// Client-IP mit geheimem Schlüssel hashen (nur für Rate-Limit, wird nach 7 Tagen gelöscht).
+// Ohne DC_IP_SALT wird der Schlüssel aus dem Service-Key abgeleitet: Ein fest im Code stehendes
+// Salz liesse sich durch Durchprobieren aller IPv4-Adressen in Minuten zurückrechnen.
 function ipHash(event) {
   const h = event.headers || {};
   const ip = h['x-nf-client-connection-ip'] || (h['x-forwarded-for'] || '').split(',')[0].trim() || '';
   if (!ip) return null;
-  const salz = process.env.DC_IP_SALT || 'drohnencheck';
-  return crypto.createHash('sha256').update(salz + '|' + ip).digest('hex');
+  const geheim = process.env.DC_IP_SALT ||
+    crypto.createHash('sha256').update('ip-hash|' + (process.env.SUPABASE_SERVICE_KEY || '')).digest('hex');
+  return crypto.createHmac('sha256', geheim).update(ip).digest('hex');
+}
+
+// Bremse gegen Massen-Einträge von vielen IP-Adressen (das Rate-Limit pro IP greift dort nicht).
+// Zählt die Einträge der letzten Stunde über alle Absender. true = Grenze erreicht.
+async function zuVieleInsgesamt(tabelle, max) {
+  if (!(max > 0)) return false;
+  const seit = new Date(Date.now() - 3600e3).toISOString();
+  const r = await rest(tabelle + '?select=id&created_at=gt.' + encodeURIComponent(seit) + '&limit=' + max);
+  return (r || []).length >= max;
 }
 
 // Supabase RPC mit service_role-Key aufrufen
@@ -167,6 +179,6 @@ function esc(s) {
 
 
 module.exports = {
-  config, antwort, ipHash, rpc, rest, storage, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc,
+  config, antwort, ipHash, zuVieleInsgesamt, rpc, rest, storage, anfrageAktualisieren, mailSenden, imEinzugsgebiet, esc,
   uploadUrl, signierteUrls, ordnerListe, bilderLoeschen, ordnerLoeschen, oeffentlicheUrl, BUCKET_MEDIEN
 };
