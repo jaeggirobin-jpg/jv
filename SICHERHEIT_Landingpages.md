@@ -9,6 +9,7 @@ Stand: Prüfung vom 27.10.2026. Gilt für `public/dachcheck/`, `public/krv/` und
 - Buckets `drohnencheck` und `krvcheck`: privat, nur Bilder, max. 10 MB. Upload nur über signierte Upload-URLs, Anzeige nur über signierte URLs (1 Stunde).
 - Buckets `drohnencheck-medien` und `krvcheck-medien`: öffentlich, nur Werbevideos, Upload nur durch den Admin.
 - Kundenfotos werden im Browser neu als JPEG gezeichnet, dadurch fallen EXIF- und GPS-Daten weg.
+- Supabase-Region: Irland (EU).
 - Löschroutinen: Drohnen-Check 60 Tage, KRV-Check 90 Tage ohne Auftrag, IP-Hash nach 7 Tagen.
 - Info-Mails enthalten keine Personendaten, nur Referenz und Link.
 
@@ -20,7 +21,7 @@ Stand: Prüfung vom 27.10.2026. Gilt für `public/dachcheck/`, `public/krv/` und
 
 ## Browser
 
-- Content-Security-Policy als `<meta>` in jeder HTML-Seite der beiden Landingpages: Skripte nur vom eigenen Server (auf der Landingpage zusätzlich das Meta Pixel nach Zustimmung), Bilder/Videos/Uploads nur zu `*.supabase.co`. Neue externe Dienste müssen dort ergänzt werden.
+- Content-Security-Policy als `<meta>` in jeder HTML-Seite der beiden Landingpages: Skripte nur vom eigenen Server (auf der Landingpage zusätzlich das Meta Pixel nach Zustimmung), Bilder/Videos/Uploads nur zu `*.supabase.co`, Adress-Vorschläge von `api3.geo.admin.ch` (swisstopo, `assets/adresse.js`, nur die getippte Adresse wird gesendet). Neue externe Dienste müssen dort ergänzt werden.
 - Alle Kundendaten werden im Admin mit `esc()` ausgegeben. Das ist wichtig, weil das Admin-Passwort im `sessionStorage` liegt.
 - Globale Header in `netlify.toml`: `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: no-referrer`, `frame-ancestors 'none'`.
 
