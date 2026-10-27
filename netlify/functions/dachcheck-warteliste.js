@@ -1,5 +1,5 @@
 // dachcheck-warteliste.js — E-Mail für «Benachrichtigt mich, wenn ihr in meine Region kommt» speichern
-const { antwort, ipHash, rpc } = require('./_lib/dachcheck');
+const { antwort, ipHash, zuVieleInsgesamt, rpc } = require('./_lib/dachcheck');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -29,6 +29,10 @@ exports.handler = async (event) => {
   }
 
   try {
+    if (await zuVieleInsgesamt('drohnencheck_warteliste', parseInt(process.env.DC_LIMIT_GESAMT || '30', 10))) {
+      console.warn('Drohnen-Check Warteliste: Gesamtlimit pro Stunde erreicht');
+      return antwort(429, { error: 'Zu viele Anfragen. Bitte versuchen Sie es später nochmals.' });
+    }
     const r = await rpc('drohnencheck_warteliste_erfassen', {
       p_daten: { email, plz, ort, utm, ip_hash: ipHash(event) },
       p_max_pro_stunde: parseInt(process.env.DC_RATE_LIMIT || '5', 10)

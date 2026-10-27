@@ -19,7 +19,7 @@
       telefonLink: '+41616920311',
       email: 'info@jaeggivollmer.ch',
       website: 'https://www.jaeggivollmer.ch',
-      uid: 'CHE-[___]',                 // Platzhalter: UID-Nummer
+      uid: 'CHE-109.860.682',
       whatsapp: null                    // optional, z. B. '+41790000000'
     },
 

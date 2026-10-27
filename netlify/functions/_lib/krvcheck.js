@@ -56,7 +56,7 @@ async function infoMailSenden(ref, anzahlFotos) {
 
 module.exports = {
   config, BUCKET, BUCKET_MEDIEN, REFERENZ_RE, imEinzugsgebiet, hash, mailInfo, infoMailSenden,
-  antwort: dc.antwort, ipHash: dc.ipHash, rpc: dc.rpc, rest: dc.rest, esc: dc.esc,
+  antwort: dc.antwort, ipHash: dc.ipHash, zuVieleInsgesamt: dc.zuVieleInsgesamt, rpc: dc.rpc, rest: dc.rest, esc: dc.esc,
   uploadUrl: (pfad) => dc.uploadUrl(pfad, BUCKET),
   medienUploadUrl: (pfad) => dc.uploadUrl(pfad, BUCKET_MEDIEN),
   signierteUrls: (pfade, sekunden) => dc.signierteUrls(pfade, sekunden, BUCKET),
