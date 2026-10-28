@@ -95,9 +95,9 @@
 
       report: {
         titel: 'Was Sie bekommen',
-        text: 'Einen kurzen Bericht zu Ihren Rinnen und Fallrohren. Die Ampel zeigt auf einen Blick, wie es steht, die Fotos zeigen, warum. Gereinigt wird nur, was nötig ist: Ist alles in Ordnung, sagen wir Ihnen das.',
+        text: 'Wir kontrollieren Ihre Rinnen und Abläufe optisch aus der Luft. Danach erhalten Sie einen kurzen Bericht: Die Ampel zeigt auf einen Blick, wie es steht, und die Fotos zeigen, worauf es ankommt. Ist alles in Ordnung, sagen wir Ihnen das ehrlich. Reinigen lohnt sich nur, wo es nötig ist.',
         ampel: [
-          { stufe: 'gut', wort: 'Gut', text: 'Rinnen und Fallrohre sind frei und intakt. Es ist nichts zu tun.' },
+          { stufe: 'gut', wort: 'Gut', text: 'Rinnen und Abläufe sind frei und sehen intakt aus. Es ist nichts zu tun.' },
           { stufe: 'beobachten', wort: 'Beobachten', text: 'Leichte Verschmutzung oder kleine Auffälligkeiten. Wir empfehlen, in 6 bis 12 Monaten wieder hinzuschauen.' },
           { stufe: 'handlung', wort: 'Handlungsbedarf', text: 'Verstopfung, Schaden oder Gefahr von Wassereintritt. Wir sagen Ihnen, was zu tun ist.' }
         ]
