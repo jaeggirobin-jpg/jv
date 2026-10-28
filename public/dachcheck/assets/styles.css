@@ -260,6 +260,8 @@ legend { font-weight: 600; font-size: .95rem; margin-bottom: 8px; padding: 0; }
 }
 @media (max-width: 799px) {
   .formular__karte { display: flex; flex-direction: column; height: 100%; }
+  /* Auf dem Handy reicht der ständig sichtbare Knopf unten (.cta-leiste) */
+  .hero__cta { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
