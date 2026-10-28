@@ -222,6 +222,7 @@ legend { font-weight: 600; font-size: .95rem; margin-bottom: 8px; padding: 0; }
 .check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--kupfer-dunkel); }
 .check .pflicht { color: var(--text-neben); font-size: .85rem; display: block; margin-top: 4px; }
 .check.fehler { border-color: var(--handlung); }
+.check.fehler .fehlertext { display: block; }
 
 .honig { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
 

@@ -136,7 +136,6 @@
           danke: 'Danke. Wir melden uns, sobald wir in Ihrer Region unterwegs sind. Ihre E-Mail-Adresse verwenden wir nur dafür.'
         },
         einwilligung: 'Ich bin Eigentümer/in oder zur Anmeldung berechtigt und einverstanden, dass beim Drohnenflug das Dach aufgenommen wird. Ohne Auftrag werden Anfrage und Aufnahmen nach 60 Tagen gelöscht.',
-        einwilligungKommunikation: 'Sie dürfen anonymisierte Aufnahmen meines Daches für Ihre Kommunikation verwenden.',
         absenden: 'Anfrage absenden'
       },
 

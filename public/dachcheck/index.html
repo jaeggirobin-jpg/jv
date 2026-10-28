@@ -109,6 +109,7 @@
         <div class="formular-fehler" id="formular-fehler" role="alert" hidden></div>
 
         <section class="schritt-panel" data-schritt="formular">
+          <p class="klein">Alle Angaben sind Pflichtfelder.</p>
           <div class="feld-reihe feld-reihe--halb">
             <div class="feld"><label for="vorname">Vorname</label><input type="text" id="vorname" name="vorname" autocomplete="given-name" required><div class="fehlertext">Bitte Vorname.</div></div>
             <div class="feld"><label for="nachname">Name</label><input type="text" id="nachname" name="nachname" autocomplete="family-name" required><div class="fehlertext">Bitte Name.</div></div>
@@ -124,8 +125,7 @@
             <div class="feld"><label for="plz">PLZ</label><input type="text" id="plz" name="plz" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="postal-code" required><div class="fehlertext">4 Ziffern</div></div>
             <div class="feld"><label for="ort">Ort</label><input type="text" id="ort" name="ort" autocomplete="address-level2" required><div class="fehlertext">Bitte Ort.</div></div>
           </div>
-          <label class="check" id="c-einwilligung"><input type="checkbox" name="einwilligung" value="ja"><span><span data-text="formular.einwilligung"></span><span class="pflicht">Pflichtfeld</span></span></label>
-          <label class="check"><input type="checkbox" name="einwilligung_kommunikation" value="ja"><span><span data-text="formular.einwilligungKommunikation"></span><span class="pflicht">freiwillig</span></span></label>
+          <label class="check" id="c-einwilligung"><input type="checkbox" name="einwilligung" value="ja"><span><span data-text="formular.einwilligung"></span><span class="pflicht">Pflichtfeld</span><span class="fehlertext">Bitte bestätigen Sie die Einwilligung.</span></span></label>
           <p class="klein">Wie wir mit Ihren Daten umgehen, lesen Sie in der <a id="link-datenschutz" target="_blank" rel="noopener">Datenschutzerklärung</a>.</p>
           <!-- Honeypot: für Menschen unsichtbar -->
           <div class="honig" aria-hidden="true"><label for="firma_website">Website</label><input type="text" id="firma_website" name="firma_website" tabindex="-1" autocomplete="off"></div>

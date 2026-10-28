@@ -221,6 +221,16 @@
     check($('plz'), !/^\d{4}$/.test(w.plz || ''));
     check($('ort'), !w.ort);
     check($('c-einwilligung'), w.einwilligung !== 'ja');
+    if (ok) {
+      $('formular-fehler').hidden = true;
+    } else {
+      // Meldung oben: sagt, was fehlt (Felder und/oder Einwilligung)
+      var felderFehlen = erstesFehler !== $('c-einwilligung');
+      var haekchenFehlt = w.einwilligung !== 'ja';
+      zeigeFehler(felderFehlen && haekchenFehlt
+        ? 'Bitte füllen Sie alle Felder aus und bestätigen Sie die Einwilligung.'
+        : felderFehlen ? 'Bitte füllen Sie alle markierten Felder aus.' : 'Bitte bestätigen Sie die Einwilligung (Häkchen setzen).');
+    }
     if (erstesFehler) {
       var ziel = erstesFehler.querySelector ? (erstesFehler.querySelector('input') || erstesFehler) : erstesFehler;
       if (ziel.focus) ziel.focus();
@@ -259,7 +269,6 @@
       vorname: w.vorname, nachname: w.nachname, email: w.email, telefon: w.telefon,
       strasse: w.strasse, hausnummer: w.hausnummer, plz: w.plz, ort: w.ort,
       einwilligung: w.einwilligung === 'ja',
-      einwilligung_kommunikation: w.einwilligung_kommunikation === 'ja',
       firma_website: w.firma_website || '',
       utm: speicher.get('dc_utm') || {}
     };
