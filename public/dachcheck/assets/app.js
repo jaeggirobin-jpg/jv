@@ -81,6 +81,7 @@
 
   // Titelvideo: wird im Admin importiert (Tab «Landingpage») und hier nachgeladen.
   // Ohne Video bleibt der ruhige Hintergrund. Bei «Bewegung reduzieren» oder Datensparmodus nur das Standbild.
+  var HERO_TEMPO = 0.6;   // Abspielgeschwindigkeit des Titelvideos (1 = normal)
   function heroMedien() {
     fetch('/api/dachcheck-medien').then(function (res) { return res.ok ? res.json() : {}; }).then(function (M) {
       var box = $('hero-medien');
@@ -94,7 +95,13 @@
         v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
         v.preload = 'auto';
         if (M.poster) v.poster = M.poster;
+        // Langsamer abspielen: ruhigere Bewegung, kleine Ruckler der Drohnenaufnahme fallen nicht auf.
+        // Safari setzt das Tempo beim Laden bzw. Neustart zurück, deshalb bei jedem Start erneut setzen.
+        var tempo = function () { v.defaultPlaybackRate = HERO_TEMPO; v.playbackRate = HERO_TEMPO; };
+        v.addEventListener('loadedmetadata', tempo);
+        v.addEventListener('playing', tempo);
         v.src = M.video;
+        tempo();
         box.appendChild(v);
         var p = v.play();
         if (p && p.catch) p.catch(function () { /* Autoplay blockiert: Standbild bleibt */ });
