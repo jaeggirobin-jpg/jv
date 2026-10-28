@@ -108,6 +108,8 @@ async function mailSenden({ an, betreff, html, text, antwortAn, absender: absend
 const BUCKET = 'drohnencheck';
 const BUCKET_MEDIEN = 'drohnencheck-medien';
 
+// Hinweis: Supabase Storage lehnt einen POST mit Content-Type JSON, aber ohne Body ab
+// («Body cannot be empty», 400). Deshalb wird bei POST ohne Angaben immer {} gesendet.
 async function storage(pfad, { method = 'POST', body } = {}) {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_KEY;
@@ -115,7 +117,7 @@ async function storage(pfad, { method = 'POST', body } = {}) {
   const res = await fetch(url.replace(/\/$/, '') + '/storage/v1/' + pfad, {
     method,
     headers: { 'Content-Type': 'application/json', apikey: key, Authorization: 'Bearer ' + key },
-    body: body ? JSON.stringify(body) : undefined
+    body: body ? JSON.stringify(body) : (method === 'POST' ? '{}' : undefined)
   });
   const text = await res.text();
   if (!res.ok) throw new Error('Storage ' + method + ' ' + pfad + ' fehlgeschlagen: ' + res.status + ' ' + text);
