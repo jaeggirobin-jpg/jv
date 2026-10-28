@@ -95,7 +95,7 @@
 
       report: {
         titel: 'Was Sie bekommen',
-        text: 'Wir kontrollieren Ihre Rinnen und Abläufe optisch aus der Luft. Danach erhalten Sie einen kurzen Bericht: Die Ampel zeigt auf einen Blick, wie es steht, und die Fotos zeigen, worauf es ankommt. Ist alles in Ordnung, sagen wir Ihnen das ehrlich. Reinigen lohnt sich nur, wo es nötig ist.',
+        text: 'Wir kontrollieren Ihre Rinnen und Abläufe optisch aus der Luft. Danach erhalten Sie einen kurzen Bericht mit Fotos. Das Ampelsystem veranschaulicht vereinfacht unsere Einschätzung. Reinigen lohnt sich nur, wo es nötig ist.',
         ampel: [
           { stufe: 'gut', wort: 'Gut', text: 'Rinnen und Abläufe sind frei und sehen intakt aus. Es ist nichts zu tun.' },
           { stufe: 'beobachten', wort: 'Beobachten', text: 'Leichte Verschmutzung oder kleine Auffälligkeiten. Wir empfehlen, in 6 bis 12 Monaten wieder hinzuschauen.' },
