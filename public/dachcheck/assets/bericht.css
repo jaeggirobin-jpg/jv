@@ -5,7 +5,6 @@
 .bericht h2 { font-size: 1.45rem; margin-top: 1.4em; }
 .bericht__ref { color: var(--text-neben); font-size: .92rem; margin-bottom: .4em; letter-spacing: .02em; }
 .bericht__adresse { color: var(--text-neben); }
-.bericht__drucken { min-height: 40px; font-size: .9rem; }
 .bericht__fehler { background: var(--weiss); border: 1px solid var(--linie); border-radius: var(--radius); padding: 16px; }
 
 .bericht__ampel {
@@ -34,14 +33,10 @@
   .bericht__fotos { grid-template-columns: 1fr 1fr; }
 }
 
-/* Drucken / als PDF speichern */
+/* Kein Drucken / Speichern als PDF: im Druck erscheint nur ein Hinweis */
+.bericht__kein-druck { display: none; }
+.bericht-seite img { -webkit-user-drag: none; -webkit-touch-callout: none; }
 @media print {
-  .kopf { position: static; border: 0; }
-  .bericht__drucken, .bericht__kontakt .bericht__knoepfe, .fuss__links { display: none !important; }
-  body { background: #fff; font-size: 12pt; }
-  .bericht { padding-top: 0; }
-  .bericht__fotos { grid-template-columns: 1fr 1fr; }
-  .bericht__fotos figure { break-inside: avoid; }
-  .fuss { background: #fff; color: #25292E; padding: 12px 0 0; border-top: 1px solid #ccc; }
-  .fuss a { color: #25292E; }
+  body.bericht-seite > *:not(.bericht__kein-druck) { display: none !important; }
+  body.bericht-seite .bericht__kein-druck { display: block !important; padding: 40px; font: 14pt/1.5 sans-serif; color: #25292E; }
 }

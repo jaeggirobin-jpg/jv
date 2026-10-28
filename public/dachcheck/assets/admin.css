@@ -70,6 +70,8 @@
 .dc-verwaltung label { display: block; font-weight: 600; font-size: .88rem; margin-bottom: 4px; }
 .dc-verwaltung select, .dc-verwaltung input, .dc-verwaltung textarea { width: 100%; max-width: 100%; min-height: 44px; padding: 9px 12px; font-size: 16px; font-family: inherit; border: 1.5px solid #CFC9C1; border-radius: 8px; background: var(--dc-weiss); color: var(--dc-text); }
 .dc-verwaltung textarea { min-height: 90px; resize: vertical; }
+/* Berichtstexte: grosses Feld, damit der ganze Text sichtbar ist */
+.dc-verwaltung textarea[data-b] { min-height: 200px; line-height: 1.5; }
 .dc-gespeichert { font-size: .88rem; color: var(--dc-gut); }
 
 /* Bericht-Editor */
@@ -87,12 +89,13 @@
 .dc-ampel.s-handlung span::before { background: #B3332B; }
 .dc-ampel input:checked + span { border-color: var(--dc-kupfer-dunkel); background: var(--dc-kupfer-hell); font-weight: 600; }
 .dc-ampel input:focus-visible + span { outline: 3px solid var(--dc-kupfer-dunkel); outline-offset: 2px; }
-.dc-bilder { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin: 16px 0 10px; }
-.dc-bild { border: 1px solid var(--dc-linie); border-radius: 10px; overflow: hidden; background: var(--dc-weiss); display: grid; }
+.dc-bilder { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin: 16px 0 10px; }
+.dc-bild { border: 1px solid var(--dc-linie); border-radius: 10px; overflow: hidden; background: var(--dc-weiss); display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
 .dc-bild img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: #ECEAE6; }
 .dc-bild__fehlt { aspect-ratio: 4 / 3; display: grid; place-items: center; color: var(--dc-neben); background: #ECEAE6; font-size: .85rem; }
 .dc-bild input, .dc-link input { width: 100%; max-width: 100%; min-height: 40px; padding: 8px 10px; font-size: 16px; font-family: inherit; border: 0; border-top: 1px solid var(--dc-linie); background: var(--dc-weiss); color: var(--dc-text); }
-.dc-bild__knoepfe { display: flex; gap: 4px; padding: 6px; border-top: 1px solid var(--dc-linie); }
+.dc-bild input { min-width: 0; }
+.dc-bild__knoepfe { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px; border-top: 1px solid var(--dc-linie); }
 .dc-bild__knoepfe .dc-btn { min-height: 34px; padding: 0 10px; font-size: .82rem; }
 .dc-bild__knoepfe .dc-btn:last-child { margin-left: auto; }
 .dc-btn[disabled] { opacity: .45; cursor: not-allowed; }
@@ -133,3 +136,19 @@ body.admin { padding-bottom: 40px; }
 .a-login { max-width: 420px; padding-top: 48px; }
 .a-login h1 { font-size: 1.9rem; margin-bottom: 24px; }
 .a-main { padding-top: 24px; }
+/* Admin nutzt die volle Bildschirmbreite (Bericht mit Text und Bildern braucht Platz) */
+body.admin .wrap:not(.a-login) { max-width: 1680px; }
+
+/* Bericht: Textfelder mit Vorlagen und KI */
+.dc-textfeld__kopf { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 6px 12px; margin-bottom: 4px; }
+.dc-textfeld__kopf label { margin-bottom: 0; }
+.dc-verwaltung .dc-vorlage-wahl { width: auto; min-width: 0; max-width: 100%; flex: 0 1 320px; min-height: 38px; padding: 6px 10px; font-size: 16px; }
+.dc-textfeld__knoepfe { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.dc-textfeld__knoepfe .dc-btn { min-height: 36px; padding: 0 12px; font-size: .85rem; }
+.dc-textfeld__abstand { flex: 1 1 0; }
+.dc-vorlagen { margin-top: 8px; border: 1px solid var(--dc-linie); border-radius: 10px; padding: 10px 12px; background: #FAF8F5; }
+.dc-vorlagen ul { list-style: none; margin: 0 0 10px; padding: 0; max-height: 320px; overflow-y: auto; }
+.dc-vorlagen li { display: flex; gap: 10px; align-items: start; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--dc-linie); }
+.dc-vorlagen li p { margin: 2px 0 0; font-size: .88rem; color: var(--dc-neben); }
+.dc-vorlagen .dc-btn { min-height: 34px; padding: 0 10px; font-size: .82rem; flex: none; }
+.dc-ki-hinweis { margin: 0; font-size: .85rem; }

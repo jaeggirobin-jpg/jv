@@ -92,6 +92,8 @@ a { color: var(--kupfer-dunkel); }
 .hero__inhalt { position: relative; z-index: 2; color: var(--weiss); padding-top: 64px; padding-bottom: 40px; }
 .hero__inhalt p { font-size: 1.15rem; max-width: 32em; color: rgba(255,255,255,.92); }
 .hero .btn { margin-top: .4em; }
+.hero__inhalt .hero__gebiet { display: inline-flex; align-items: center; gap: .45em; font-size: .95rem; font-weight: 600; margin-top: -.3em; color: var(--weiss); }
+.hero__gebiet::before { content: ''; width: .55em; height: .55em; border-radius: 50%; background: var(--kupfer); flex: none; }
 
 /* ── Abschnitte ────────────────────────────────────────────────────────── */
 .abschnitt { padding: 64px 0; }

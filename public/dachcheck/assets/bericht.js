@@ -52,9 +52,9 @@
     if (b.empfehlung) html += '<section class="bericht__text"><h2>' + esc(T.bericht.empfehlungTitel) + '</h2>' + absaetze(b.empfehlung) + '</section>';
 
     if (b.bilder && b.bilder.length) {
-      html += '<section><h2>' + esc(T.bericht.fotosTitel) + '</h2><div class="bericht__fotos">' +
+      html += '<section><h2>' + esc(T.bericht.fotosTitel) + '</h2><div class="bericht__fotos" data-bildgruppe>' +
         b.bilder.map(function (x, i) {
-          return '<figure><a href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
+          return '<figure><a href="' + esc(x.url) + '" target="_blank" rel="noopener" data-gross data-titel="' + esc(x.beschriftung || '') + '">' +
             '<img src="' + esc(x.url) + '" alt="' + esc(x.beschriftung || 'Foto ' + (i + 1)) + '" loading="' + (i < 2 ? 'eager' : 'lazy') + '"></a>' +
             (x.beschriftung ? '<figcaption>' + esc(x.beschriftung) + '</figcaption>' : '') + '</figure>';
         }).join('') + '</div></section>';
@@ -65,14 +65,24 @@
       '<a class="btn btn--sekundaer" href="mailto:' + esc(F.email) + '?subject=' + encodeURIComponent('Drohnen-Check ' + b.referenz) + '">E-Mail schreiben</a></div></section>';
 
     html += '<p class="klein bericht__fuss">Bericht vom ' + esc(datum(b.erstellt)) + '.' +
-      (b.loeschdatum ? ' Er ist bis ' + esc(datum(b.loeschdatum)) + ' abrufbar. Danach löschen wir Bericht und Aufnahmen. Speichern Sie ihn bei Bedarf als PDF.' : '') + '</p>';
+      (b.loeschdatum ? ' Er ist bis ' + esc(datum(b.loeschdatum)) + ' abrufbar. Danach löschen wir Bericht und Aufnahmen.' : '') + '</p>';
 
     $('bericht').innerHTML = html;
-    $('drucken').hidden = false;
     document.title = T.bericht.titel + ' ' + b.referenz + ' | Jäggi Vollmer';
   }
 
-  $('drucken').addEventListener('click', function () { window.print(); });
+  // Kein Drucken / Speichern als PDF (Robins Vorgabe). Hohe Hürde, kein absoluter Schutz:
+  // Bildschirmfotos bleiben möglich. Beim Drucken zeigt bericht.css nur einen Hinweis.
+  document.addEventListener('keydown', function (e) {
+    var k = (e.key || '').toLowerCase();
+    if ((e.ctrlKey || e.metaKey) && (k === 'p' || k === 's')) e.preventDefault();
+  });
+  document.addEventListener('contextmenu', function (e) {
+    if (e.target.closest && e.target.closest('img, .bildansicht')) e.preventDefault();
+  });
+  document.addEventListener('dragstart', function (e) {
+    if (e.target.tagName === 'IMG') e.preventDefault();
+  });
 
   var token = new URLSearchParams(location.search).get('t') || '';
   if (!/^[a-f0-9]{32}$/.test(token)) { fehler(T.bericht.nichtGefunden); return; }

@@ -488,14 +488,15 @@
               return '<label class="dc-ampel s-' + x.wert + '"><input type="radio" name="dc-ampel" value="' + x.wert + '"' + (w.ampel === x.wert ? ' checked' : '') + '><span>' + esc(x.label) + '</span></label>';
             }).join('') +
           '</fieldset>' +
-          '<div><label for="dc-zusammenfassung">Befund</label><textarea id="dc-zusammenfassung" data-b="zusammenfassung" placeholder="Was wir gesehen haben, in zwei, drei Sätzen." autocomplete="off">' + esc(w.zusammenfassung) + '</textarea></div>' +
-          '<div><label for="dc-empfehlung">Empfehlung <span class="dc-optional">(optional)</span></label><textarea id="dc-empfehlung" data-b="empfehlung" placeholder="Was wir empfehlen und bis wann." autocomplete="off">' + esc(w.empfehlung) + '</textarea></div>' +
+          textFeld('zusammenfassung', 'Befund', 'Was wir gesehen haben, in zwei, drei Sätzen.', w.zusammenfassung) +
+          textFeld('empfehlung', 'Empfehlung <span class="dc-optional">(optional)</span>', 'Was wir empfehlen und bis wann.', w.empfehlung) +
+          '<p class="dc-hinweis dc-ki-hinweis">KI-Knöpfe: Der Text des Feldes wird zur Überarbeitung an Anthropic (USA) gesendet. Bitte keine Namen, Adressen oder Telefonnummern in Befund und Empfehlung schreiben.</p>' +
         '</div>' +
 
-        '<div class="dc-bilder">' +
+        '<div class="dc-bilder" data-bildgruppe>' +
           (w.bilder.length ? w.bilder.map(function (x, i) {
             return '<div class="dc-bild">' +
-              (x.url ? '<a href="' + esc(x.url) + '" target="_blank" rel="noopener"><img src="' + esc(x.url) + '" alt="Bild ' + (i + 1) + '" loading="lazy"></a>' : '<div class="dc-bild__fehlt">Bild fehlt</div>') +
+              (x.url ? '<a href="' + esc(x.url) + '" target="_blank" rel="noopener" data-gross data-titel="' + esc(x.beschriftung) + '"><img src="' + esc(x.url) + '" alt="Bild ' + (i + 1) + '" loading="lazy"></a>' : '<div class="dc-bild__fehlt">Bild fehlt</div>') +
               '<input type="text" data-b="beschriftung" data-pfad="' + esc(x.pfad) + '" value="' + esc(x.beschriftung) + '" placeholder="Beschriftung, z. B. Rinne Nordseite" aria-label="Beschriftung Bild ' + (i + 1) + '" autocomplete="off">' +
               '<div class="dc-bild__knoepfe">' +
                 '<button type="button" class="dc-btn" data-bild="hoch" data-pfad="' + esc(x.pfad) + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="Nach vorne">↑</button>' +
@@ -530,6 +531,165 @@
         if (dateien.length) bilderHochladen(dateien);
       });
       box.oninput = function () { zustand.bericht.ungespeichert = true; };
+      box.onchange = function (ev) {
+        var wahl = ev.target.closest && ev.target.closest('[data-vorlage-feld]');
+        if (wahl && wahl.value) vorlageEinfuegen(wahl.dataset.vorlageFeld, wahl.value);
+      };
+      if (!zustand.vorlagen && !zustand.vorlagenLaden) vorlagenLaden();
+    }
+
+    // ── Textvorlagen und KI für Befund und Empfehlung ─────────────────
+    // zustand.vorlagen = [{ id, feld, titel, text, eigene }], vom Server (Vorschläge + eigene)
+    // zustand.kiVorher = { feld: Text vor der letzten KI-Überarbeitung } für «Rückgängig»
+
+    function textFeld(feld, label, platzhalter, wert) {
+      var id = 'dc-' + feld;
+      var alle = (zustand.vorlagen || []).filter(function (v) { return v.feld === feld; });
+      var option = function (v) { return '<option value="' + esc(v.id) + '">' + esc(v.titel) + '</option>'; };
+      var eigene = alle.filter(function (v) { return v.eigene; });
+      var vorschlaege = alle.filter(function (v) { return !v.eigene; });
+      var kiVorher = zustand.bericht.kiVorher || {};
+      var offen = zustand.bericht.vorlagenOffen === feld;
+      return '<div class="dc-textfeld">' +
+        '<div class="dc-textfeld__kopf"><label for="' + id + '">' + label + '</label>' +
+          '<select class="dc-vorlage-wahl" data-vorlage-feld="' + feld + '" aria-label="Vorlage einfügen"' + (zustand.vorlagen ? '' : ' disabled') + '>' +
+            '<option value="">' + (zustand.vorlagen ? 'Vorlage einfügen …' : 'Vorlagen werden geladen …') + '</option>' +
+            (eigene.length ? '<optgroup label="Eigene Vorlagen">' + eigene.map(option).join('') + '</optgroup>' : '') +
+            (vorschlaege.length ? '<optgroup label="Vorschläge">' + vorschlaege.map(option).join('') + '</optgroup>' : '') +
+          '</select></div>' +
+        '<textarea id="' + id + '" data-b="' + feld + '" placeholder="' + esc(platzhalter) + '" autocomplete="off">' + esc(wert) + '</textarea>' +
+        '<div class="dc-textfeld__knoepfe">' +
+          '<button type="button" class="dc-btn" data-txt="ki-korrigieren" data-feld="' + feld + '">KI: korrigieren</button>' +
+          '<button type="button" class="dc-btn" data-txt="ki-umschreiben" data-feld="' + feld + '">KI: umschreiben</button>' +
+          (Object.prototype.hasOwnProperty.call(kiVorher, feld) ? '<button type="button" class="dc-btn" data-txt="ki-zurueck" data-feld="' + feld + '">Rückgängig</button>' : '') +
+          '<span class="dc-textfeld__abstand"></span>' +
+          '<button type="button" class="dc-btn" data-txt="vorlage-speichern" data-feld="' + feld + '">Als Vorlage speichern</button>' +
+          '<button type="button" class="dc-btn" data-txt="vorlagen-verwalten" data-feld="' + feld + '" aria-expanded="' + offen + '">Vorlagen verwalten</button>' +
+        '</div>' +
+        (offen ? vorlagenVerwaltung(feld, alle) : '') +
+      '</div>';
+    }
+
+    function vorlagenVerwaltung(feld, alle) {
+      return '<div class="dc-vorlagen">' +
+        (alle.length ? '<ul>' + alle.map(function (v) {
+          return '<li><div><strong>' + esc(v.titel) + '</strong>' + (v.eigene ? '' : ' <span class="dc-optional">(Vorschlag)</span>') +
+            '<p>' + esc(v.text) + '</p></div>' +
+            '<button type="button" class="dc-btn" data-txt="vorlage-loeschen" data-id="' + esc(v.id) + '">' + (v.eigene ? 'Löschen' : 'Ausblenden') + '</button></li>';
+        }).join('') + '</ul>' : '<p class="dc-hinweis">Keine Vorlagen.</p>') +
+        '<button type="button" class="dc-btn" data-txt="vorschlaege-zuruecksetzen" data-feld="' + feld + '">Ausgeblendete Vorschläge wieder anzeigen</button>' +
+      '</div>';
+    }
+
+    function texteAufruf(action, daten) {
+      return aufruf('/dachcheck-texte', { method: 'POST', body: JSON.stringify(Object.assign({ action: action }, daten || {})) });
+    }
+
+    // Neu zeichnen, ohne Eingaben zu verlieren
+    function berichtNeu(meldung, istFehler) {
+      if (!zustand.bericht || zustand.bericht.referenz !== zustand.aktiv) return;
+      berichtEingabenUebernehmen();
+      if (meldung) berichtMeldung(meldung, istFehler);
+      else berichtZeigen();
+    }
+
+    function vorlagenLaden() {
+      zustand.vorlagenLaden = true;
+      texteAufruf('vorlagen').then(function (r) {
+        zustand.vorlagen = r.vorlagen || [];
+        berichtNeu();
+      }).catch(function (e) {
+        zustand.vorlagen = [];
+        berichtNeu('Vorlagen konnten nicht geladen werden: ' + e.message, true);
+      }).then(function () { zustand.vorlagenLaden = false; });
+    }
+
+    function textFeldEl(feld) {
+      var box = el('bericht');
+      return box && box.querySelector('textarea[data-b="' + feld + '"]');
+    }
+
+    function vorlageEinfuegen(feld, id) {
+      var v = (zustand.vorlagen || []).filter(function (x) { return x.id === id; })[0];
+      var ta = textFeldEl(feld);
+      if (!v || !ta) return;
+      var bisher = ta.value.replace(/\s+$/, '');
+      ta.value = bisher ? bisher + ' ' + v.text : v.text;
+      zustand.bericht.ungespeichert = true;
+      berichtNeu();
+      var neu = textFeldEl(feld);
+      if (neu) { neu.focus(); neu.setSelectionRange(neu.value.length, neu.value.length); }
+    }
+
+    function textAktion(art, t) {
+      var feld = t.dataset.feld;
+      var ta = feld && textFeldEl(feld);
+      switch (art) {
+        case 'ki-korrigieren':
+        case 'ki-umschreiben': {
+          if (!ta) return;
+          var text = ta.value.trim();
+          if (!text) { berichtNeu('Bitte zuerst einen Text eingeben.', true); return; }
+          var ampel = el('bericht').querySelector('input[name="dc-ampel"]:checked');
+          var knoepfe = el('bericht').querySelectorAll('[data-txt^="ki-"]');
+          knoepfe.forEach(function (k) { k.disabled = true; });
+          t.textContent = 'KI arbeitet …';
+          texteAufruf('ki', { modus: art === 'ki-korrigieren' ? 'korrigieren' : 'umschreiben', feld: feld, text: text, ampel: ampel ? ampel.value : '' }).then(function (r) {
+            var aktuell = textFeldEl(feld);
+            if (!aktuell) return;
+            zustand.bericht.kiVorher = zustand.bericht.kiVorher || {};
+            zustand.bericht.kiVorher[feld] = aktuell.value;
+            aktuell.value = r.text;
+            zustand.bericht.ungespeichert = true;
+            berichtNeu(r.gekuerzt ? 'Die KI-Antwort war zu lang und wurde abgeschnitten. Bitte prüfen.' : 'Text von der KI überarbeitet. Bitte prüfen und dann speichern.', !!r.gekuerzt);
+          }).catch(function (e) {
+            berichtNeu('KI: ' + e.message, true);
+          });
+          return;
+        }
+        case 'ki-zurueck': {
+          var vorher = zustand.bericht.kiVorher || {};
+          if (!ta || !Object.prototype.hasOwnProperty.call(vorher, feld)) return;
+          ta.value = vorher[feld];
+          delete vorher[feld];
+          zustand.bericht.ungespeichert = true;
+          berichtNeu();
+          return;
+        }
+        case 'vorlage-speichern': {
+          if (!ta) return;
+          // Markierter Text oder ganzes Feld
+          var auswahl = ta.value.slice(ta.selectionStart, ta.selectionEnd).trim();
+          var inhalt = auswahl || ta.value.trim();
+          if (!inhalt) { berichtNeu('Das Feld ist leer. Zuerst Text eingeben, dann als Vorlage speichern.', true); return; }
+          var titel = window.prompt('Name der Vorlage (erscheint in der Auswahl):', inhalt.slice(0, 40));
+          if (titel === null) return;
+          texteAufruf('vorlage-speichern', { feld: feld, titel: titel, text: inhalt }).then(function (r) {
+            zustand.vorlagen = r.vorlagen || [];
+            berichtNeu('Vorlage gespeichert. Sie steht jetzt bei allen Berichten zur Auswahl.');
+          }).catch(function (e) { berichtNeu('Vorlage nicht gespeichert: ' + e.message, true); });
+          return;
+        }
+        case 'vorlagen-verwalten':
+          zustand.bericht.vorlagenOffen = zustand.bericht.vorlagenOffen === feld ? null : feld;
+          berichtNeu();
+          return;
+        case 'vorlage-loeschen': {
+          var v = (zustand.vorlagen || []).filter(function (x) { return x.id === t.dataset.id; })[0];
+          if (!v || !window.confirm(v.eigene ? 'Vorlage «' + v.titel + '» löschen?' : 'Vorschlag «' + v.titel + '» ausblenden?')) return;
+          texteAufruf('vorlage-loeschen', { id: v.id }).then(function (r) {
+            zustand.vorlagen = r.vorlagen || [];
+            berichtNeu();
+          }).catch(function (e) { berichtNeu('Löschen fehlgeschlagen: ' + e.message, true); });
+          return;
+        }
+        case 'vorschlaege-zuruecksetzen':
+          texteAufruf('vorschlaege-zuruecksetzen').then(function (r) {
+            zustand.vorlagen = r.vorlagen || [];
+            berichtNeu();
+          }).catch(function (e) { berichtNeu(e.message, true); });
+          return;
+      }
     }
 
     // Meldung direkt beim Bericht anzeigen (die allgemeine Fehlerzeile steht weit unten)
@@ -842,6 +1002,7 @@
       var t = e.target.closest('button, a');
       if (!t || !root.contains(t)) return;
       if (t.dataset.bild) { bildAktion(t.dataset.bild, t.dataset.pfad); return; }
+      if (t.dataset.txt) { textAktion(t.dataset.txt, t); return; }
       if (t.dataset.ref) { zeige(t.dataset.ref); if (window.innerWidth < 900) root.scrollIntoView({ block: 'start' }); return; }
       if (t.dataset.filter) { zustand.filter = t.dataset.filter; chips(); liste(); return; }
       if (t.dataset.tab) {

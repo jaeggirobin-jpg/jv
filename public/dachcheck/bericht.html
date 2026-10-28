@@ -10,6 +10,7 @@
 <link rel="preload" href="assets/fonts/oswald-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/styles.css">
 <link rel="stylesheet" href="assets/bericht.css">
+<link rel="stylesheet" href="assets/bildansicht.css">
 <link rel="icon" href="assets/icon/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="icon" href="assets/icon/favicon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="assets/icon/apple-touch-icon.png">
@@ -19,9 +20,10 @@
 <header class="kopf">
   <div class="wrap">
     <a class="kopf__logo" href="./"><img src="assets/logo-jaeggi-vollmer.svg" alt="Jäggi Vollmer" width="138" height="44"></a>
-    <button class="btn btn--sekundaer bericht__drucken" type="button" id="drucken" hidden>Als PDF speichern</button>
   </div>
 </header>
+
+<p class="bericht__kein-druck">Dieser Bericht kann nicht gedruckt oder als PDF gespeichert werden. Sie können ihn jederzeit über den Link ansehen.</p>
 
 <main class="wrap bericht" id="bericht" aria-live="polite">
   <p class="klein" id="laden">Bericht wird geladen …</p>
@@ -38,5 +40,6 @@
 
 <script src="config.js"></script>
 <script src="assets/bericht.js"></script>
+<script src="assets/bildansicht.js"></script>
 </body>
 </html>
