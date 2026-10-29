@@ -67,12 +67,22 @@
         punkte: ['Gratis und unverbindlich', 'In 2 Minuten erledigt', 'Antwort per E-Mail']
       },
 
+      // Unterlagen von IWB (IWB-Mail vom 29.10.2026). Leer = Link wird nicht angezeigt.
+      // broschuere: PDF z. B. unter 'assets/iwb-broschuere-rueckflussverhinderer.pdf' ablegen.
+      // formular: Link auf das Online-Formular von IWB für die Rückmeldung «schon vorhanden».
+      // Keine IWB-Kontaktdaten selbst angeben: Kontakt steht in der Broschüre (Wunsch IWB).
+      iwb: {
+        broschuere: '',
+        formular: ''
+      },
+
       pflicht: {
         titel: 'Worum es geht',
         text: 'Gemäss IWB braucht jede Liegenschaft nach dem Wasserzähler einen Rückflussverhinderer, eingebaut auf Kosten der Eigentümerschaft (§ 28 Ausführungsbestimmungen IWB, SG 772.800). Er verhindert, dass Wasser aus dem Haus zurück ins Trinkwassernetz fliesst.',
+        fristDatum: '1.1.2027', // falls IWB die Frist neu setzt: hier und im Satz darunter anpassen
         frist: 'IWB hat Liegenschaften ohne Rückflussverhinderer angeschrieben und um Nachrüstung bis zum 1. Januar 2027 gebeten.',
-        gebiet: 'Versorgungsgebiet IWB: Basel, Riehen, Bettingen und Binningen',
-        quelle: 'Quelle: IWB, Flyer «Rückflussverhinderung in Trinkwasserinstallationen» und Schreiben an Hauseigentümer. Jäggi Vollmer ist ein unabhängiges Sanitärunternehmen und nicht Teil von IWB.'
+        gebiet: 'Versorgungsgebiet IWB: ganzer Kanton Basel-Stadt (Basel, Riehen, Bettingen) und Gemeinde Binningen',
+        quelle: 'Quelle: IWB, Broschüre «Rückflussverhinderung in Trinkwasserinstallationen» und Schreiben an Hauseigentümer. Jäggi Vollmer ist ein unabhängiges Sanitärunternehmen und nicht Teil von IWB.'
       },
 
       anleitung: {
@@ -112,7 +122,7 @@
           { f: 'Muss ich einen einbauen?', a: 'Gemäss IWB braucht jede Liegenschaft im Versorgungsgebiet einen kontrollierbaren Rückflussverhinderer nach dem Wasserzähler, eingebaut auf Kosten der Eigentümerschaft. Wurden Sie von IWB angeschrieben, hat IWB bei Ihrer Liegenschaft keinen festgestellt und bittet um Nachrüstung bis zum 1. Januar 2027.' },
           { f: 'Kostet der Check etwas?', a: 'Nein. Die Beurteilung Ihrer Fotos ist kostenlos und unverbindlich. Eine Offerte erhalten Sie nur, wenn ein Rückflussverhinderer fehlt und Sie das möchten.' },
           { f: 'Wie sicher ist eine Beurteilung per Foto?', a: 'Auf guten Fotos erkennen wir meist, ob ein Rückflussverhinderer vorhanden ist. Es bleibt eine Einschätzung und ersetzt keine Kontrolle vor Ort. Sind die Fotos nicht eindeutig, fragen wir nach.' },
-          { f: 'Ich habe schon einen. Was nun?', a: 'Dann müssen Sie nichts einbauen. Wurden Sie von IWB angeschrieben, melden Sie IWB mit der beigelegten Rückantwortkarte, dass bereits ein Rückflussverhinderer vorhanden ist.' },
+          { f: 'Ich habe schon einen. Was nun?', a: 'Dann müssen Sie nichts einbauen. Wurden Sie von IWB angeschrieben, melden Sie IWB, dass bereits ein Rückflussverhinderer vorhanden ist, mit der Rückantwortkarte aus dem Schreiben oder über das Online-Formular von IWB (Link oben bei der Frist).' },
           { f: 'Wer darf den Rückflussverhinderer einbauen?', a: 'Gemäss IWB ein Sanitärunternehmen mit Installationsbewilligung von IWB. Jäggi Vollmer hat diese Bewilligung und meldet den Einbau direkt an IWB.' },
         ]
       },
