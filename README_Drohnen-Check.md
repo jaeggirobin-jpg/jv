@@ -21,6 +21,7 @@ netlify/functions/
 │   ├── dachcheck-admin-update.js      → Status, Termin, Notiz ändern (Admin)
 │   ├── dachcheck-bericht.js           → Bericht erstellen, Bilder hochladen, veröffentlichen (Admin)
 │   ├── dachcheck-bericht-ansehen.js   → veröffentlichten Bericht für den Kunden ausliefern
+│   ├── dachcheck-texte.js             → Textvorlagen und KI-Korrektur für Befund und Empfehlung (Admin)
 │   ├── dachcheck-admin-medien.js      → Titelvideo importieren, ersetzen, entfernen (Admin)
 │   ├── dachcheck-medien.js            → aktuelles Titelvideo für die Landingpage
 │   └── _lib/dachcheck.js              → Supabase-, Storage- und Mail-Helfer (ohne npm-Abhängigkeiten)
@@ -77,6 +78,8 @@ Für lokale Tests eine Datei `.env` im Repo-Root mit den Variablen unten anlegen
    | `DC_ABSENDER` | optional, überschreibt die Absender-Adresse |
    | `DC_RATE_LIMIT` | optional, Anfragen pro Stunde und IP (Standard 5) |
    | `DC_LIMIT_GESAMT` | optional, Anfragen pro Stunde über alle Absender (Standard 30, gilt auch für die Warteliste) |
+   | `ANTHROPIC_API_KEY` | für die KI-Knöpfe im Bericht (korrigieren, umschreiben). Fehlt er, funktioniert alles andere normal |
+   | `DC_KI_MODELL` | optional, Claude-Modell für die KI-Knöpfe (Standard `claude-haiku-5-5`, schnell genug für das 10-Sekunden-Limit der Functions) |
 
 5. **Werbelinks** mit UTM-Parametern, z. B.
    `https://dachcheck.jaeggivollmer.ch/?utm_source=instagram&utm_medium=paid&utm_campaign=rinnencheck-herbst`
@@ -108,11 +111,13 @@ SELECT utm_source, utm_campaign, count(*) FROM drohnencheck_anfragen GROUP BY 1,
 Im Detail einer Anfrage, Abschnitt **Bericht**:
 
 1. Flugdatum, Ampel (Gut / Beobachten / Handlungsbedarf), Befund und optional Empfehlung erfassen.
+   - **Vorlage einfügen …** hängt einen fertigen Text an. Vorschläge stehen fest in `dachcheck-texte.js`, eigene Texte speichert «Als Vorlage speichern» (markierter Text oder ganzes Feld) in `drohnencheck_einstellungen` (Schlüssel `textbausteine`). «Vorlagen verwalten» löscht eigene und blendet Vorschläge aus.
+   - **KI: korrigieren / umschreiben** schickt nur den Text des Feldes an Anthropic (Claude) und ersetzt ihn, «Rückgängig» holt den alten Text zurück. Braucht `ANTHROPIC_API_KEY`. Keine Namen oder Adressen in die Texte schreiben.
 2. **Bilder hinzufügen** (mehrere auf einmal, auch direkt vom Handy). Sie werden verkleinert und direkt in den privaten Bucket `drohnencheck` geladen (Pfad `{anfrage_id}/{zufall}.jpg`), in der Datenbank steht nur der Pfad. Beschriften, mit ↑ ↓ sortieren, «Entfernen» löscht das Bild auch im Bucket.
 3. **Bericht speichern**, dann **Speichern und veröffentlichen**. Der Status springt auf «Bericht versendet».
 4. **Per E-Mail senden** öffnet einen fertigen Entwurf mit dem Kundenlink im eigenen Mailprogramm. Alternativ «Link kopieren» (z. B. für WhatsApp).
 
-Der Kunde sieht den Bericht unter `dachcheck.jaeggivollmer.ch/bericht.html?t=…` (Ampel, Befund, Empfehlung, Fotos, Kontakt) und kann ihn als PDF speichern. Die Bilder werden nur über signierte URLs mit einer Stunde Gültigkeit ausgeliefert. «Kundenlink sperren» macht den Link sofort ungültig.
+Der Kunde sieht den Bericht unter `dachcheck.jaeggivollmer.ch/bericht.html?t=…` (Ampel, Befund, Empfehlung, Fotos, Kontakt). Fotos öffnen gross auf derselben Seite (mit «Schliessen»). Drucken und Speichern als PDF sind gesperrt (Ctrl+P zeigt nur einen Hinweis); Bildschirmfotos bleiben möglich. Die Bilder werden nur über signierte URLs mit einer Stunde Gültigkeit ausgeliefert. «Kundenlink sperren» macht den Link sofort ungültig.
 
 ## Löschung nach 60 Tagen
 

@@ -332,9 +332,9 @@
         var box = el('fotos');
         if (!box) return;
         box.innerHTML = fotos.length
-          ? '<div class="dc-bilder">' + fotos.map(function (f, i) {
-            return '<div class="dc-bild"><a href="' + esc(f.url) + '" target="_blank" rel="noopener"><img src="' + esc(f.url) + '" alt="Foto ' + (i + 1) + '" loading="lazy"></a></div>';
-          }).join('') + '</div><p class="dc-hinweis">Antippen öffnet das Foto in voller Grösse. Links sind eine Stunde gültig.</p>'
+          ? '<div class="dc-bilder" data-bildgruppe>' + fotos.map(function (f, i) {
+            return '<div class="dc-bild"><a href="' + esc(f.url) + '" target="_blank" rel="noopener" data-gross><img src="' + esc(f.url) + '" alt="Foto ' + (i + 1) + '" loading="lazy"></a></div>';
+          }).join('') + '</div><p class="dc-hinweis">Antippen zeigt das Foto gross. Links sind eine Stunde gültig.</p>'
           : '<p class="krv-anrufen">Keine Fotos angekommen' + (a.fotos_abgeschlossen_at ? '' : ' (Upload nicht abgeschlossen)') + '. Bitte anrufen oder per E-Mail nachfragen.</p>';
       };
       var cache = zustand.fotos[ref];

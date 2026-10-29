@@ -57,6 +57,12 @@
   force = true
 
 [[redirects]]
+  from = "https://dachcheck.jaeggivollmer.ch/api/dachcheck-texte"
+  to = "/.netlify/functions/dachcheck-texte"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "https://dachcheck.jaeggivollmer.ch/*"
   to = "/dachcheck/:splat"
   status = 200

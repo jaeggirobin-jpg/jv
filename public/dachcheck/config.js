@@ -81,7 +81,8 @@
 
       hero: {
         titel: 'Wann haben Sie Ihre Dachrinne zuletzt gesehen?',
-        unterzeile: 'Wir schauen mit der Drohne nach. Gratis, ohne Leiter, und Sie müssen nicht zu Hause sein.'
+        unterzeile: 'Wir schauen mit der Drohne nach. Gratis, ohne Leiter, und Sie müssen nicht zu Hause sein.',
+        gebiet: 'Für Häuser in Basel und Umgebung'
       },
 
       ablauf: {
@@ -115,6 +116,7 @@
         titel: 'Häufige Fragen',
         fragen: [
           { f: 'Kostet das wirklich nichts?', a: 'Ja. Der Rinnen-Check mit Drohnenflug und Kurzbericht ist kostenlos und unverbindlich. Eine Offerte erhalten Sie nur, wenn wir einen Befund haben und Sie das möchten.' },
+          { f: 'Wo bieten Sie den Drohnen-Check an?', a: 'In Basel und Umgebung, also in Basel-Stadt und Basel-Landschaft. Dort sind unsere Projektleiter jeden Tag unterwegs. Wohnen Sie weiter weg, freut uns Ihr Interesse trotzdem: Hinterlassen Sie im Formular Ihre E-Mail-Adresse, dann melden wir uns, sobald wir auch in Ihre Region kommen.' },
           { f: 'Muss ich zu Hause sein?', a: 'Nein. Wir fliegen, wenn unser Projektleiter in Ihrer Nähe ist, und kündigen den Flug vorher per E-Mail an. Wir starten von der Strasse oder einem Platz in der Nähe. Brauchen wir ausnahmsweise Zugang zum Grundstück, melden wir uns.' },
           { f: 'Wann bekomme ich den Bericht?', a: 'In der Regel wenige Tage nach dem Flug, per E-Mail mit einem Link. Bei Regen oder starkem Wind fliegen wir nicht und kommen an einem anderen Tag.' },
           { f: 'Was geschieht mit den Aufnahmen?', a: 'Wir verwenden sie für Ihren Bericht und, falls Sie das wünschen, für eine Offerte. Ohne Auftrag löschen wir Anfrage, Bericht und Aufnahmen nach 60 Tagen. Nachbargrundstücke am Bildrand verwenden wir nicht, erkennbare Personen machen wir unkenntlich.' },
