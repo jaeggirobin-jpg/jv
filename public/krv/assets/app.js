@@ -53,6 +53,13 @@
       el.addEventListener('click', function () { formularOeffnen(); });
     });
 
+    // Unterlagen von IWB (Broschüre, Online-Formular), nur wenn in config.js gesetzt
+    var iwb = T.iwb || {};
+    var iwbLinks = [];
+    if (iwb.broschuere) iwbLinks.push('<a href="' + esc(iwb.broschuere) + '" target="_blank" rel="noopener">IWB-Broschüre herunterladen (PDF)</a>');
+    if (iwb.formular) iwbLinks.push('<a href="' + esc(iwb.formular) + '" target="_blank" rel="noopener">Schon eingebaut? Online-Formular von IWB</a>');
+    if (iwbLinks.length) { $('iwb-links').innerHTML = iwbLinks.join(''); $('iwb-links').hidden = false; }
+
     $('hero-punkte').innerHTML = T.hero.punkte.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('');
 
     $('anleitung-schritte').innerHTML = T.anleitung.schritte.map(function (s, i) {

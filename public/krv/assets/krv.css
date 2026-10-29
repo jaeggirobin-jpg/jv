@@ -14,6 +14,9 @@
 .krv-pflicht { display: grid; gap: 22px; }
 .krv-frist { display: grid; gap: 4px; background: #F4EADD; border-left: 4px solid #BD843A; border-radius: 8px; padding: 16px 18px; margin: 0 0 12px; }
 .krv-gebiet { margin-top: 6px; padding-top: 8px; border-top: 1px solid rgba(189,132,58,.35); font-weight: 600; color: #94621F; }
+.krv-iwb-links { display: grid; gap: 6px; margin: 0 0 12px; }
+.krv-iwb-links[hidden] { display: none; }
+.krv-iwb-links a { color: #94621F; font-weight: 600; }
 .krv-frist strong { font-family: 'Oswald', sans-serif; font-size: 1.8rem; color: #94621F; line-height: 1.1; }
 
 /* ── Anleitung ────────────────────────────────────────────────────────── */
