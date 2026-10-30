@@ -26,6 +26,8 @@
   var VIDEO_MAX_SEKUNDEN = 60;
   var VIDEO_KANTE = 1280;
   var VIDEO_BITRATE = 2000000;
+  // Ordner dieses Skripts (…/krv/assets/), funktioniert auf krv.jaeggivollmer.ch und im Admin-Panel
+  var ASSETS = ((document.currentScript && document.currentScript.src) || '/krv/assets/admin.js').replace(/[^/]*$/, '');
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -140,6 +142,10 @@
         '<p class="dc-fehler" data-a="fehler" role="alert" hidden></p>';
 
       root.addEventListener('click', klick);
+      // Rückantwortkarte: Einbaudatum nur bei «eingebaut»
+      root.addEventListener('change', function (e) {
+        if (e.target.dataset.a === 'karte-art') el('karte-datum-feld').hidden = e.target.value !== 'eingebaut';
+      });
       root.querySelector('[data-a="video-datei"]').addEventListener('change', function (e) {
         var datei = e.target.files && e.target.files[0];
         e.target.value = '';
@@ -300,6 +306,19 @@
         '</div>' +
         '<div class="dc-knoepfe" data-a="antwort">' + antwortKnopf(a) + '</div>' +
 
+        '<h4>IWB-Rückantwortkarte</h4><div class="dc-verwaltung krv-karte">' +
+          '<p class="dc-hinweis">Karte mit den Angaben aus der Anfrage als PDF. Ort, Datum und Unterschrift ergänzt die Eigentümerschaft von Hand.</p>' +
+          '<fieldset class="dc-ampelwahl"><legend>Rückflussverhinderer</legend>' +
+            '<label class="dc-ampel"><input type="radio" name="krv-karte-' + esc(a.referenz) + '" data-a="karte-art" value="vorhanden"' + (a.beurteilung !== 'fehlt' ? ' checked' : '') + '><span>ist bereits vorhanden</span></label>' +
+            '<label class="dc-ampel"><input type="radio" name="krv-karte-' + esc(a.referenz) + '" data-a="karte-art" value="eingebaut"' + (a.beurteilung === 'fehlt' ? ' checked' : '') + '><span>ist eingebaut worden (durch uns)</span></label>' +
+          '</fieldset>' +
+          '<div class="krv-karte__felder">' +
+            '<div><label for="krv-zaehler">Wasserzählernummer <span class="dc-optional">(falls bekannt)</span></label><input type="text" id="krv-zaehler" data-a="karte-zaehler" autocomplete="off"></div>' +
+            '<div data-a="karte-datum-feld"' + (a.beurteilung === 'fehlt' ? '' : ' hidden') + '><label for="krv-einbau">Einbaudatum</label><input type="date" id="krv-einbau" data-a="karte-datum" autocomplete="off" value="' + new Date().toISOString().slice(0, 10) + '"></div>' +
+          '</div>' +
+          '<div><button type="button" class="dc-btn dc-btn--primaer" data-a="karte">Karte herunterladen (PDF)</button> <span class="dc-gespeichert" data-a="karte-status" aria-live="polite"></span></div>' +
+        '</div>' +
+
         '<h4>Kontakt und Liegenschaft</h4><dl>' +
           zeile('Adresse', adresse) + zeile('E-Mail', a.email) + zeile('Telefon', a.telefon) +
           zeile('Rolle', ROLLEN[a.rolle] || a.rolle) + zeile('IWB-Brief', a.iwb_brief ? 'ja, erhalten' : 'nein / nicht angegeben') +
@@ -318,6 +337,78 @@
       root.querySelector('.dc-layout').classList.add('detail-offen');
       if (opts.onDetail) opts.onDetail(ref);
       if (!a.keine_fotos || (a.fotos || []).length) fotosLaden(a);
+    }
+
+    // ── IWB-Rückantwortkarte: leere IWB-Karte (assets/iwb-rueckantwortkarte.pdf) mit pdf-lib ausfüllen ──
+    var pdfLib = null;
+    function pdfLibLaden() {
+      if (window.PDFLib) return Promise.resolve(window.PDFLib);
+      if (!pdfLib) pdfLib = new Promise(function (ok, nein) {
+        var sk = document.createElement('script');
+        sk.src = ASSETS + 'vendor/pdf-lib.min.js';
+        sk.onload = function () { ok(window.PDFLib); };
+        sk.onerror = function () { pdfLib = null; nein(new Error('PDF-Bibliothek konnte nicht geladen werden')); };
+        document.head.appendChild(sk);
+      });
+      return pdfLib;
+    }
+    // Standardschrift Helvetica kennt nur westeuropäische Zeichen: Rest ohne Akzent bzw. weglassen
+    function latin1(t) {
+      return String(t == null ? '' : t).replace(/[^\u0000-\u00FF]/g, function (c) {
+        return c.normalize('NFD').replace(/[^\u0000-\u00FF]/g, '');
+      }).trim();
+    }
+    function karte() {
+      var a = aktuelleAnfrage();
+      if (!a) return;
+      var art = (root.querySelector('[data-a="karte-art"]:checked') || {}).value || 'vorhanden';
+      var zaehler = el('karte-zaehler').value;
+      var einbau = el('karte-datum').value;
+      var status = el('karte-status');
+      status.textContent = 'PDF wird erstellt …';
+      Promise.all([pdfLibLaden(), fetch(ASSETS + 'iwb-rueckantwortkarte.pdf').then(function (r) {
+        if (!r.ok) throw new Error('Vorlage nicht gefunden');
+        return r.arrayBuffer();
+      })]).then(function (x) {
+        var L = x[0];
+        return L.PDFDocument.load(x[1]).then(function (doc) {
+          return Promise.all([doc.embedFont(L.StandardFonts.Helvetica), doc.embedFont(L.StandardFonts.HelveticaBold)]).then(function (f) {
+            var seite = doc.getPage(0);
+            var farbe = L.rgb(0.1, 0.1, 0.12);
+            // Text auf eine Linie der Karte (Koordinaten in Punkt, Ursprung unten links), bei Bedarf kleiner
+            var schreibe = function (text, x, linieY, breite) {
+              text = latin1(text);
+              if (!text) return;
+              var gr = 11;
+              while (gr > 7 && f[0].widthOfTextAtSize(text, gr) > breite) gr -= 0.5;
+              seite.drawText(text, { x: x + 2, y: linieY + 4, size: gr, font: f[0], color: farbe });
+            };
+            schreibe((a.plz || '') + ' ' + (a.ort || ''), 28.35, 323.24, 316);
+            schreibe(zaehler, 373.8, 323.24, 190);
+            schreibe(((a.strasse || '') + ' ' + (a.hausnummer || '')), 28.35, 292.85, 316);
+            // Kreuz im passenden Kästchen
+            var kx = art === 'eingebaut' ? 165 : 34, ky = 243.3;
+            seite.drawLine({ start: { x: kx - 4, y: ky - 4 }, end: { x: kx + 4, y: ky + 4 }, thickness: 1.4, color: farbe });
+            seite.drawLine({ start: { x: kx - 4, y: ky + 4 }, end: { x: kx + 4, y: ky - 4 }, thickness: 1.4, color: farbe });
+            if (art === 'eingebaut') {
+              schreibe((CFG.firma && CFG.firma.name) || 'Jäggi Vollmer GmbH', 28.35, 211.92, 316);
+              if (einbau) schreibe(einbau.split('-').reverse().join('.'), 373.8, 211.92, 190);
+            }
+            schreibe(a.vorname, 28.35, 143.1, 252);
+            schreibe(a.nachname, 28.35, 112.75, 252);
+            schreibe(a.telefon, 28.35, 82.7, 252);
+            return doc.save();
+          });
+        });
+      }).then(function (bytes) {
+        var blob = new Blob([bytes], { type: 'application/pdf' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'IWB-Rueckantwortkarte-' + a.referenz + '.pdf';
+        document.body.appendChild(link); link.click(); link.remove();
+        setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
+        status.textContent = 'Heruntergeladen.';
+      }).catch(function (e) { status.textContent = 'Fehler: ' + e.message; });
     }
 
     function antwortKnopf(a) {
@@ -517,6 +608,7 @@
         case 'laden': zustand.fotos = {}; laden(); break;
         case 'csv': csv(); break;
         case 'speichern': speichern(); break;
+        case 'karte': karte(); break;
         case 'video-los': videoLos(); break;
         case 'video-entfernen': videoEntfernen(); break;
         case 'video-hier': el('video-start').value = Math.floor(el('video-quelle').currentTime || 0); break;

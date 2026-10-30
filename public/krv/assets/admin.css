@@ -12,3 +12,8 @@
 .krv-admin .krv-fotoliste .dc-bilder { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); margin-top: 4px; }
 .krv-admin .krv-fotoliste .dc-bild img { aspect-ratio: 3 / 4; }
 .krv-anrufen { background: #FBF0DD; color: #7A4D00; border-radius: 8px; padding: 10px 12px; font-size: .92rem; margin: 0; }
+
+/* IWB-Rückantwortkarte */
+.krv-karte__felder { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.krv-karte__felder [hidden] { display: none; }
+.krv-karte input[type="text"], .krv-karte input[type="date"] { max-width: 100%; box-sizing: border-box; font-size: 16px; }
