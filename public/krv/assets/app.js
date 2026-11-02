@@ -117,11 +117,11 @@
     });
   }
 
-  // Startzeiten der Schritte im mitgelieferten Video assets/anleitung.mp4/.webm (7/5/7/5 s, danach 4 s Schlussbild).
+  // Startzeiten der Schritte im mitgelieferten Video assets/anleitung.mp4/.webm (7/5/7 s, danach 4 s Schlussbild).
   // In Schritt 1 und 3 zeigt das Video Beispielfotos von Zählern bzw. Ventilen.
   // Quelle des Videos: Projektordner krv-check/video-quelle/web.html
-  var VIDEO_SCHRITTE = [0, 7, 12, 19];
-  var VIDEO_ENDE = 24;
+  var VIDEO_SCHRITTE = [0, 7, 12];
+  var VIDEO_ENDE = 19;
   var anleitungVideo = null;
 
   function anleitungsVideo(ruhig) {
@@ -263,7 +263,9 @@
   // ════════════════════════════════════════════════════════════════════
   // Fotos: im Browser verkleinern (spart Datenvolumen, entfernt Standortdaten)
   // ════════════════════════════════════════════════════════════════════
-  var fotos = [];   // [{ blob, url }]
+  // Geführte Fotos: ein Platz pro Foto (Foto 1 ganze Stelle, Foto 2 Ventile nach dem Zähler)
+  var plaetze = [];  // [{ blob, url } | null], Index = Foto-Nr. - 1
+  var fotos = [];    // aufgenommene Fotos in Reihenfolge, für den Upload
   var fotoArbeit = Promise.resolve();
 
   function verkleinern(datei) {
@@ -299,30 +301,69 @@
     s.classList.toggle('fehler', !!istFehler);
   }
 
-  function fotosZeigen() {
-    $('fotos').innerHTML = fotos.map(function (f, i) {
-      return '<div class="krv-foto"><img src="' + f.url + '" alt="Foto ' + (i + 1) + '">' +
-        '<button type="button" data-foto-weg="' + i + '" aria-label="Foto ' + (i + 1) + ' entfernen">' +
-        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
+  function knopfText(vorlage, n) { return String(vorlage || '').replace('{n}', n); }
+
+  // Fotoplätze einmal aufbauen: Nummer, Titel, Skizze mit Rahmen, Aufnahme-Knopf
+  function fotoplaetzeAufbauen() {
+    var schritte = T.formular.fotoSchritte || [];
+    plaetze = schritte.map(function () { return null; });
+    var kamera = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+    $('fotoplaetze').innerHTML = schritte.map(function (sch, i) {
+      var n = i + 1;
+      return '<li class="krv-fotoplatz" data-platz="' + i + '">' +
+        '<div class="krv-fotoplatz__kopf"><span class="nr" aria-hidden="true">' + n + '</span>' +
+          '<h3>Foto ' + n + ': ' + esc(sch.titel) + '</h3></div>' +
+        '<p class="klein">' + esc(sch.text) + '</p>' +
+        '<div class="krv-fotoplatz__bild">' +
+          '<div class="krv-fotoplatz__skizze" data-skizze="' + i + '"></div>' +
+          '<div class="krv-fotoplatz__foto" data-foto="' + i + '" hidden></div>' +
+        '</div>' +
+        '<label class="btn btn--sekundaer krv-foto-knopf">' + kamera +
+          '<span data-knopf="' + i + '">' + esc(knopfText(T.formular.fotoKnopf, n)) + '</span>' +
+          '<input type="file" accept="image/*" data-foto-input="' + i + '" aria-label="Foto ' + n + ': ' + esc(sch.titel) + '">' +
+        '</label>' +
+      '</li>';
     }).join('');
-    $('foto-knopf').classList.toggle('voll', fotos.length >= C.fotos.max);
+    schritte.forEach(function (sch, i) {
+      if (window.KRVSzene) KRVSzene.erstellen(document.querySelector('[data-skizze="' + i + '"]'), { start: sch.szene || 0 });
+    });
+    fotosZeigen();
+  }
+
+  function fotosZeigen() {
+    fotos = plaetze.filter(Boolean);
+    var naechster = plaetze.indexOf(null);
+    plaetze.forEach(function (f, i) {
+      var li = document.querySelector('[data-platz="' + i + '"]');
+      var box = li.querySelector('[data-foto]');
+      li.classList.toggle('fertig', !!f);
+      li.classList.toggle('aktiv', i === naechster);
+      li.querySelector('[data-skizze]').hidden = !!f;
+      box.hidden = !f;
+      box.innerHTML = f
+        ? '<img src="' + f.url + '" alt="Ihr Foto ' + (i + 1) + '">' +
+          '<span class="krv-fotoplatz__ok">' + esc(knopfText(T.formular.fotoFertig, i + 1)) + '</span>' +
+          '<button type="button" data-foto-weg="' + i + '" aria-label="Foto ' + (i + 1) + ' entfernen">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
+        : '';
+      li.querySelector('[data-knopf]').textContent = f ? T.formular.fotoNeu : knopfText(T.formular.fotoKnopf, i + 1);
+    });
     if (fotos.length) $('c-keine-fotos').classList.remove('fehler');
   }
 
-  function fotosHinzufuegen(dateien) {
-    var platz = C.fotos.max - fotos.length;
-    if (dateien.length > platz) fotoStatus('Höchstens ' + C.fotos.max + ' Fotos. Die ersten ' + platz + ' wurden übernommen.', true);
-    dateien = dateien.slice(0, Math.max(0, platz));
-    dateien.forEach(function (datei) {
-      fotoArbeit = fotoArbeit.then(function () {
-        fotoStatus('Foto wird vorbereitet …');
-        return verkleinern(datei).then(function (blob) {
-          fotos.push({ blob: blob, url: URL.createObjectURL(blob) });
-          fotosZeigen();
-          fotoStatus('');
-          form.elements.keine_fotos.checked = false;
-        }).catch(function (e) { fotoStatus(e.message, true); });
-      });
+  function fotoSetzen(i, datei) {
+    fotoArbeit = fotoArbeit.then(function () {
+      fotoStatus('Foto wird vorbereitet …');
+      return verkleinern(datei).then(function (blob) {
+        if (plaetze[i]) URL.revokeObjectURL(plaetze[i].url);
+        plaetze[i] = { blob: blob, url: URL.createObjectURL(blob) };
+        fotosZeigen();
+        fotoStatus('');
+        form.elements.keine_fotos.checked = false;
+        // Weiter zum nächsten offenen Foto
+        var naechster = document.querySelector('.krv-fotoplatz.aktiv');
+        if (naechster && naechster.scrollIntoView) naechster.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }).catch(function (e) { fotoStatus(e.message, true); });
     });
   }
 
@@ -394,9 +435,13 @@
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
   function pruefeFotos() {
-    if (fotos.length || form.elements.keine_fotos.checked) return true;
+    if (form.elements.keine_fotos.checked) return true;
+    var fehlt = plaetze.indexOf(null);
+    if (fehlt < 0) return true;
     $('c-keine-fotos').classList.add('fehler');
-    fotoStatus('Bitte laden Sie mindestens ein Foto hoch oder kreuzen Sie an, dass wir Sie anrufen sollen.', true);
+    var li = document.querySelector('[data-platz="' + fehlt + '"]');
+    if (li && li.scrollIntoView) li.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    fotoStatus('Bitte machen Sie noch Foto ' + (fehlt + 1) + ' oder kreuzen Sie unten an, dass wir Sie anrufen sollen.', true);
     return false;
   }
 
@@ -591,6 +636,7 @@
   // Start
   // ════════════════════════════════════════════════════════════════════
   seiteAufbauen();
+  fotoplaetzeAufbauen();
   utmErfassen();
   wiederherstellen();
   cookieHinweis();
@@ -604,17 +650,20 @@
     else zeigeSchritt('fotos');
   });
   $('formular-schliessen').addEventListener('click', function () { sichern(); formularSchliessen(); });
-  $('foto-input').addEventListener('change', function (e) {
-    var dateien = Array.prototype.slice.call(e.target.files || []);
-    e.target.value = '';
-    if (dateien.length) fotosHinzufuegen(dateien);
+  $('fotoplaetze').addEventListener('change', function (e) {
+    var inp = e.target.closest('[data-foto-input]');
+    if (!inp) return;
+    e.stopPropagation();   // kein sichern() für Dateifelder
+    var datei = inp.files && inp.files[0];
+    inp.value = '';
+    if (datei) fotoSetzen(Number(inp.getAttribute('data-foto-input')), datei);
   });
-  $('fotos').addEventListener('click', function (e) {
+  $('fotoplaetze').addEventListener('click', function (e) {
     var b = e.target.closest('[data-foto-weg]');
     if (!b) return;
     var i = Number(b.getAttribute('data-foto-weg'));
-    URL.revokeObjectURL(fotos[i].url);
-    fotos.splice(i, 1);
+    URL.revokeObjectURL(plaetze[i].url);
+    plaetze[i] = null;
     fotosZeigen();
   });
   $('link-anleitung').addEventListener('click', function (e) {

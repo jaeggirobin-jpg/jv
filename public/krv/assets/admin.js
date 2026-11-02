@@ -319,7 +319,10 @@
             '<div><label for="krv-zaehler">Wasserzählernummer <span class="dc-optional">(falls bekannt)</span></label><input type="text" id="krv-zaehler" data-a="karte-zaehler" autocomplete="off"></div>' +
             '<div data-a="karte-datum-feld"' + (a.beurteilung === 'fehlt' ? '' : ' hidden') + '><label for="krv-einbau">Einbaudatum</label><input type="date" id="krv-einbau" data-a="karte-datum" autocomplete="off" value="' + new Date().toISOString().slice(0, 10) + '"></div>' +
           '</div>' +
-          '<div><button type="button" class="dc-btn dc-btn--primaer" data-a="karte">Karte herunterladen (PDF)</button> <span class="dc-gespeichert" data-a="karte-status" aria-live="polite"></span></div>' +
+          '<div class="dc-knoepfe"><button type="button" class="dc-btn dc-btn--primaer" data-a="karte-mail">Mail an IWB mit Karte</button>' +
+            '<button type="button" class="dc-btn" data-a="karte">Nur Karte herunterladen (PDF)</button></div>' +
+          '<p class="dc-hinweis">«Mail an IWB» lädt die Karte herunter und öffnet einen Entwurf an ' + esc(CFG.iwbInstallationskontrolle || 'IWB') + ' mit allen Angaben. Die heruntergeladene Karte im Mail anhängen.</p>' +
+          '<p class="dc-gespeichert" data-a="karte-status" aria-live="polite"></p>' +
         '</div>' +
 
         '<h4>Kontakt und Liegenschaft</h4><dl>' +
@@ -362,12 +365,45 @@
         return c.normalize('NFD').replace(/[^\u0000-\u00FF]/g, '');
       }).trim();
     }
-    function karte() {
+    function karteAngaben() {
+      return {
+        art: (root.querySelector('[data-a="karte-art"]:checked') || {}).value || 'vorhanden',
+        zaehler: el('karte-zaehler').value.trim(),
+        einbau: el('karte-datum').value
+      };
+    }
+
+    // Mail-Entwurf an die IWB-Installationskontrolle mit den Angaben der Karte als Text
+    function iwbMail(a, k) {
+      var liegenschaft = (a.strasse || '') + ' ' + (a.hausnummer || '') + ', ' + (a.plz || '') + ' ' + (a.ort || '');
+      var eingebaut = k.art === 'eingebaut';
+      var F = CFG.firma || {};
+      var zeilen = [
+        'Liegenschaft: ' + liegenschaft.trim(),
+        'Wasserzählernummer: ' + (k.zaehler || 'nicht bekannt'),
+        'Rückflussverhinderer: ' + (eingebaut ? 'ist eingebaut worden' : 'ist bereits vorhanden')
+      ];
+      if (eingebaut) {
+        zeilen.push('Installationsfirma: ' + (F.name || 'Jäggi Vollmer GmbH'));
+        if (k.einbau) zeilen.push('Einbaudatum: ' + k.einbau.split('-').reverse().join('.'));
+      }
+      zeilen.push('Name, Vorname: ' + (a.nachname || '') + ' ' + (a.vorname || '') + (ROLLEN[a.rolle] ? ' (' + ROLLEN[a.rolle] + ')' : ''));
+      zeilen.push('Telefon: ' + (a.telefon || ''));
+      zeilen.push('Unsere Referenz: ' + a.referenz);
+      var betreff = 'Rückantwortkarte Rückflussverhinderer: ' + liegenschaft.trim();
+      var body = 'Guten Tag\n\n' +
+        'Im Anhang erhalten Sie die Rückantwortkarte Rückflussverhinderer für folgende Liegenschaft:\n\n' +
+        zeilen.join('\n') + '\n\n' +
+        'Freundliche Grüsse\n' + (F.name || 'Jäggi Vollmer GmbH') + '\n' +
+        [F.strasse, F.ort].filter(Boolean).join(', ') + '\n' + [F.telefon, F.email].filter(Boolean).join(' · ');
+      return 'mailto:' + (CFG.iwbInstallationskontrolle || '') + '?subject=' + encodeURIComponent(betreff) + '&body=' + encodeURIComponent(body);
+    }
+
+    function karte(mitMail) {
       var a = aktuelleAnfrage();
       if (!a) return;
-      var art = (root.querySelector('[data-a="karte-art"]:checked') || {}).value || 'vorhanden';
-      var zaehler = el('karte-zaehler').value;
-      var einbau = el('karte-datum').value;
+      var k = karteAngaben();
+      var art = k.art, zaehler = k.zaehler, einbau = k.einbau;
       var status = el('karte-status');
       status.textContent = 'PDF wird erstellt …';
       Promise.all([pdfLibLaden(), fetch(ASSETS + 'iwb-rueckantwortkarte.pdf').then(function (r) {
@@ -411,7 +447,10 @@
         link.download = 'IWB-Rueckantwortkarte-' + a.referenz + '.pdf';
         document.body.appendChild(link); link.click(); link.remove();
         setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
-        status.textContent = 'Heruntergeladen.';
+        if (mitMail) {
+          window.location.href = iwbMail(a, k);
+          status.textContent = 'Karte heruntergeladen und Mail-Entwurf geöffnet: bitte die Karte (' + link.download + ') anhängen.';
+        } else status.textContent = 'Heruntergeladen.';
       }).catch(function (e) { status.textContent = 'Fehler: ' + e.message; });
     }
 
@@ -612,7 +651,8 @@
         case 'laden': zustand.fotos = {}; laden(); break;
         case 'csv': csv(); break;
         case 'speichern': speichern(); break;
-        case 'karte': karte(); break;
+        case 'karte': karte(false); break;
+        case 'karte-mail': karte(true); break;
         case 'video-los': videoLos(); break;
         case 'video-entfernen': videoEntfernen(); break;
         case 'video-hier': el('video-start').value = Math.floor(el('video-quelle').currentTime || 0); break;

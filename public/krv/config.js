@@ -27,6 +27,9 @@
       plz: ['4000-4099', 4102, 4125, 4126]
     },
 
+    // ── IWB Installationskontrolle: Empfänger der Rückantwortkarte (Mail-Entwurf im Admin) ──
+    iwbInstallationskontrolle: 'installationskontrolle@iwb.ch',
+
     // ── Fotos ──────────────────────────────────────────────────────────────
     fotos: {
       max: 5,           // muss zu MAX_FOTOS in netlify/functions/krv-anfrage.js passen
@@ -91,8 +94,7 @@
         schritte: [
           { titel: 'Wasserzähler finden', text: 'Meist im Keller, dort wo die Wasserleitung ins Haus kommt, oft im Heizungs- oder Waschraum. Am Zähler steht «m³».' },
           { titel: 'Foto 1: die ganze Stelle', text: 'Einen Meter zurückstehen. Auf dem Foto sollen der Zähler und die Leitung links und rechts davon sein, mit allen Ventilen.' },
-          { titel: 'Foto 2: nach dem Zähler', text: 'Näher ran an die Ventile direkt nach dem Zähler, also auf der Seite, wo die Leitung ins Haus weitergeht.' },
-          { titel: 'Foto 3: Beschriftung (wenn vorhanden)', text: 'Gibt es auf einem Ventil eine Aufschrift, ein Schild oder einen Pfeil? Dann davon ein Nahfoto. Freiwillig.' }
+          { titel: 'Foto 2: nach dem Zähler', text: 'Näher ran an die Ventile direkt nach dem Zähler, also auf der Seite, wo die Leitung ins Haus weitergeht.' }
         ],
         zaehler: {
           titel: 'So sieht ein Wasserzähler aus',
@@ -134,9 +136,16 @@
 
       formular: {
         titel: 'Gratis KRV-Check',
-        fotosTitel: 'Fotos hochladen',
-        fotosText: 'Mindestens ein Foto, am besten zwei: die ganze Stelle mit Zähler und ein Nahfoto der Ventile nach dem Zähler.',
-        fotoKnopf: 'Foto aufnehmen oder auswählen',
+        fotosTitel: 'Zwei Fotos beim Wasserzähler',
+        fotosText: 'Gehen Sie zum Wasserzähler, meist im Keller, dort wo die Wasserleitung ins Haus kommt. Licht an, nichts auf- oder zudrehen. Dann diese zwei Fotos machen:',
+        // Geführte Fotos: Skizze zeigt mit dem Rahmen, was aufs Bild soll (szene = Schritt in assets/szene.js)
+        fotoSchritte: [
+          { titel: 'Die ganze Stelle', text: 'Etwa einen Meter zurückstehen. Auf dem Foto sind der Zähler und die Leitung links und rechts davon mit allen Ventilen.', szene: 1 },
+          { titel: 'Die Ventile nach dem Zähler', text: 'Näher ran an die Ventile direkt nach dem Zähler, auf der Seite, wo die Leitung ins Haus weitergeht. Kein Zoom, scharf stellen.', szene: 2 }
+        ],
+        fotoKnopf: 'Foto {n} aufnehmen',
+        fotoNeu: 'Neu aufnehmen',
+        fotoFertig: 'Foto {n} erfasst',
         keineFotos: 'Ich finde den Wasserzähler nicht oder kann kein Foto machen. Bitte rufen Sie mich an.',
         kontaktTitel: 'Ihre Angaben',
         rollen: [
