@@ -66,7 +66,7 @@
 
       hero: {
         titel: 'Hat Ihr Haus schon einen Rückflussverhinderer?',
-        unterzeile: 'Zwei Fotos vom Wasserzähler genügen. Wir sagen Ihnen gratis, ob er eingebaut ist.',
+        unterzeile: 'Drei Fotos vom Wasserzähler genügen. Wir sagen Ihnen gratis, ob er eingebaut ist.',
         punkte: ['Gratis und unverbindlich', 'In 2 Minuten erledigt', 'Antwort per E-Mail']
       },
 
@@ -94,7 +94,8 @@
         schritte: [
           { titel: 'Wasserzähler finden', text: 'Meist im Keller, dort wo die Wasserleitung ins Haus kommt, oft im Heizungs- oder Waschraum. Am Zähler steht «m³».' },
           { titel: 'Foto 1: die ganze Stelle', text: 'Einen Meter zurückstehen. Auf dem Foto sollen der Zähler und die Leitung links und rechts davon sein, mit allen Ventilen.' },
-          { titel: 'Foto 2: nach dem Zähler', text: 'Näher ran an die Ventile direkt nach dem Zähler, also auf der Seite, wo die Leitung ins Haus weitergeht.' }
+          { titel: 'Foto 2: nach dem Zähler', text: 'Näher ran an die Ventile direkt nach dem Zähler, also auf der Seite, wo die Leitung ins Haus weitergeht.' },
+          { titel: 'Foto 3: Zählernummer', text: 'Deckel des Wasserzählers aufklappen und nah ran, bis die Zählernummer gut lesbar ist.' }
         ],
         zaehler: {
           titel: 'So sieht ein Wasserzähler aus',
@@ -130,18 +131,19 @@
       },
 
       abschluss: {
-        titel: 'Zwei Fotos, eine klare Antwort',
+        titel: 'Drei Fotos, eine klare Antwort',
         text: 'Gratis, unverbindlich, von Sanitärfachleuten aus Basel.'
       },
 
       formular: {
         titel: 'Gratis KRV-Check',
-        fotosTitel: 'Zwei Fotos beim Wasserzähler',
-        fotosText: 'Gehen Sie zum Wasserzähler, meist im Keller, dort wo die Wasserleitung ins Haus kommt. Licht an, nichts auf- oder zudrehen. Dann diese zwei Fotos machen:',
+        fotosTitel: 'Drei Fotos beim Wasserzähler',
+        fotosText: 'Gehen Sie zum Wasserzähler, meist im Keller, dort wo die Wasserleitung ins Haus kommt. Licht an, nichts auf- oder zudrehen. Dann diese drei Fotos machen:',
         // Geführte Fotos: Skizze zeigt mit dem Rahmen, was aufs Bild soll (szene = Schritt in assets/szene.js)
         fotoSchritte: [
           { titel: 'Die ganze Stelle', text: 'Etwa einen Meter zurückstehen. Auf dem Foto sind der Zähler und die Leitung links und rechts davon mit allen Ventilen.', szene: 1 },
-          { titel: 'Die Ventile nach dem Zähler', text: 'Näher ran an die Ventile direkt nach dem Zähler, auf der Seite, wo die Leitung ins Haus weitergeht. Kein Zoom, scharf stellen.', szene: 2 }
+          { titel: 'Die Ventile nach dem Zähler', text: 'Näher ran an die Ventile direkt nach dem Zähler, auf der Seite, wo die Leitung ins Haus weitergeht. Kein Zoom, scharf stellen.', szene: 2 },
+          { titel: 'Die Zählernummer', text: 'Deckel des Wasserzählers aufklappen und nah ran, bis die Zählernummer gut lesbar ist. Sie steht meist auf dem Zifferblatt oder auf dem Gehäuse.', szene: 3 }
         ],
         fotoKnopf: 'Foto {n} aufnehmen',
         fotoNeu: 'Neu aufnehmen',

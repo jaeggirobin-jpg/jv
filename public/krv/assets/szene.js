@@ -10,7 +10,8 @@
   var RAHMEN = [
     { x: 126, y: 88, b: 82, h: 86 },    // 1. Wasserzähler finden
     { x: 30, y: 70, b: 300, h: 116 },   // 2. ganze Stelle
-    { x: 222, y: 70, b: 92, h: 112 }    // 3. Ventile nach dem Zähler
+    { x: 222, y: 70, b: 92, h: 112 },   // 3. Ventile nach dem Zähler
+    { x: 136, y: 100, b: 62, h: 58 }    // 4. Zählernummer (Nahaufnahme Zähler)
   ];
 
   var SVG =
