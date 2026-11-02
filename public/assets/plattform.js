@@ -493,7 +493,7 @@
           '<p class="sub">' + esc([p.address || 'Keine Adresse', p.client ? 'Bauherrschaft ' + p.client : ''].filter(Boolean).join(' · ')) + '</p></div>' +
           '<div class="jvp-titel__knoepfe">' +
             '<button type="button" class="jvp-knopf" data-a="bearbeiten" aria-expanded="' + !!offen.bearbeiten + '">Projektdaten bearbeiten</button>' +
-            '<a class="jvp-knopf jvp-knopf--primaer" href="' + terminplanUrl(p) + '" target="_blank" rel="noopener">' + (gewerke(p) ? 'Terminplan öffnen ↗' : 'Terminplan erstellen ↗') + '</a>' +
+            '<a class="jvp-knopf jvp-knopf--primaer" href="' + terminplanUrl(p) + '">' + (gewerke(p) ? 'Terminplan öffnen' : 'Terminplan erstellen') + '</a>' +
           '</div>' +
         '</header>' +
         bearbeitenHtml(p) +
@@ -604,7 +604,7 @@
         var li = '<li>' + bild + '<div class="haupt"><b>' + esc(o.titel || o.raum || o.id) + '</b>' +
           '<span class="muted">' + esc([o.raum, o.kunde, o.datum].filter(Boolean).join(' · ')) + '</span></div>' +
           '<div class="actions">' +
-            '<a class="jvp-knopf jvp-knopf--klein" href="/tools/badvisualisierungen/#' + encodeURIComponent(o.id) + '" target="_blank" rel="noopener">Ansehen ↗</a>' +
+            '<a class="jvp-knopf jvp-knopf--klein" href="/tools/badvisualisierungen/#' + encodeURIComponent(o.id) + '">Ansehen</a>' +
             (darf('kunden') ? '<button type="button" data-a="link-neu" data-objekt="' + esc(o.id) + '">Kundenlink erstellen</button>' : '') +
             '<button type="button" class="danger" data-a="vis-loesen" data-id="' + esc(o.id) + '">Vom Projekt lösen</button>' +
           '</div>';
@@ -654,7 +654,7 @@
       html += '<ul class="jvp-liste">' + eigene.map(function (w) {
         return '<li><div class="haupt"><b>' + esc(w.name || 'Ohne Namen') + '</b><span class="muted">' +
           esc([w.customer, w.scanDate ? 'Scan ' + w.scanDate : '', w.builtin ? 'Scan aus der Datenübernahme' : ''].filter(Boolean).join(' · ')) + '</span></div>' +
-          '<div class="actions"><a class="jvp-knopf jvp-knopf--klein" href="/tools/gaeste-wc/?projekt=' + encodeURIComponent(w.id) + '" target="_blank" rel="noopener">Öffnen ↗</a>' +
+          '<div class="actions"><a class="jvp-knopf jvp-knopf--klein" href="/tools/gaeste-wc/?projekt=' + encodeURIComponent(w.id) + '">Öffnen</a>' +
           '<button type="button" class="danger" data-a="wc-loesen" data-id="' + esc(w.id) + '">Vom Projekt lösen</button></div></li>';
       }).join('') + '</ul>';
     } else {
@@ -679,8 +679,8 @@
     return '<section class="card" aria-labelledby="pkTpTitel"><h2 id="pkTpTitel">Terminplan</h2>' +
       (n ? '<dl class="jvp-fakten">' + f.map(function (x) { return '<div><dt>' + esc(x[0]) + '</dt><dd>' + esc(x[1]) + '</dd></div>'; }).join('') + '</dl>'
         : '<p class="jvp-leer">Noch keine Gewerke. Im Terminplaner eine Vorlage einfügen (z.B. Badsanierung).</p>') +
-      '<div class="jvp-knopfreihe" style="margin-top:14px"><a class="jvp-knopf" href="' + terminplanUrl(p) + '" target="_blank" rel="noopener">' +
-      (n ? 'Im Terminplaner öffnen ↗' : 'Terminplan erstellen ↗') + '</a></div></section>';
+      '<div class="jvp-knopfreihe" style="margin-top:14px"><a class="jvp-knopf" href="' + terminplanUrl(p) + '">' +
+      (n ? 'Im Terminplaner öffnen' : 'Terminplan erstellen') + '</a></div></section>';
   }
 
   function panelMeldung(name, text, art) {
@@ -1327,6 +1327,33 @@
     var m = $('benutzerMenue');
     if (m && m.open && !m.contains(ev.target)) m.open = false;
   });
+
+  // Zurück aus Tools und Seiten (Robin, 2.11.2026: alles öffnet im selben Tab). Führt ein Link aus der
+  // Plattform hinaus, merkt sich der Tab die Ansicht; assets/zurueck.js zeigt dort die Lasche «Zurück».
+  function zurueckText() {
+    if (aktuell === 'projekt') {
+      var p = D.projekte[aktuellesProjekt];
+      return 'Zurück zum Projekt «' + ((p && p.name) || 'Ohne Namen') + '»';
+    }
+    var texte = {
+      uebersicht: 'Zurück zur Übersicht', projekte: 'Zurück zu den Projekten', kunden: 'Zurück zu den Kunden',
+      katalog: 'Zurück zum Katalog', feedback: 'Zurück zum Feedback-Board'
+    };
+    return texte[aktuell] || 'Zurück zu «' + (TITEL[aktuell] || 'Übersicht') + '»';
+  }
+  document.addEventListener('click', function (ev) {
+    var a = ev.target && ev.target.closest ? ev.target.closest('a[href]') : null;
+    if (!a || a.hasAttribute('download') || (a.target && a.target !== '_self')) return;
+    var ziel;
+    try { ziel = new URL(a.getAttribute('href'), location.href); } catch (e) { return; }
+    if (ziel.origin !== location.origin || ziel.pathname === location.pathname ||
+        ziel.pathname === '/' || ziel.pathname === '/index.html') return;   // Ansichten der Plattform selbst
+    try {
+      sessionStorage.setItem('jv-zurueck', JSON.stringify({
+        url: location.pathname + location.search + location.hash, text: zurueckText(), zeit: Date.now()
+      }));
+    } catch (e) { /* ohne sessionStorage führt die Lasche zur Übersicht */ }
+  }, true);
   document.addEventListener('keydown', function (ev) {
     var m = $('benutzerMenue');
     if (ev.key === 'Escape' && m && m.open) { m.open = false; m.querySelector('summary').focus(); }

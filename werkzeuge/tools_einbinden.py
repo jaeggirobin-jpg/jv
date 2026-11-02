@@ -11,8 +11,9 @@ Die Tools werden NICHT umgebaut, nur minimal angepasst:
         (kommen über «Daten übernehmen» in der Plattform in die Datenbank)
       - Badvisualisierungen: Objekte und Bilder entfernt (kommen aus der Datenbank)
       - Gäste-WC: eingebetteter 3D-Scan entfernt (liegt im privaten Bucket)
-  * Terminplaner: feste Google-Karte entfernt, Karte der Projektadresse von geo.admin.ch,
-    Adressvorschläge (plattform.js)
+  * Terminplaner: feste Google-Karte entfernt; die Karte der Projektadresse (geo.admin.ch) erscheint
+    nur noch im PDF, schwarz-weiss mit farbigem Kreis um die Adresse; Adressvorschläge und
+    Projektsuche statt Auswahlliste (plattform.js)
 
 Neue Version eines Tools aus Claude? Datei(en) als ZIP oder einzeln angeben und das Skript erneut
 ausführen. Bricht ab, wenn eine Stelle nicht mehr passt (dann Muster unten anpassen) oder wenn im
@@ -84,6 +85,14 @@ def feedback_einbinden(text, ordner, name):
     return text[:i] + tag + text[i:]
 
 
+# Zurück zur Plattform (Robin, 2.11.2026: Tools öffnen im selben Tab): Lasche am linken Rand
+def zurueck_einbinden(text, name):
+    i = text.rfind('</body>')
+    if i < 0:
+        raise Fehler(name + ': </body> fehlt')
+    return text[:i] + '<script src="/assets/zurueck.js" defer></script>\n' + text[i:]
+
+
 # ── 1. Bau-Terminplaner ──────────────────────────────────────────────────
 def terminplaner(t):
     n = 'Terminplaner'
@@ -108,6 +117,12 @@ def terminplaner(t):
     t = ersetzen(t, "ch:'Karte \\u00a9 swisstopo'};", "ch:'Karte \\u00a9 swisstopo',av:'Grundkarte \\u00a9 Amtliche Vermessung der Kantone, geo.admin.ch'};", n)
     t = ersetzen(t, 'Für diese Adresse ist noch kein Kartenausschnitt hinterlegt – im Chat mit Claude anfordern',
                  'Für diese Adresse wurde noch keine Karte gefunden – Adresse mit Strasse, Hausnummer und PLZ eintragen (Vorschläge von geo.admin.ch)', n)
+    # PDF Terminplan: Ende der Tabelle je Seite und Lage der Legende merken, plattform.js setzt den
+    # Punkt der Karte in die Mitte dazwischen (Robin, 2.11.2026)
+    t = ersetzen(t, 'const frame=y1=>{doc.setDrawColor(...C.line);',
+                 'const frame=y1=>{(doc.jvUnten=doc.jvUnten||{})[doc.internal.getCurrentPageInfo().pageNumber]=y1;doc.setDrawColor(...C.line);', n)
+    t = ersetzen(t, 'const fy=PH-M-6;doc.setFillColor(...C.soft);',
+                 'const fy=PH-M-6;doc.jvLegende={x:M,y:fy-1.5,w:W};doc.setFillColor(...C.soft);', n)
 
     # Keine Personendaten im öffentlichen Repo: kommen aus der Datenbank
     t = regex_ersetzen(t, r'const BASE_FIRMS=\[.*?\];\n', 'const BASE_FIRMS=[];\n', n)
@@ -125,6 +140,11 @@ def terminplaner(t):
                  "toast('In dieser Ansicht gibt es keinen Online-Speicher – bitte das Tool über die JV-Plattform öffnen')", n)
     t = ersetzen(t, "toast('Online-Speicher ist in dieser Ansicht nicht verfügbar – bitte in der Claude-App oder auf claude.ai öffnen')",
                  "toast('Online-Speicher ist nicht erreichbar – bitte die Seite neu laden')", n)
+
+    # Projekte: Suche statt Auswahlliste im Kopf (Robin, 2.11.2026); die Suche baut plattform.js
+    t = regex_ersetzen(t, r'<select class="inp" id="projsel" data-chg="pickProject"[^\n]*?</select>\n ', '', n)
+    t = ersetzen(t, '<button class="btn" data-act="projects" title="Projekte verwalten">',
+                 '<button class="btn" data-act="projects" title="Projekt suchen und öffnen" aria-haspopup="dialog">', n)
 
     # Ergänzungen der Plattform nach dem Skript des Tools (vor dem letzten </body>)
     i = t.rfind('</body>')
@@ -171,11 +191,11 @@ def reel(t):
 # (Datei, Ordner, Anpassung, erwartete Änderung der Anzahl <script>-Tags)
 # Schutz: Fällt beim Anpassen ein Skript des Tools weg (z. B. die Importmap), bricht das Skript ab.
 TOOLS = [
-    ('1_Bau-Terminplaner_JV.html', 'terminplaner', terminplaner, +4),           # Bridge, geo-admin, plattform.js, Feedback
-    ('2_JV_Badvisualisierungen.html', 'badvisualisierungen', badvisualisierungen, +3),   # Bridge, daten.js, Feedback
-    ('3_Gaeste-WC_Umbauvorschau.html', 'gaeste-wc', gaeste_wc, +1),             # Bridge, Feedback, 3D-Scan entfernt
-    ('4_JV_Story_Badumbau.html', 'story', story, +1),                           # Feedback
-    ('5_JV_Reel-Generator.html', 'reel', reel, +2),                             # Bridge, Feedback
+    ('1_Bau-Terminplaner_JV.html', 'terminplaner', terminplaner, +5),           # Bridge, geo-admin, plattform.js, Feedback, Zurück
+    ('2_JV_Badvisualisierungen.html', 'badvisualisierungen', badvisualisierungen, +4),   # Bridge, daten.js, Feedback, Zurück
+    ('3_Gaeste-WC_Umbauvorschau.html', 'gaeste-wc', gaeste_wc, +2),             # Bridge, Feedback, Zurück, 3D-Scan entfernt
+    ('4_JV_Story_Badumbau.html', 'story', story, +2),                           # Feedback, Zurück
+    ('5_JV_Reel-Generator.html', 'reel', reel, +3),                             # Bridge, Feedback, Zurück
 ]
 
 
@@ -229,6 +249,7 @@ def main():
             continue
         ergebnis = fn(dateien[datei])
         ergebnis = feedback_einbinden(ergebnis, ordner, datei)
+        ergebnis = zurueck_einbinden(ergebnis, datei)
         vorher, nachher = dateien[datei].count('<script'), ergebnis.count('<script')
         if nachher - vorher != differenz:
             raise Fehler(f'{datei}: {vorher} Skripte vorher, {nachher} nachher (erwartet {differenz:+d}); '

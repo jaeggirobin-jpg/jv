@@ -72,7 +72,9 @@
       impressum: 'impressum.html',
       datenschutz: 'datenschutz.html',
       // Kundenlink zum Bericht (absolut, weil das Admin-Panel auf docs.jaeggivollmer.ch läuft)
-      bericht: 'https://dachcheck.jaeggivollmer.ch/bericht.html'
+      bericht: 'https://dachcheck.jaeggivollmer.ch/bericht.html',
+      // Plattform (Vorschau eines Berichts: Leiste «Zurück zur Anfrage»)
+      plattform: 'https://docs.jaeggivollmer.ch/'
     },
 
     // ── Texte ──────────────────────────────────────────────────────────────

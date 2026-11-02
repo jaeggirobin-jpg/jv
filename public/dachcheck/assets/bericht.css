@@ -33,6 +33,20 @@
   .bericht__fotos { grid-template-columns: 1fr 1fr; }
 }
 
+/* Vorschau aus dem Admin (Marke #vorschau-… in der Adresse): Hinweis oben, Lasche «Zurück» links wie in den Tools */
+.vorschau-hinweis { margin: 0; padding: 8px 20px; background: #4B575D; color: #fff; font-size: .92rem; text-align: center; }
+.vorschau-zurueck {
+  position: fixed; left: 0; top: 50%; transform: translateY(-50%); z-index: 60;
+  display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 11px 7px 14px;
+  border-radius: 0 8px 8px 0; background: #4B575D; color: #fff; text-decoration: none;
+  font-weight: 700; font-size: 13px; line-height: 1; letter-spacing: .04em;
+  box-shadow: 2px 2px 12px rgba(40, 50, 60, .28); opacity: .92; -webkit-tap-highlight-color: transparent;
+}
+.vorschau-zurueck:hover, .vorschau-zurueck:focus-visible { opacity: 1; background: #3a4449; color: #fff; outline: none; }
+.vorschau-zurueck:focus-visible { box-shadow: 0 0 0 3px rgba(189, 132, 58, .55), 2px 2px 12px rgba(40, 50, 60, .28); }
+.vorschau-zurueck span { writing-mode: vertical-rl; }
+.vorschau-zurueck svg { width: 15px; height: 15px; flex: none; }
+
 /* Kein Drucken / Speichern als PDF: im Druck erscheint nur ein Hinweis */
 .bericht__kein-druck { display: none; }
 .bericht-seite img { -webkit-user-drag: none; -webkit-touch-callout: none; }

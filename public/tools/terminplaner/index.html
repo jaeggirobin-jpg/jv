@@ -884,8 +884,7 @@ function render(){
 }
 function renderTop(){
  const ps=Object.values(S.projects).sort((a,b)=>(a.name||'').localeCompare(b.name||'','de'));
- $('#projpick').innerHTML=`<select class="inp" id="projsel" data-chg="pickProject" aria-label="Projekt wählen">${ps.length?'':'<option>– kein Projekt –</option>'}${ps.map(p=>`<option value="${p.id}" ${p.id===S.cur?'selected':''}>${esc(p.name||'Ohne Namen')}</option>`).join('')}</select>
- <button class="btn" data-act="projects" title="Projekte verwalten">${IC.folder}<span class="hide-sm">Projekte</span></button>
+ $('#projpick').innerHTML=`<button class="btn" data-act="projects" title="Projekt suchen und öffnen" aria-haspopup="dialog">${IC.folder}<span class="hide-sm">Projekte</span></button>
  <button class="btn pri" data-act="newProject">${IC.plus}<span class="hide-sm">Neues Projekt</span></button>`;
 }
 function emptyProject(){return `<div class="card empty"><h2>Noch kein Projekt geöffnet</h2><p>Lege eine Baustelle an. Du kannst mit einer Vorlage starten (z.B. Badsanierung) und danach Gewerke einfügen, verschieben oder löschen.</p><button class="btn pri" data-act="newProject">${IC.plus}Neues Projekt anlegen</button></div>`;}
@@ -1658,7 +1657,7 @@ function planPdf(p,opt={}){
   if(map.has(mi)||mi<=cols[cols.length-1]){doc.setFont('helvetica','bold');doc.setFontSize(5.8);doc.setTextColor(...C.green);doc.text('EINZUG',XL(mi)+.8,y+3.4);}
   return y+H;
  };
- const frame=y1=>{doc.setDrawColor(...C.line);doc.setLineWidth(.3);doc.roundedRect(M,tableTop,W,y1-tableTop,3,3,'S');};
+ const frame=y1=>{(doc.jvUnten=doc.jvUnten||{})[doc.internal.getCurrentPageInfo().pageNumber]=y1;doc.setDrawColor(...C.line);doc.setLineWidth(.3);doc.roundedRect(M,tableTop,W,y1-tableTop,3,3,'S');};
  let y=header();
  const rows=[];p.phases.forEach(ph=>{rows.push({ph});ph.tasks.forEach(t=>rows.push({t}));});
  let zi=0;
@@ -1696,7 +1695,7 @@ function planPdf(p,opt={}){
  frame(y);
  const n=doc.getNumberOfPages();
  for(let i=1;i<=n;i++){doc.setPage(i);
-  const fy=PH-M-6;doc.setFillColor(...C.soft);doc.roundedRect(M,fy-1.5,W,8,2.5,2.5,'F');
+  const fy=PH-M-6;doc.jvLegende={x:M,y:fy-1.5,w:W};doc.setFillColor(...C.soft);doc.roundedRect(M,fy-1.5,W,8,2.5,2.5,'F');
   doc.setFont('helvetica','normal');doc.setFontSize(7.2);doc.setTextColor(...RGB.muted);
   let lx=M+4;const ly=fy+3.6;[...legendList(p).map(([l,c])=>[l,hexRgb(c)]),['Feiertag',RGB.hol],['Wochenende',C.we]].forEach(([l,c])=>{doc.setFillColor(...c);doc.roundedRect(lx,ly-2.4,5,2.8,.8,.8,'F');doc.text(shortName(l),lx+6.5,ly);lx+=doc.getTextWidth(shortName(l))+11;});
   doc.setFillColor(...RGB.late);doc.circle(lx+1,ly-1,.7,'F');doc.text('Verzug',lx+2.8,ly);lx+=doc.getTextWidth('Verzug')+8;
@@ -2033,4 +2032,5 @@ Store.init().then(()=>{S.scrollToday=true;});
 
 <script src="/tools/terminplaner/plattform.js"></script>
 <script src="/assets/feedback.js" data-seite="tool-terminplaner" data-name="Bau-Terminplaner" data-knopf="schwebend" defer></script>
+<script src="/assets/zurueck.js" defer></script>
 </body></html>

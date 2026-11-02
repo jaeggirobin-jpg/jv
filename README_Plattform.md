@@ -14,6 +14,7 @@ Mitarbeiterinnen und Mitarbeiter.
 | Logins verwalten | `netlify/functions/zugaenge.js`, `public/assets/zugaenge.js`; Tabellen `mitarbeiter`, `anmelde_fehler` (`migration_017`) |
 | Michis Tools | `public/tools/<tool>/index.html`; Speicher `tool-db.js`, `tool-asset.js`, `tool-blob.js`; Tabelle `tool_docs`, Bucket `tools` (`migration_015`) |
 | Karte und Adressvorschläge (swisstopo) | `public/tools/assets/geo-admin.js`, `public/tools/terminplaner/plattform.js` |
+| Lasche «Zurück» (alles öffnet im selben Tab) | `public/assets/zurueck.js`, Merker in `public/assets/plattform.js` |
 | Kundenlink für Badvisualisierungen | `visualisierung-links.js`, `get-visualisierung.js`, `public/visualisierung.html`; Tabelle `visualisierung_links` |
 | Feedback | `public/assets/feedback.js` (Knopf, Bildausschnitt), `feedback-board.js` (Board, Export), Function `feedback.js`; Tabelle `plattform_feedback`, Bucket `feedback` (`migration_016`) |
 | Neue Tool-Version von Michi übernehmen | `werkzeuge/tools_einbinden.py` |
@@ -42,11 +43,31 @@ Das Repo ist öffentlich. Kundendaten, Kundenfotos, 3D-Scans und Personendaten k
    erscheint **genau einmal**: persönlich oder per SMS übergeben, nicht zusammen mit der E-Mail-Adresse per Mail.
    Beim ersten Login setzt die Person ein eigenes Passwort (mind. 10 Zeichen).
 6. **Live testen** (in der Cloud-Sitzung waren geo.admin.ch und Supabase nur mit Attrappen prüfbar):
-   - Terminplaner: Projekt öffnen, Karte der Adresse erscheint, Adressvorschläge beim Tippen, PDF mit Karte.
+   - Terminplaner: Knopf «Projekte» → Suchfeld (Name, Adresse, Bauherrschaft), Adressvorschläge beim Tippen,
+     PDF «Terminplan» mit schwarz-weisser Karte und farbigem Kreis um die Adresse.
+   - Aus der Plattform ein Tool öffnen: öffnet im selben Tab, die Lasche «Zurück» am linken Rand führt zurück.
    - Badvisualisierung: im Projekt Kundenlink erstellen, in einem privaten Fenster öffnen, Link deaktivieren → gesperrt.
    - Gäste-WC: 3D-Ansicht lädt den Scan.
    - Feedback: Knopf «Feedback» → Bereich aufziehen → markieren → senden → erscheint im Feedback-Board.
    - Mit einem Mitarbeiter-Login anmelden: nur die freigegebenen Bereiche sind sichtbar.
+
+## Navigation
+
+- Tools, Kundenseiten und Berichtsvorschauen öffnen im selben Tab. Am linken Rand erscheint die Lasche «Zurück»: sie
+  führt dorthin zurück, wo man in der Plattform war (Übersicht, Projekt, Kunden, Anfrage). Direkt aufgerufen führt sie
+  zur Übersicht. Kunden sehen die Lasche nicht (nur wenn die Seite aus der Plattform geöffnet wurde).
+- Externe Ziele bleiben in einem neuen Tab: WhatsApp, Karte, E-Mail, Telefon, Webseiten von Firmen und der IWB.
+
+## Terminplaner: Karte und Projektsuche
+
+- Die Karte der Projektadresse erscheint nur im PDF (Terminplan, Auswertung, Checklisten, Kontaktliste), nicht mehr am
+  Bildschirm. Sie ist schwarz-weiss, nur der Kreis um die Adresse ist farbig. Im Terminplan liegt der Punkt mittig
+  zwischen dem Ende der Tabelle und der Legende; ist eine Seite voll, bekommt nur die Seite mit Platz die Karte.
+- Das erste PDF nach einem Projektwechsel wartet höchstens 6 Sekunden auf die Karte (geo.admin.ch). Kommt sie nicht,
+  entsteht das PDF ohne Karte.
+- Knopf «Projekte»: der Cursor steht im Suchfeld. Gesucht wird in Name, Adresse, Bauherrschaft, Projektleiter und
+  Status, kleine Tippfehler werden erkannt. ↑ ↓ wählen, Enter öffnet, Escape leert bzw. schliesst. Die Auswahlliste
+  im Kopf gibt es nicht mehr.
 
 ## Logins und Rechte
 

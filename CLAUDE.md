@@ -38,6 +38,7 @@ docs.jaeggivollmer.ch/
 │   │   └── assets/jv-bridge.js → Speicher der Tools (statt claude.ai) + Anmeldefenster der Plattform
 │   ├── assets/plattform.js|css → Plattform (Router, Projekte, Rechte im Menü, Daten übernehmen)
 │   ├── assets/feedback.js  → Feedback-Knopf mit Bildausschnitt (Plattform und Tools)
+│   ├── assets/zurueck.js   → Lasche «Zurück» in Tools und Seiten (alles öffnet im selben Tab)
 │   ├── assets/feedback-board.js, zugaenge.js → Verwaltung: Feedback-Board, Logins
 │   ├── assets/vendor/      → html2canvas-pro (MIT, für die Feedback-Bilder)
 │   └── assets/, logo.png
@@ -159,6 +160,8 @@ Einrichtung, Rechte, Feedback und Datenschutz für Robin: `README_Plattform.md`.
 - Navigation und Kacheln zeigen nur die Bereiche des Logins (`data-bereich`, `data-nur-admin`); der Server prüft trotzdem jede Anfrage
 - Feedback: Knopf «Feedback» (oben rechts, in den Tools am rechten Rand, in offenen Dialogen als kleiner Knopf) → Bereich aufziehen, markieren, beschreiben. Wartet offline im Browser und wird nachgesendet. Board unter Verwaltung «Feedback»: Status, «Umsetzen», Markdown-Export für Claude Code mit eingebetteten Bildern
 - Michis Tools in `public/tools/` nicht von Hand umbauen: neue Versionen mit `werkzeuge/tools_einbinden.py` übernehmen (sonst gehen Änderungen beim nächsten Einbinden verloren)
+- Alles öffnet im selben Tab (Robin, 2.11.2026): Links zu Tools und eigenen Seiten ohne `target="_blank"`. Die Plattform merkt sich die Ansicht in `sessionStorage` (`jv-zurueck`), `assets/zurueck.js` zeigt dort die Lasche «Zurück» (nur Pfade der Plattform, Kundenseiten mit `data-nur-plattform` nur aus der Plattform). Nur externe Ziele (WhatsApp, Karte, E-Mail, fremde Webseiten) öffnen einen neuen Tab.
+- Terminplaner (`public/tools/terminplaner/plattform.js`): Karte der Projektadresse nur im PDF (schwarz-weiss, Kreis um die Adresse farbig, Punkt mittig zwischen Tabellenende und Legende, ohne Platz keine Karte); Knopf «Projekte» = Suche (Name, Adresse, Bauherrschaft, Tippfehler) statt Auswahlliste
 - PDF-Upload via `<input type="file">` → Base64 → an `create-link.js`
 - Tabelle aller Links mit:
   - Kundenname, Notiz, Erstelldatum

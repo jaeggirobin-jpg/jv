@@ -59,15 +59,15 @@
         <div class="grid">
           <div class="kachel--gruppe">Planung</div>
           <a class="kachel" href="#/projekte" data-bereich="projekte"><span class="tag">Planung</span><span class="n">Projekte</span><span class="d">Alle Baustellen mit Adresse, Bauherrschaft und Projektleiter. Von hier aus zu Terminplan, Kundenzugang und Visualisierungen.</span><span class="go">Öffnen →</span></a>
-          <a class="kachel" href="/tools/terminplaner/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Planung</span><span class="n">Bau-Terminplaner JV</span><span class="d">Terminplanung der Baustellen, mit Karte der Projektadresse.</span><span class="go">Öffnen ↗</span></a>
+          <a class="kachel" href="/tools/terminplaner/" data-bereich="projekte"><span class="tag">Planung</span><span class="n">Bau-Terminplaner JV</span><span class="d">Terminplanung der Baustellen, mit Karte der Projektadresse.</span><span class="go">Öffnen →</span></a>
           <div class="kachel--gruppe">Badumbau</div>
-          <a class="kachel" href="/tools/badvisualisierungen/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Badumbau</span><span class="n">JV Badvisualisierungen</span><span class="d">Visualisierungen für Badumbauten.</span><span class="go">Öffnen ↗</span></a>
-          <a class="kachel" href="/tools/gaeste-wc/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Badumbau</span><span class="n">Gäste-WC Umbauvorschau</span><span class="d">Vorher/Nachher-Vorschau Gäste-WC.</span><span class="go">Öffnen ↗</span></a>
+          <a class="kachel" href="/tools/badvisualisierungen/" data-bereich="projekte"><span class="tag">Badumbau</span><span class="n">JV Badvisualisierungen</span><span class="d">Visualisierungen für Badumbauten.</span><span class="go">Öffnen →</span></a>
+          <a class="kachel" href="/tools/gaeste-wc/" data-bereich="projekte"><span class="tag">Badumbau</span><span class="n">Gäste-WC Umbauvorschau</span><span class="d">Vorher/Nachher-Vorschau Gäste-WC.</span><span class="go">Öffnen →</span></a>
           <a class="kachel" href="#/kunden" data-bereich="kunden"><span class="tag">Badumbau</span><span class="n">Kunden</span><span class="d">Kundenzugänge für Inspiration, Swipe und Dokumente.</span><span class="go">Öffnen →</span></a>
           <a class="kachel" href="#/katalog" data-bereich="katalog"><span class="tag">Badumbau</span><span class="n">Katalog</span><span class="d">Inspirations-Katalog mit Bildern, Videos und Ansprechpersonen.</span><span class="go">Öffnen →</span></a>
           <div class="kachel--gruppe">Marketing</div>
-          <a class="kachel" href="/tools/story/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Marketing</span><span class="n">JV Story Badumbau</span><span class="d">Story zum Badumbau.</span><span class="go">Öffnen ↗</span></a>
-          <a class="kachel" href="/tools/reel/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Marketing</span><span class="n">JV Reel-Generator</span><span class="d">Reels für Social Media erstellen.</span><span class="go">Öffnen ↗</span></a>
+          <a class="kachel" href="/tools/story/" data-bereich="projekte"><span class="tag">Marketing</span><span class="n">JV Story Badumbau</span><span class="d">Story zum Badumbau.</span><span class="go">Öffnen →</span></a>
+          <a class="kachel" href="/tools/reel/" data-bereich="projekte"><span class="tag">Marketing</span><span class="n">JV Reel-Generator</span><span class="d">Reels für Social Media erstellen.</span><span class="go">Öffnen →</span></a>
           <div class="kachel--gruppe">Anfragen</div>
           <a class="kachel" href="#/drohnencheck" data-bereich="anfragen"><span class="tag">Anfragen</span><span class="n">Drohnen-Check</span><span class="d">Anfragen von dachcheck.jaeggivollmer.ch, Berichte und Titelvideo.</span><span class="go">Öffnen →</span></a>
           <a class="kachel" href="#/krv" data-bereich="anfragen"><span class="tag">Anfragen</span><span class="n">KRV-Check</span><span class="d">Anfragen zum Rückflussverhinderer von krv.jaeggivollmer.ch.</span><span class="go">Öffnen →</span></a>
@@ -504,6 +504,16 @@
     // ============================================================
     // BEREICHE (geöffnet vom Router in /assets/plattform.js)
     // ============================================================
+    // Offene Anfrage in der Adresse (#/drohnencheck/DC-2026-0001): «Zurück» aus der Vorschau des
+    // Berichts führt wieder zu dieser Anfrage
+    function refAusHash(bereich) {
+      var m = new RegExp('^#/' + bereich + '/(.+)$').exec(location.hash);
+      if (!m) return '';
+      try { return decodeURIComponent(m[1]); } catch (e) { return ''; }
+    }
+    function refInHash(bereich, ref) {
+      try { history.replaceState(null, '', '#/' + bereich + (ref ? '/' + encodeURIComponent(ref) : '')); } catch (e) { /* egal */ }
+    }
     function bereichOeffnen(name) {
       if (name === 'kunden') { loadKunden(); loadPunkteCheckboxes(); loadAnsprechpersonenDropdown(); }
       if (name === 'katalog') loadKatalog();
@@ -512,6 +522,9 @@
         window.DCAdmin.mount($('dc-admin-root'), {
           getPwd: function() { return ''; },
           api: API,
+          vorschau: 'plattform',
+          startReferenz: function() { return refAusHash('drohnencheck'); },
+          onDetail: function(ref) { refInHash('drohnencheck', ref); },
           onUnauthorized: function() { window.JVBridge.anmelden(); }
         });
       }
@@ -736,7 +749,7 @@
         }) });
         var inspoUrl = location.origin + '/inspiration.html?t=' + data.kunde.access_token;
         showMsg('kundeCreateMsg',
-          'Kunde angelegt! Link: <a href="'+inspoUrl+'" target="_blank">'+inspoUrl+'</a>','success');
+          'Kunde angelegt! Link: <a href="'+inspoUrl+'">'+inspoUrl+'</a>','success');
         $('k-vorname').value=''; $('k-nachname').value=''; $('k-email').value='';
         $('k-telefon').value=''; $('k-adresse').value=''; $('k-datum').value='';
         $('k-notizen').value=''; $('k-projekt').value='';
