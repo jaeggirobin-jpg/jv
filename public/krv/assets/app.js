@@ -117,11 +117,11 @@
     });
   }
 
-  // Startzeiten der Schritte im mitgelieferten Video assets/anleitung.mp4/.webm (7/5/7 s, danach 4 s Schlussbild).
+  // Startzeiten der Schritte im mitgelieferten Video assets/anleitung.mp4/.webm (7/5/7/5 s, danach 4 s Schlussbild).
   // In Schritt 1 und 3 zeigt das Video Beispielfotos von Zählern bzw. Ventilen.
   // Quelle des Videos: Projektordner krv-check/video-quelle/web.html
-  var VIDEO_SCHRITTE = [0, 7, 12];
-  var VIDEO_ENDE = 19;
+  var VIDEO_SCHRITTE = [0, 7, 12, 19];
+  var VIDEO_ENDE = 24;
   var anleitungVideo = null;
 
   function anleitungsVideo(ruhig) {
