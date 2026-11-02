@@ -81,8 +81,10 @@
       betreff = 'Ihr KRV-Check ' + a.referenz + ': Rückflussverhinderer fehlt';
       body = anrede +
         'Auf Ihren Fotos sehen wir nach dem Wasserzähler keinen Rückflussverhinderer.\n\n' + zusatz +
-        'Gemäss IWB muss die Eigentümerschaft einen Rückflussverhinderer auf eigene Kosten einbauen lassen. Gerne erstellen wir Ihnen dafür eine Offerte. Den Einbau melden wir anschliessend direkt an IWB.\n\n' +
-        '[Die Offerte finden Sie im Anhang. / Wir senden Ihnen die Offerte in den nächsten Tagen.]\n\n' +
+        (a.offerte_gewuenscht === false
+          ? 'Gemäss IWB muss die Eigentümerschaft einen Rückflussverhinderer auf eigene Kosten einbauen lassen. Wenn Sie dafür eine Offerte möchten, antworten Sie einfach auf diese E-Mail. Den Einbau melden wir anschliessend direkt an IWB.\n\n'
+          : 'Gemäss IWB muss die Eigentümerschaft einen Rückflussverhinderer auf eigene Kosten einbauen lassen. Wie gewünscht erstellen wir Ihnen dafür eine Offerte. Den Einbau melden wir anschliessend direkt an IWB.\n\n' +
+            '[Die Offerte finden Sie im Anhang. / Wir senden Ihnen die Offerte in den nächsten Tagen.]\n\n') +
         mieter + vorbehalt + gruss;
     } else {
       betreff = 'Ihr KRV-Check ' + a.referenz + ': noch ein Foto, bitte';
@@ -277,7 +279,8 @@
         '<div class="dc-zeile1"><h3>' + esc(a.vorname + ' ' + a.nachname) + '</h3><span class="dc-badge s-' + esc(a.status) + '">' + esc(label(STATUS, a.status)) + '</span></div>' +
         '<div class="dc-meta">' + esc(a.referenz) + ' · eingegangen ' + datum(a.created_at, true) +
           (a.rolle === 'mieter' ? ' · <span class="dc-badge mieter">Mieter/in</span>' : '') +
-          (a.iwb_brief ? ' · <span class="dc-badge krv-iwb">IWB-Brief erhalten</span>' : '') + '</div>' +
+          (a.iwb_brief ? ' · <span class="dc-badge krv-iwb">IWB-Brief erhalten</span>' : '') +
+          (a.offerte_gewuenscht === false ? ' · <span class="dc-badge krv-keine-offerte">Keine Offerte gewünscht</span>' : '') + '</div>' +
         '<p class="dc-loeschung">' + esc(loeschText) + '</p>' +
         '<div class="dc-knoepfe">' +
           '<a class="dc-btn" href="tel:' + esc(String(a.telefon).replace(/[^\d+]/g, '')) + '">Anrufen</a>' +
@@ -322,6 +325,7 @@
         '<h4>Kontakt und Liegenschaft</h4><dl>' +
           zeile('Adresse', adresse) + zeile('E-Mail', a.email) + zeile('Telefon', a.telefon) +
           zeile('Rolle', ROLLEN[a.rolle] || a.rolle) + zeile('IWB-Brief', a.iwb_brief ? 'ja, erhalten' : 'nein / nicht angegeben') +
+          zeile('Offerte, falls KRV fehlt', a.offerte_gewuenscht === false ? 'nein, nur prüfen' : 'ja, gewünscht') +
           zeileWenn('Bemerkung', a.bemerkung) +
           zeileWenn('Beurteilt am', a.beurteilt_at ? datum(a.beurteilt_at, true) : '') +
         '</dl>' +
@@ -575,7 +579,7 @@
 
     function csv() {
       var spalten = ['referenz', 'status', 'created_at', 'vorname', 'nachname', 'email', 'telefon', 'strasse', 'hausnummer', 'plz', 'ort',
-        'rolle', 'iwb_brief', 'keine_fotos', 'beurteilung', 'beurteilt_at', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'notiz_intern'];
+        'rolle', 'iwb_brief', 'offerte_gewuenscht', 'keine_fotos', 'beurteilung', 'beurteilt_at', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'notiz_intern'];
       var zelle = function (v) {
         v = v == null ? '' : String(v);
         if (/^[=+\-@]/.test(v)) v = "'" + v;   // Formel-Injection in Excel verhindern

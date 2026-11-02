@@ -144,6 +144,11 @@
           { wert: 'verwaltung', label: 'Verwaltung' },
           { wert: 'mieter', label: 'Mieter/in' }
         ],
+        offerte: {
+          frage: 'Falls noch kein Rückflussverhinderer eingebaut ist: Möchten Sie eine Offerte für den Einbau?',
+          ja: 'Ja, gerne',
+          nein: 'Nein, nur prüfen'
+        },
         iwbBrief: 'Ich habe von IWB einen Brief zum Rückflussverhinderer erhalten.',
         einwilligung: 'Ich bin einverstanden, dass Jäggi Vollmer meine Angaben und Fotos für die Beurteilung und eine allfällige Offerte verwendet. Ohne Auftrag werden sie nach 90 Tagen gelöscht.',
         weiter: 'Weiter',

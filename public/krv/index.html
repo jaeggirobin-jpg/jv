@@ -178,6 +178,13 @@
             <div class="wahl-gruppe krv-rollen" id="rollen"></div>
             <div class="fehlertext">Bitte wählen.</div>
           </fieldset>
+          <fieldset class="feld" id="f-offerte">
+            <legend data-text="formular.offerte.frage"></legend>
+            <div class="wahl-gruppe">
+              <label class="wahl"><input type="radio" name="offerte" value="ja" checked><span data-text="formular.offerte.ja"></span></label>
+              <label class="wahl"><input type="radio" name="offerte" value="nein"><span data-text="formular.offerte.nein"></span></label>
+            </div>
+          </fieldset>
           <label class="check"><input type="checkbox" name="iwb_brief" value="ja"><span data-text="formular.iwbBrief"></span></label>
           <div class="feld"><label for="bemerkung">Bemerkung <span class="optional">(freiwillig)</span></label><textarea id="bemerkung" name="bemerkung" autocomplete="off" maxlength="1000" placeholder="z. B. Mehrfamilienhaus, Zähler im Schacht vor dem Haus"></textarea></div>
           <label class="check" id="c-einwilligung"><input type="checkbox" name="einwilligung" value="ja"><span><span data-text="formular.einwilligung"></span><span class="pflicht">Pflichtfeld</span></span></label>

@@ -29,6 +29,7 @@ function pruefen(b) {
     email: text(b.email, 200).toLowerCase(),
     rolle: text(b.rolle, 20),
     iwb_brief: b.iwb_brief === true,
+    offerte_gewuenscht: b.offerte_gewuenscht !== false,   // Standard: Ja
     bemerkung: text(b.bemerkung, 1000) || null,
     keine_fotos: b.keine_fotos === true,
     einwilligung: b.einwilligung === true
