@@ -1,7 +1,7 @@
 // upload-punkt-medium-file.js — Bild oder Video für ein Punkt-Medium hochladen (Admin)
 
 const { createClient } = require('@supabase/supabase-js');
-const { checkAuth } = require('./_lib/auth');
+const { anmeldung } = require('./_lib/auth');
 
 function respond(statusCode, body) {
   return {
@@ -57,7 +57,7 @@ exports.handler = async (event) => {
     return respond(405, { error: 'Methode nicht erlaubt' });
   }
 
-  if (!checkAuth(event)) {
+  if (!(await anmeldung(event, 'katalog'))) {
     return respond(401, { error: 'Nicht autorisiert' });
   }
 

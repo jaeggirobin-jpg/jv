@@ -3,7 +3,7 @@
 // CASCADE in der DB räumt kunden_interessen auf, aktivitaet_log wird anonymisiert.
 
 const { createClient } = require('@supabase/supabase-js');
-const { checkAuth } = require('./_lib/auth');
+const { anmeldung } = require('./_lib/auth');
 
 function respond(statusCode, body) {
   return {
@@ -27,7 +27,7 @@ exports.handler = async (event) => {
     return respond(405, { error: 'Methode nicht erlaubt' });
   }
 
-  if (!checkAuth(event)) {
+  if (!(await anmeldung(event, 'kunden'))) {
     return respond(401, { error: 'Nicht autorisiert' });
   }
 

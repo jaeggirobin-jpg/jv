@@ -2,396 +2,137 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>JV Admin</title>
-<link rel="icon" href="/dachcheck/assets/icon/favicon-32.png" type="image/png" sizes="32x32">
-<link rel="icon" href="/dachcheck/assets/icon/favicon-192.png" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/dachcheck/assets/icon/apple-touch-icon.png">
+  <meta name="color-scheme" content="light" />
+  <title>JV-Plattform</title>
+  <link rel="icon" href="/dachcheck/assets/icon/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="/dachcheck/assets/icon/favicon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/dachcheck/assets/icon/apple-touch-icon.png">
+  <link rel="preload" href="/assets/fonts/roboto-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/arimo-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/dachcheck/assets/admin.css" />
   <link rel="stylesheet" href="/dachcheck/assets/bildansicht.css" />
   <link rel="stylesheet" href="/krv/assets/admin.css" />
-  <style>
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0; padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      background: #f5f5f5;
-      color: #4B575D;
-      -webkit-text-size-adjust: 100%;
-    }
-    header {
-      background: #fff;
-      color: #4B575D;
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 3px solid #BF853B;
-    }
-    header .logo { display: flex; align-items: center; gap: 0.9rem; }
-    header .logo img { height: 48px; width: auto; display: block; }
-    header .logo .label {
-      font-size: 0.95rem; font-weight: 500; color: #929A9D;
-      border-left: 1px solid #d0d0d0; padding-left: 0.9rem;
-    }
-    header button {
-      background: transparent; border: 1px solid #929A9D; color: #4B575D;
-      padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem;
-    }
-    header button:hover { background: #BF853B; border-color: #BF853B; color: #fff; }
-    #login .login-logo { text-align: center; margin-bottom: 1.2rem; }
-    #login .login-logo img { max-width: 240px; width: 80%; height: auto; }
-    main { max-width: 1680px; margin: 2rem auto; padding: 0 1.5rem; }
-    .card {
-      background: #fff; border-radius: 6px; padding: 1.5rem;
-      margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-    .card h2 {
-      margin: 0 0 1rem 0; font-size: 1.05rem; color: #4B575D;
-      border-bottom: 2px solid #BF853B; padding-bottom: 0.5rem;
-    }
-    label {
-      display: block; font-size: 0.85rem; margin: 0.75rem 0 0.25rem;
-      color: #4B575D; font-weight: 500;
-    }
-    input[type="text"], input[type="password"], input[type="file"],
-    input[type="email"], input[type="tel"], input[type="date"],
-    input[type="time"], input[type="number"], textarea, select {
-      width: 100%; max-width: 100%; padding: 0.55rem 0.7rem; border: 1px solid #929A9D;
-      border-radius: 4px; font-size: 0.95rem; font-family: inherit;
-      background: #fff; color: #4B575D;
-      box-sizing: border-box;
-    }
-    select { appearance: auto; }
-    textarea { min-height: 60px; resize: vertical; }
-    input:focus, textarea:focus, select:focus {
-      outline: none; border-color: #BF853B;
-      box-shadow: 0 0 0 2px rgba(191,133,59,0.2);
-    }
-    button.primary {
-      background: #BF853B; color: #fff; border: none;
-      padding: 0.6rem 1.2rem; border-radius: 4px; cursor: pointer;
-      font-size: 0.95rem; font-weight: 500; margin-top: 1rem;
-    }
-    button.primary:hover { background: #a8722e; }
-    button.primary:disabled { background: #929A9D; cursor: not-allowed; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    th, td {
-      padding: 0.7rem 0.6rem; text-align: left;
-      border-bottom: 1px solid #e5e5e5; vertical-align: middle;
-    }
-    th {
-      background: #f5f5f5; color: #4B575D; font-weight: 600;
-      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em;
-    }
-    tr:hover td { background: #fafafa; }
-    .status {
-      display: inline-block; padding: 0.2rem 0.6rem; border-radius: 10px;
-      font-size: 0.75rem; font-weight: 600;
-    }
-    .status.active { background: #e6f4e6; color: #2d7a2d; }
-    .status.inactive { background: #f5e6e6; color: #963030; }
-    .actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-    .actions button {
-      border: 1px solid #929A9D; background: #fff; color: #4B575D;
-      padding: 0.3rem 0.6rem; border-radius: 3px; cursor: pointer; font-size: 0.78rem;
-    }
-    .actions button:hover { background: #4B575D; color: #fff; border-color: #4B575D; }
-    .actions button.danger:hover { background: #963030; border-color: #963030; }
-    #login { max-width: 380px; margin: 5rem auto; }
-    .msg { padding: 0.7rem 1rem; border-radius: 4px; margin: 0.5rem 0; font-size: 0.9rem; }
-    .msg.error { background: #f5e6e6; color: #963030; border-left: 3px solid #963030; }
-    .msg.success { background: #e6f4e6; color: #2d7a2d; border-left: 3px solid #2d7a2d; }
-    .msg.info { background: #eef2f5; color: #4B575D; border-left: 3px solid #929A9D; }
-    .muted { color: #929A9D; font-size: 0.8rem; }
-    .hidden { display: none !important; }
-    .token-short { font-family: monospace; font-size: 0.8rem; color: #929A9D; }
-    .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-
-    /* ======= Tabs ======= */
-    .tabs {
-      display: flex; gap: 0; margin-bottom: 1.5rem;
-      border-bottom: 2px solid #e5e5e5;
-      background: #fff;
-      border-radius: 6px 6px 0 0;
-      padding: 0 0.5rem;
-      overflow-x: hidden;
-    }
-    .tabs button {
-      background: none; border: none; border-bottom: 3px solid transparent;
-      margin-bottom: -2px; padding: 0.8rem 1.2rem;
-      font-size: 0.95rem; font-weight: 600; color: #929A9D;
-      cursor: pointer; transition: color 0.2s, border-color 0.2s;
-      white-space: nowrap; flex-shrink: 0;
-    }
-    .tabs button:hover { color: #4B575D; }
-    .tabs button.active { color: #BF853B; border-bottom-color: #BF853B; }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-
-    /* ======= Formular-Zeile (2 Spalten) ======= */
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.2rem; }
-
-    /* ======= Katalog-Grid ======= */
-    .kat-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.2rem;
-    }
-    .kat-card {
-      background: #fff; border: 1px solid #e5e5e5; border-radius: 6px;
-      overflow: hidden;
-    }
-    .kat-card .kat-img {
-      width: 100%; height: 160px; object-fit: cover; display: block;
-      background: #eee;
-    }
-    .kat-card .kat-placeholder {
-      width: 100%; height: 160px; display: flex; align-items: center;
-      justify-content: center; background: #eee; color: #929A9D;
-      font-size: 0.85rem;
-    }
-    .kat-card .kat-body { padding: 0.9rem; }
-    .kat-card .kat-body h3 {
-      margin: 0 0 0.4rem 0; font-size: 0.95rem; color: #4B575D;
-    }
-    .kat-card .kat-body .kat-cat {
-      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
-      color: #BF853B; font-weight: 600; margin-bottom: 0.3rem;
-    }
-    .kat-card .kat-body p {
-      font-size: 0.82rem; color: #929A9D; margin: 0.3rem 0;
-      line-height: 1.4;
-    }
-    .kat-card .kat-actions {
-      padding: 0 0.9rem 0.9rem; display: flex; gap: 0.4rem; flex-wrap: wrap;
-    }
-    .kat-card .kat-actions button {
-      font-size: 0.75rem; padding: 0.3rem 0.55rem; border: 1px solid #929A9D;
-      border-radius: 3px; background: #fff; color: #4B575D; cursor: pointer;
-    }
-    .kat-card .kat-actions button:hover { background: #4B575D; color: #fff; border-color: #4B575D; }
-
-    /* Medien-Slides im Bearbeiten-Panel */
-    .medien-list { margin: 0.8rem 0; }
-    .medien-item {
-      display: flex; align-items: center; gap: 0.6rem;
-      padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0;
-    }
-    .medien-item img {
-      width: 50px; height: 50px; border-radius: 4px; object-fit: cover;
-    }
-    .medien-item .medien-placeholder {
-      width: 50px; height: 50px; border-radius: 4px; background: #eee;
-      display: flex; align-items: center; justify-content: center;
-      color: #929A9D; font-size: 0.65rem;
-    }
-    .medien-item .medien-info { flex: 1; font-size: 0.82rem; }
-    .medien-item .medien-info input {
-      width: 100%; font-size: 0.82rem; padding: 0.25rem 0.4rem;
-      border: 1px solid #e5e5e5; border-radius: 3px;
-    }
-
-    /* ======= Kunden-Detail-Panel ======= */
-    .detail-panel {
-      position: fixed; top: 0; right: -520px; width: 500px; max-width: 90vw;
-      height: 100vh; background: #fff; box-shadow: -4px 0 20px rgba(0,0,0,0.12);
-      z-index: 100; transition: right 0.3s ease; overflow-y: auto; padding: 1.5rem;
-      pointer-events: none;
-    }
-    .detail-panel.open { right: 0; pointer-events: auto; }
-    .detail-panel .detail-close {
-      position: absolute; top: 1rem; right: 1rem;
-      background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #929A9D;
-    }
-    .detail-panel .detail-close:hover { color: #4B575D; }
-    .detail-panel h3 { margin: 0 0 1rem 0; color: #4B575D; font-size: 1.1rem; border-bottom: 2px solid #BF853B; padding-bottom: 0.5rem; }
-    .detail-panel .interest-item {
-      padding: 0.6rem 0; border-bottom: 1px solid #f0f0f0;
-    }
-    .detail-panel .interest-item .int-title { font-weight: 600; font-size: 0.88rem; }
-    .detail-panel .interest-item .int-cat { font-size: 0.7rem; color: #BF853B; text-transform: uppercase; }
-    .detail-panel .interest-item .int-comment { font-size: 0.82rem; color: #929A9D; margin-top: 0.2rem; font-style: italic; }
-    .detail-panel .log-entry { font-size: 0.78rem; color: #929A9D; padding: 0.25rem 0; border-bottom: 1px dashed #f0f0f0; }
-
-    /* Detail-Panel Sektionen */
-    .detail-section { margin-bottom: 1.5rem; }
-    .detail-section h3 { margin-top: 0; }
-    .detail-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 0.8rem; }
-    .detail-link-buttons { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
-    .detail-link-buttons button {
-      flex: 1; min-width: 140px;
-      border: 1px solid #BF853B; background: #fff; color: #BF853B;
-      padding: 0.5rem 0.6rem; border-radius: 4px; cursor: pointer;
-      font-size: 0.82rem; font-weight: 600; text-align: center;
-    }
-    .detail-link-buttons button:hover { background: #BF853B; color: #fff; }
-
-    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; display: none; }
-    .overlay.open { display: block; }
-
-    /* Ansprechpersonen-Liste */
-    .ap-item {
-      display: flex; align-items: center; gap: 0.8rem;
-      padding: 0.6rem 0; border-bottom: 1px solid #f0f0f0;
-    }
-    .ap-item img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #BF853B; }
-    .ap-item .ap-placeholder { width: 44px; height: 44px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; color: #929A9D; font-size: 0.75rem; }
-    .ap-item .ap-info { flex: 1; }
-    .ap-item .ap-info strong { font-size: 0.9rem; }
-    .ap-item .ap-info .muted { font-size: 0.78rem; }
-
-    /* Drag-Handle (6 Punkte) */
-    .drag-handle {
-      display: inline-flex; flex-direction: column; gap: 2px;
-      cursor: grab; padding: 4px 6px; color: #929A9D; flex-shrink: 0;
-    }
-    .drag-handle::before, .drag-handle::after {
-      content: ''; display: block;
-      width: 12px; height: 2px;
-      background: radial-gradient(circle, #929A9D 1.5px, transparent 1.5px);
-      background-size: 6px 2px;
-    }
-    .drag-handle:active { cursor: grabbing; color: #BF853B; }
-    .drag-handle:active::before, .drag-handle:active::after {
-      background: radial-gradient(circle, #BF853B 1.5px, transparent 1.5px);
-      background-size: 6px 2px;
-    }
-
-    /* Kategorie-Inline-Editor */
-    .kat-header-edit {
-      background: #f9f7f4; border: 1px solid #e5e5e5; border-radius: 6px;
-      padding: 0.9rem; margin-bottom: 0.8rem;
-      cursor: grab; transition: box-shadow 0.2s, opacity 0.15s;
-    }
-    .kat-header-edit.dragging { opacity: 0.5; }
-    .kat-header-edit.drag-over { box-shadow: 0 0 0 2px #BF853B; }
-    .kat-header-edit h3 { margin: 0 0 0.5rem; font-size: 0.95rem; color: #BF853B; }
-    .kat-header-edit input, .kat-header-edit textarea {
-      width: 100%; margin-bottom: 0.4rem;
-    }
-    .kat-header-edit textarea { min-height: 40px; }
-
-    /* Drag & Drop fuer Katalog-Karten */
-    .kat-card { transition: box-shadow 0.2s, transform 0.15s; position: relative; }
-    .kat-card > .drag-handle { position: absolute; top: 6px; left: 6px; z-index: 1; background: rgba(255,255,255,0.85); border-radius: 3px; }
-    .kat-card.dragging { opacity: 0.5; transform: scale(0.97); }
-    .kat-card.drag-over { box-shadow: 0 0 0 2px #BF853B; }
-
-    /* Punkte-Checkboxen-Gruppe */
-    .punkte-group { margin-bottom: 0.8rem; }
-    .punkte-group-title {
-      font-size: 0.78rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.04em; color: #BF853B; margin: 0.6rem 0 0.3rem;
-    }
-    .punkte-group label.punkt-cb {
-      display: flex; align-items: center; gap: 0.5rem;
-      font-size: 0.85rem; font-weight: 400; margin: 0.2rem 0;
-      cursor: pointer; color: #4B575D;
-    }
-    .punkte-group input[type="checkbox"] {
-      width: auto; accent-color: #BF853B; margin: 0;
-    }
-
-    /* Dokumente im Detail-Panel */
-    .detail-doc {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0; font-size: 0.82rem;
-    }
-    .detail-doc .doc-name { color: #4B575D; }
-    .detail-doc .doc-meta { color: #929A9D; font-size: 0.75rem; }
-    .detail-doc .doc-actions { display: flex; gap: 0.3rem; align-items: center; }
-
-    /* ======= Responsive ======= */
-    @media (max-width: 900px) {
-      header { padding: 0.8rem 1rem; }
-      header .logo img { height: 40px; }
-      header .logo .label { font-size: 0.8rem; padding-left: 0.7rem; }
-      main { margin: 1.25rem auto; padding: 0 1rem; }
-      .card { padding: 1.1rem; }
-      table { font-size: 0.82rem; }
-      th, td { padding: 0.55rem 0.45rem; }
-      .form-row { grid-template-columns: 1fr; }
-      .detail-form-row { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 640px) {
-      header { padding: 0.7rem 0.9rem; }
-      header .logo { gap: 0.6rem; }
-      header .logo img { height: 34px; }
-      header .logo .label { display: none; }
-      header button { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
-      main { margin: 0.9rem auto; padding: 0 0.75rem; }
-      .card { padding: 0.95rem; border-radius: 5px; }
-      .card h2 { font-size: 1rem; }
-      label { font-size: 0.82rem; }
-      input[type="text"], input[type="password"], input[type="file"],
-      input[type="email"], input[type="tel"], input[type="date"],
-      input[type="time"], input[type="number"], textarea, select {
-        font-size: 16px;
-        max-width: 100%;
-        box-sizing: border-box;
-      }
-      button.primary { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; }
-      #login { max-width: 100%; margin: 2rem auto; padding: 0 0.9rem; }
-      #login .login-logo img { max-width: 220px; }
-      .tabs { padding: 0 0.3rem; }
-      .tabs button { padding: 0.7rem 0.8rem; font-size: 0.88rem; }
-      .kat-grid { grid-template-columns: 1fr; }
-      .detail-panel { width: 100%; max-width: 100%; right: -100%; }
-
-      /* Kunden-Tabelle -> Kacheln auf Mobile */
-      #kundenTable thead { display: none; }
-      #kundenTable, #kundenTable tbody { display: block; width: 100%; }
-      #kundenTable tr {
-        display: block; border: 1px solid #e5e5e5; border-radius: 6px;
-        margin-bottom: 0.8rem; padding: 0.8rem; background: #fff;
-      }
-      #kundenTable tr:hover td { background: transparent; }
-      #kundenTable td {
-        display: block; padding: 0.2rem 0; border-bottom: none;
-        font-size: 0.88rem;
-      }
-      #kundenTable td:last-child { margin-top: 0.5rem; }
-      #kundenTable td .actions { flex-wrap: wrap; }
-      #kundenTable td .actions button { flex: 1 1 auto; text-align: center; padding: 0.45rem 0.5rem; }
-    }
-  </style>
+  <link rel="stylesheet" href="/assets/plattform.css" />
 </head>
-<body>
+<body class="jvp">
+  <a class="jvp-skip" href="#inhalt">Zum Inhalt</a>
+  <div id="start" class="jvp-start">Wird geladen …</div>
 
-  <!-- Login -->
-  <div id="login">
-    <div class="card">
-      <div class="login-logo"><img src="/logo.png" alt="Jaeggi Vollmer" /></div>
-      <h2>Admin</h2>
-      <label for="pwd">Passwort</label>
-      <input type="password" id="pwd" autocomplete="off" />
-      <div id="loginMsg"></div>
-      <button class="primary" id="loginBtn" type="button" onclick="doLogin()">Anmelden</button>
-    </div>
-  </div>
-
-  <!-- App -->
-  <div id="app" class="hidden">
-    <header>
-      <div class="logo">
-        <img src="/logo.png" alt="Jaeggi Vollmer" />
-        <span class="label">Admin</span>
+  <div id="app" hidden>
+    <header class="jvp-kopf">
+      <div class="jvp-kopf__innen">
+        <a class="jvp-marke" href="#/" aria-label="Zur Übersicht"><img src="/dachcheck/assets/logo-jaeggi-vollmer.svg" alt="Jäggi Vollmer – Spenglerei, Sanitär, Planung" /></a>
+        <nav class="jvp-nav" aria-label="Bereiche">
+          <a href="#/" data-nav="uebersicht">Übersicht</a>
+          <a href="#/projekte" data-nav="projekte" data-bereich="projekte">Projekte</a>
+          <a href="#/kunden" data-nav="kunden" data-bereich="kunden">Kunden</a>
+          <a href="#/katalog" data-nav="katalog" data-bereich="katalog">Katalog</a>
+          <a href="#/drohnencheck" data-nav="drohnencheck" data-bereich="anfragen">Drohnen-Check</a>
+          <a href="#/krv" data-nav="krv" data-bereich="anfragen">KRV-Check</a>
+        </nav>
+        <div class="jvp-kopf__rechts">
+          <button type="button" class="jvp-knopf jvp-knopf--klein jvp-feedback-knopf" data-feedback-start title="Feedback zu dieser Seite geben: Ausschnitt wählen, markieren, beschreiben">Feedback</button>
+          <details class="jvp-benutzer" id="benutzerMenue">
+            <summary aria-label="Angemeldet: Menü öffnen"><span class="jvp-benutzer__kuerzel" id="benutzerKuerzel" aria-hidden="true">…</span><span class="jvp-benutzer__name" id="benutzerKurzname"></span></summary>
+            <div class="jvp-benutzer__menue">
+              <b id="benutzerName"></b>
+              <span class="muted" id="benutzerInfo"></span>
+              <button type="button" class="jvp-knopf jvp-knopf--klein" id="passwortBtn" hidden>Passwort ändern</button>
+              <button type="button" class="jvp-knopf jvp-knopf--klein" id="logoutBtn">Abmelden</button>
+            </div>
+          </details>
+        </div>
       </div>
-      <button id="logoutBtn">Abmelden</button>
     </header>
 
-    <main>
-      <div class="tabs">
-        <button class="active" data-tab="kunden">Kunden</button>
-        <button data-tab="katalog">Katalog</button>
-        <button data-tab="dachcheck">Drohnen-Check</button>
-        <button data-tab="krv">KRV-Check</button>
-      </div>
+    <main id="inhalt" class="jvp-main" tabindex="-1">
 
-      <!-- ============ Tab: Kunden ============ -->
-      <div class="tab-panel active" id="tab-kunden">
+      <!-- ============ Übersicht (Aufbau wie Michis Ordner-Übersicht) ============ -->
+      <section class="jvp-view jvp-view--schmal" data-view="uebersicht" hidden>
+        <header class="jvp-titel">
+          <span class="eb">JV-Plattform · Horburgstrasse 96, Basel</span>
+          <h1>Planung, Badumbau und Marketing. <b>Alles an einem Ort.</b></h1>
+          <p class="sub">Ein Projekt wird einmal angelegt und gilt danach für Terminplan, Kundenzugang, Dokumente und Visualisierungen.</p>
+        </header>
+        <div class="grid">
+          <div class="kachel--gruppe">Planung</div>
+          <a class="kachel" href="#/projekte" data-bereich="projekte"><span class="tag">Planung</span><span class="n">Projekte</span><span class="d">Alle Baustellen mit Adresse, Bauherrschaft und Projektleiter. Von hier aus zu Terminplan, Kundenzugang und Visualisierungen.</span><span class="go">Öffnen →</span></a>
+          <a class="kachel" href="/tools/terminplaner/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Planung</span><span class="n">Bau-Terminplaner JV</span><span class="d">Terminplanung der Baustellen, mit Karte der Projektadresse.</span><span class="go">Öffnen ↗</span></a>
+          <div class="kachel--gruppe">Badumbau</div>
+          <a class="kachel" href="/tools/badvisualisierungen/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Badumbau</span><span class="n">JV Badvisualisierungen</span><span class="d">Visualisierungen für Badumbauten.</span><span class="go">Öffnen ↗</span></a>
+          <a class="kachel" href="/tools/gaeste-wc/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Badumbau</span><span class="n">Gäste-WC Umbauvorschau</span><span class="d">Vorher/Nachher-Vorschau Gäste-WC.</span><span class="go">Öffnen ↗</span></a>
+          <a class="kachel" href="#/kunden" data-bereich="kunden"><span class="tag">Badumbau</span><span class="n">Kunden</span><span class="d">Kundenzugänge für Inspiration, Swipe und Dokumente.</span><span class="go">Öffnen →</span></a>
+          <a class="kachel" href="#/katalog" data-bereich="katalog"><span class="tag">Badumbau</span><span class="n">Katalog</span><span class="d">Inspirations-Katalog mit Bildern, Videos und Ansprechpersonen.</span><span class="go">Öffnen →</span></a>
+          <div class="kachel--gruppe">Marketing</div>
+          <a class="kachel" href="/tools/story/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Marketing</span><span class="n">JV Story Badumbau</span><span class="d">Story zum Badumbau.</span><span class="go">Öffnen ↗</span></a>
+          <a class="kachel" href="/tools/reel/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Marketing</span><span class="n">JV Reel-Generator</span><span class="d">Reels für Social Media erstellen.</span><span class="go">Öffnen ↗</span></a>
+          <div class="kachel--gruppe">Anfragen</div>
+          <a class="kachel" href="#/drohnencheck" data-bereich="anfragen"><span class="tag">Anfragen</span><span class="n">Drohnen-Check</span><span class="d">Anfragen von dachcheck.jaeggivollmer.ch, Berichte und Titelvideo.</span><span class="go">Öffnen →</span></a>
+          <a class="kachel" href="#/krv" data-bereich="anfragen"><span class="tag">Anfragen</span><span class="n">KRV-Check</span><span class="d">Anfragen zum Rückflussverhinderer von krv.jaeggivollmer.ch.</span><span class="go">Öffnen →</span></a>
+          <div class="kachel--gruppe" data-nur-admin>Verwaltung</div>
+          <a class="kachel" href="#/feedback" data-nur-admin><span class="tag">Verwaltung</span><span class="n">Feedback-Board</span><span class="d">Rückmeldungen aus Plattform und Tools mit Bildausschnitt. Status setzen und als Markdown für Claude Code exportieren.</span><span class="go" id="feedbackKachelZahl">Öffnen →</span></a>
+          <a class="kachel" href="#/zugaenge" data-nur-admin><span class="tag">Verwaltung</span><span class="n">Logins</span><span class="d">Eigene Logins für Mitarbeiterinnen und Mitarbeiter anlegen, sperren und zurücksetzen.</span><span class="go">Öffnen →</span></a>
+          <a class="kachel" href="#/import" data-nur-admin><span class="tag">Verwaltung</span><span class="n">Daten übernehmen</span><span class="d">Projekte, Firmen, Visualisierungen und 3D-Scan aus den Claude-Tools einlesen.</span><span class="go">Öffnen →</span></a>
+        </div>
+        <section class="jvp-abschnitt" aria-labelledby="aktuelleTitel">
+          <div class="jvp-abschnitt__kopf"><h2 id="aktuelleTitel">Aktuelle Projekte</h2><a href="#/projekte">Alle Projekte →</a></div>
+          <div class="grid" id="uebersichtProjekte"><p class="jvp-leer">Wird geladen …</p></div>
+        </section>
+        <footer class="jvp-fuss" id="uebersichtFuss"></footer>
+      </section>
+
+      <!-- ============ Projekte ============ -->
+      <section class="jvp-view" data-view="projekte" hidden>
+        <header class="jvp-titel jvp-titel--zeile">
+          <div>
+            <span class="eb">Planung</span>
+            <h1>Projekte</h1>
+            <p class="sub">Ein Projekt gilt für Terminplan, Kundenzugang, Dokumente und Visualisierungen.</p>
+          </div>
+          <div class="jvp-titel__knoepfe"><button type="button" class="jvp-knopf jvp-knopf--primaer" id="projektNeuBtn">Neues Projekt</button></div>
+        </header>
+        <div class="jvp-filter">
+          <input type="search" id="projektSuche" placeholder="Suchen: Name, Adresse, Bauherrschaft, Projektleiter …" autocomplete="off" aria-label="Projekte durchsuchen" />
+          <div class="jvp-chips" id="projektChips" role="group" aria-label="Nach Status filtern"></div>
+        </div>
+        <div id="projekteMsg"></div>
+        <div class="grid" id="projekteListe"><p class="jvp-leer">Wird geladen …</p></div>
+      </section>
+
+      <!-- ============ Ein Projekt (Terminplan, Kundenzugang, Visualisierungen, 3D) ============ -->
+      <section class="jvp-view" data-view="projekt" hidden>
+        <a class="jvp-zurueck" href="#/projekte">← Alle Projekte</a>
+        <div id="projektInhalt"></div>
+      </section>
+
+      <!-- ============ Kunden (Inspiration, Swipe, Dokumente) ============ -->
+      <section class="jvp-view" data-view="kunden" hidden>
+        <header class="jvp-titel">
+          <span class="eb">Badumbau</span>
+          <h1>Kunden</h1>
+          <p class="sub">Zugang zu Inspiration, Swipe und Dokumenten. Jeder Kunde kann einem Projekt zugeordnet werden.</p>
+        </header>
         <div class="card">
+          <h2>Alle Kunden</h2>
+          <div id="kundenMsg"></div>
+          <div class="table-wrap">
+            <table id="kundenTable">
+              <thead>
+                <tr>
+                  <th>Name</th><th>Projekt</th><th>Adresse</th><th>Termin</th>
+                  <th>Besuche</th><th>Markiert</th>
+                  <th>Status</th><th>Aktionen</th>
+                </tr>
+              </thead>
+              <tbody id="kundenBody">
+                <tr><td colspan="8" class="muted">Lade...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card" id="kundeNeuKarte">
           <h2>Neuen Kunden anlegen</h2>
           <div class="form-row">
             <div>
@@ -410,17 +151,19 @@
           <div class="form-row">
             <div>
               <label for="k-nachname">Nachname *</label>
-              <input type="text" id="k-nachname" placeholder="Mueller" autocomplete="off" />
+              <input type="text" id="k-nachname" placeholder="Muster" autocomplete="off" />
             </div>
             <div>
-              <label for="k-adresse">Projekt-Adresse</label>
-              <input type="text" id="k-adresse" placeholder="Hauptstrasse 5, 4051 Basel" autocomplete="off" />
+              <label for="k-projekt">Projekt</label>
+              <select id="k-projekt"><option value="">– Kein Projekt –</option></select>
             </div>
           </div>
+          <label for="k-adresse">Projekt-Adresse</label>
+          <input type="text" id="k-adresse" placeholder="Strasse Nr, PLZ Ort" autocomplete="off" />
           <div class="form-row">
             <div>
               <label for="k-email">E-Mail</label>
-              <input type="email" id="k-email" placeholder="lisa@example.com" autocomplete="new-password" />
+              <input type="email" id="k-email" placeholder="name@beispiel.ch" autocomplete="new-password" />
             </div>
             <div>
               <label for="k-telefon">Telefon</label>
@@ -430,11 +173,11 @@
           <div class="form-row">
             <div>
               <label for="k-datum">Termin Datum</label>
-              <input type="date" id="k-datum" style="width:100%;max-width:100%;box-sizing:border-box" />
+              <input type="date" id="k-datum" />
             </div>
             <div>
               <label for="k-uhrzeit">Termin Uhrzeit</label>
-              <input type="time" id="k-uhrzeit" value="14:00" style="width:100%;max-width:100%;box-sizing:border-box" />
+              <input type="time" id="k-uhrzeit" value="14:00" />
             </div>
           </div>
           <label for="k-ansprechperson">Ansprechperson</label>
@@ -443,142 +186,215 @@
           </select>
 
           <label for="k-notizen">Admin-Notizen (intern)</label>
-          <textarea id="k-notizen" placeholder="Nur fuer dich sichtbar"></textarea>
+          <textarea id="k-notizen" placeholder="Nur intern sichtbar" autocomplete="off"></textarea>
 
-          <label style="margin-top:1.2rem">Sichtbare Inspiration-Punkte</label>
-          <p class="muted" style="margin:0 0 0.6rem">Standardmaessig alles sichtbar. Haken entfernen = Kunde sieht diesen Punkt nicht.</p>
+          <label style="margin-top:18px">Sichtbare Inspiration-Punkte</label>
+          <p class="muted" style="margin:0 0 8px">Standardmässig alles sichtbar. Haken entfernen = Kunde sieht diesen Punkt nicht.</p>
           <div id="punkteCheckboxes" class="muted">Lade Katalog...</div>
 
           <div id="kundeCreateMsg"></div>
-          <button class="primary" id="kundeCreateBtn">Kunde anlegen</button>
+          <button class="primary" id="kundeCreateBtn" type="button">Kunde anlegen</button>
         </div>
-        <div class="card">
-          <h2>Alle Kunden</h2>
-          <div id="kundenMsg"></div>
-          <div class="table-wrap">
-            <table id="kundenTable">
-              <thead>
-                <tr>
-                  <th>Name</th><th>Adresse</th><th>Termin</th>
-                  <th>Besuche</th><th>Markiert</th>
-                  <th>Status</th><th>Aktionen</th>
-                </tr>
-              </thead>
-              <tbody id="kundenBody">
-                <tr><td colspan="7" class="muted">Lade...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      </section>
 
-      <!-- ============ Tab: Katalog ============ -->
-      <div class="tab-panel" id="tab-katalog">
-        <!-- Ansprechpersonen -->
+      <!-- ============ Katalog ============ -->
+      <section class="jvp-view" data-view="katalog" hidden>
+        <header class="jvp-titel">
+          <span class="eb">Badumbau</span>
+          <h1>Katalog</h1>
+          <p class="sub">Inspirations-Katalog für die Kundenseiten: Bilder, Videos, Texte, Kategorien und Ansprechpersonen. Änderungen sind sofort für Kunden sichtbar.</p>
+        </header>
         <div class="card">
-          <h2>Ansprechpersonen</h2>
-          <p class="muted" style="margin-top:-0.5rem">Projektleiter/Berater, die beim Kunden in der Termin-Karte erscheinen.</p>
-          <div id="ansprechBody" class="muted">Lade...</div>
-          <div class="form-row" style="margin-top:0.8rem">
-            <div>
-              <label for="ap-name">Name *</label>
-              <input type="text" id="ap-name" placeholder="Robin Jaeggi" autocomplete="off" />
-            </div>
-            <div>
-              <label for="ap-email">E-Mail</label>
-              <input type="email" id="ap-email" placeholder="robin@jaeggivollmer.ch" autocomplete="off" />
-            </div>
-          </div>
-          <label for="ap-telefon">Telefon</label>
-          <input type="tel" id="ap-telefon" placeholder="+41 79 ..." autocomplete="off" style="max-width:300px" />
-          <div id="apMsg"></div>
-          <button class="primary" id="apCreateBtn">Hinzufuegen</button>
-        </div>
-
-        <!-- Kategorien -->
-        <div class="card">
-          <h2>Kategorien</h2>
-          <p class="muted" style="margin-top:-0.5rem">Titel und Intro-Texte bearbeiten. Reihenfolge per Drag & Drop aendern.</p>
-          <div id="kategorienBody" class="muted">Lade...</div>
-        </div>
-
-        <div class="card">
-          <h2>Hero-Hintergrundbild</h2>
-          <p class="muted" style="margin-top:-0.5rem">Das grosse Bild auf der Startseite der Inspiration. Empfohlen: Querformat, mind. 1920px breit, max. 5 MB.</p>
-          <div style="display:flex;align-items:center;gap:1rem;margin-top:0.8rem;flex-wrap:wrap">
-            <img id="heroBgPreview" src="/assets/inspiration/heroBg.jpg" style="height:80px;border-radius:4px;border:1px solid #e5e5e5;object-fit:cover" alt="Vorschau" />
-            <div>
-              <input type="file" id="heroBgFile" accept="image/jpeg,image/png,image/webp" style="font-size:0.85rem" />
-              <button class="primary" id="heroBgUpload" style="margin-top:0.5rem;font-size:0.85rem;padding:0.45rem 1rem">Hintergrund ersetzen</button>
-              <div id="heroBgMsg"></div>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <h2>Neuen Punkt hinzufuegen</h2>
-          <div class="form-row">
-            <div>
-              <label for="np-kategorie">Kategorie *</label>
-              <input type="text" id="np-kategorie" list="kat-vorschlaege" placeholder="z.B. dusche, boden, spiegel" />
-              <datalist id="kat-vorschlaege"></datalist>
-            </div>
-            <div>
-              <label for="np-titel">Titel *</label>
-              <input type="text" id="np-titel" placeholder="z.B. Regenbrause" />
-            </div>
-          </div>
-          <label for="np-kurz">Kurzbeschreibung</label>
-          <input type="text" id="np-kurz" placeholder="Ein Satz, was es ist" />
-          <div class="form-row">
-            <div>
-              <label for="np-vorteil">Vorteil</label>
-              <input type="text" id="np-vorteil" placeholder="Was spricht dafuer?" />
-            </div>
-            <div>
-              <label for="np-bedenken">Zu bedenken</label>
-              <input type="text" id="np-bedenken" placeholder="Was muss man wissen?" />
-            </div>
-          </div>
-          <div id="npMsg"></div>
-          <button class="primary" id="npCreateBtn">Punkt hinzufuegen</button>
-        </div>
-        <div class="card">
-          <h2>Katalog-Uebersicht</h2>
-          <p class="muted" style="margin-top:-0.5rem">Bilder, Videos und Texte verwalten. Aenderungen sind sofort fuer Kunden sichtbar.</p>
+          <h2>Katalog-Übersicht</h2>
           <div id="katalogMsg"></div>
           <div class="kat-grid" id="katalogGrid">
             <div class="muted">Lade...</div>
           </div>
         </div>
-      </div>
-      <!-- ============ Tab: Drohnen-Check (Anfragen von dachcheck.jaeggivollmer.ch) ============ -->
-      <div class="tab-panel" id="tab-dachcheck">
+        <div class="jvp-panels">
+          <div class="card">
+            <h2>Neuen Punkt hinzufügen</h2>
+            <div class="form-row">
+              <div>
+                <label for="np-kategorie">Kategorie *</label>
+                <input type="text" id="np-kategorie" list="kat-vorschlaege" placeholder="z.B. dusche, boden, spiegel" autocomplete="off" />
+                <datalist id="kat-vorschlaege"></datalist>
+              </div>
+              <div>
+                <label for="np-titel">Titel *</label>
+                <input type="text" id="np-titel" placeholder="z.B. Regenbrause" autocomplete="off" />
+              </div>
+            </div>
+            <label for="np-kurz">Kurzbeschreibung</label>
+            <input type="text" id="np-kurz" placeholder="Ein Satz, was es ist" autocomplete="off" />
+            <div class="form-row">
+              <div>
+                <label for="np-vorteil">Vorteil</label>
+                <input type="text" id="np-vorteil" placeholder="Was spricht dafür?" autocomplete="off" />
+              </div>
+              <div>
+                <label for="np-bedenken">Zu bedenken</label>
+                <input type="text" id="np-bedenken" placeholder="Was muss man wissen?" autocomplete="off" />
+              </div>
+            </div>
+            <div id="npMsg"></div>
+            <button class="primary" id="npCreateBtn" type="button">Punkt hinzufügen</button>
+          </div>
+          <div class="card">
+            <h2>Ansprechpersonen</h2>
+            <p class="muted">Projektleiter und Berater, die beim Kunden in der Termin-Karte erscheinen.</p>
+            <div id="ansprechBody" class="muted">Lade...</div>
+            <div class="form-row" style="margin-top:8px">
+              <div>
+                <label for="ap-name">Name *</label>
+                <input type="text" id="ap-name" placeholder="Vorname Name" autocomplete="off" />
+              </div>
+              <div>
+                <label for="ap-email">E-Mail</label>
+                <input type="email" id="ap-email" placeholder="name@jaeggivollmer.ch" autocomplete="off" />
+              </div>
+            </div>
+            <label for="ap-telefon">Telefon</label>
+            <input type="tel" id="ap-telefon" placeholder="+41 79 ..." autocomplete="off" />
+            <div id="apMsg"></div>
+            <button class="primary" id="apCreateBtn" type="button">Hinzufügen</button>
+          </div>
+          <div class="card">
+            <h2>Kategorien</h2>
+            <p class="muted">Titel und Intro-Texte bearbeiten. Reihenfolge per Drag &amp; Drop ändern.</p>
+            <div id="kategorienBody" class="muted">Lade...</div>
+          </div>
+          <div class="card">
+            <h2>Hero-Hintergrundbild</h2>
+            <p class="muted">Das grosse Bild auf der Startseite der Inspiration. Empfohlen: Querformat, mind. 1920 px breit, max. 5 MB.</p>
+            <div style="display:flex;align-items:center;gap:16px;margin-top:12px;flex-wrap:wrap">
+              <img id="heroBgPreview" src="/assets/inspiration/heroBg.jpg" style="height:80px;border-radius:4px;border:1px solid var(--line);object-fit:cover" alt="Vorschau" />
+              <div style="flex:1 1 220px;min-width:0">
+                <input type="file" id="heroBgFile" accept="image/jpeg,image/png,image/webp" />
+                <button class="primary" id="heroBgUpload" type="button">Hintergrund ersetzen</button>
+                <div id="heroBgMsg"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ Drohnen-Check (Anfragen von dachcheck.jaeggivollmer.ch) ============ -->
+      <section class="jvp-view" data-view="drohnencheck" hidden>
+        <header class="jvp-titel">
+          <span class="eb">Anfragen · dachcheck.jaeggivollmer.ch</span>
+          <h1>Drohnen-Check</h1>
+        </header>
         <div class="card"><div id="dc-admin-root"></div></div>
-      </div>
-      <!-- ============ Tab: KRV-Check (Anfragen von krv.jaeggivollmer.ch) ============ -->
-      <div class="tab-panel" id="tab-krv">
+      </section>
+
+      <!-- ============ KRV-Check (Anfragen von krv.jaeggivollmer.ch) ============ -->
+      <section class="jvp-view" data-view="krv" hidden>
+        <header class="jvp-titel">
+          <span class="eb">Anfragen · krv.jaeggivollmer.ch</span>
+          <h1>KRV-Check</h1>
+        </header>
         <div class="card"><div id="krv-admin-root"></div></div>
-      </div>
+      </section>
+
+      <!-- ============ Feedback-Board (nur Admins) ============ -->
+      <section class="jvp-view" data-view="feedback" hidden>
+        <header class="jvp-titel jvp-titel--zeile">
+          <div>
+            <span class="eb">Verwaltung</span>
+            <h1>Feedback</h1>
+            <p class="sub">Rückmeldungen aus der Plattform und den Tools, jeweils mit markiertem Bildausschnitt. Was mit <b>«Umsetzen»</b> markiert ist, kommt in den Markdown-Export für Claude Code.</p>
+          </div>
+          <div class="jvp-titel__knoepfe">
+            <button type="button" class="jvp-knopf" data-feedback-start>Feedback geben</button>
+            <button type="button" class="jvp-knopf jvp-knopf--primaer" id="fbExportBtn">Markdown-Export</button>
+          </div>
+        </header>
+        <div id="fbBoard" class="jvp-stapel"><p class="jvp-leer">Wird geladen …</p></div>
+      </section>
+
+      <!-- ============ Logins für Mitarbeiter (nur Admins) ============ -->
+      <section class="jvp-view jvp-view--schmal" data-view="zugaenge" hidden>
+        <header class="jvp-titel">
+          <span class="eb">Verwaltung</span>
+          <h1>Logins</h1>
+          <p class="sub">Eigene Logins für Mitarbeiterinnen und Mitarbeiter. Das Startpasswort erscheint nur einmal; beim ersten Login legt die Person ein eigenes Passwort fest. Das Hauptpasswort bleibt als Zugang für Admins bestehen.</p>
+        </header>
+        <div id="zgInhalt" class="jvp-stapel"><p class="jvp-leer">Wird geladen …</p></div>
+      </section>
+
+      <!-- ============ Daten übernehmen (aus den Claude-Tools) ============ -->
+      <section class="jvp-view jvp-view--schmal" data-view="import" hidden>
+        <header class="jvp-titel">
+          <span class="eb">Verwaltung</span>
+          <h1>Daten übernehmen</h1>
+          <p class="sub">Die Daten aus Michis Claude-Tools einlesen: Projekte, Firmen und Einstellungen des Terminplaners, die Badvisualisierungen und den 3D-Scan des Gäste-WCs. Am einfachsten die ganze Datei <b>JV_Tools.zip</b> wählen.</p>
+        </header>
+        <div class="card">
+          <label class="jvp-ablage" id="importAblage" for="importDatei">
+            <span><b>ZIP oder einzelne Dateien wählen</b></span>
+            <span class="muted">JV_Tools.zip · Terminplaner-Daten (.json) · Badvisualisierungen (.html) · Gäste-WC (.html)</span>
+            <input type="file" id="importDatei" accept=".zip,.json,.html,application/zip,application/json,text/html" multiple />
+          </label>
+          <div id="importMsg"></div>
+          <div class="jvp-befund" id="importBefund" hidden></div>
+          <div class="jvp-knopfreihe" id="importKnoepfe" hidden style="margin-top:14px">
+            <button type="button" class="jvp-knopf jvp-knopf--primaer" id="importStart">Ausgewählte Daten übernehmen</button>
+          </div>
+          <pre class="jvp-protokoll" id="importProtokoll" hidden aria-live="polite"></pre>
+        </div>
+        <p class="muted">Die Daten werden nur in der JV-Plattform gespeichert (Supabase, privater Speicher). Nichts davon landet im öffentlichen Code.</p>
+      </section>
     </main>
   </div>
 
-  <!-- Kunden-Detail (Slide-in Panel) -->
+  <!-- Neues Projekt -->
+  <dialog class="jvp-dialog" id="projektDialog" aria-labelledby="projektDialogTitel">
+    <form method="dialog" id="projektForm" autocomplete="off">
+      <h2 id="projektDialogTitel">Neues Projekt</h2>
+      <p class="muted" style="margin:0">Gilt danach für Terminplan, Kundenzugang und Visualisierungen.</p>
+      <label for="pj-name">Projektname *</label>
+      <input type="text" id="pj-name" placeholder="z.B. Badumbau Muster" required />
+      <label for="pj-adresse">Adresse</label>
+      <input type="text" id="pj-adresse" placeholder="Strasse Nr, PLZ Ort" />
+      <div class="form-row">
+        <div>
+          <label for="pj-bauherr">Bauherrschaft</label>
+          <input type="text" id="pj-bauherr" />
+        </div>
+        <div>
+          <label for="pj-leiter">Projektleiter JV</label>
+          <select id="pj-leiter"></select>
+        </div>
+      </div>
+      <label for="pj-start">Start</label>
+      <input type="date" id="pj-start" />
+      <div id="projektDialogMsg"></div>
+      <div class="jvp-knopfreihe">
+        <button type="button" class="jvp-knopf" id="projektAbbrechen">Abbrechen</button>
+        <button type="submit" class="jvp-knopf jvp-knopf--primaer" id="projektAnlegen">Projekt anlegen</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Kunden-Detail (Seitenpanel) -->
   <div class="overlay" id="detailOverlay"></div>
-  <div class="detail-panel" id="detailPanel">
-    <button class="detail-close" id="detailClose">&times;</button>
+  <div class="detail-panel" id="detailPanel" role="dialog" aria-modal="true" aria-label="Details">
+    <button class="detail-close" id="detailClose" type="button" aria-label="Schliessen">&times;</button>
     <div id="detailContent"></div>
   </div>
 
   <!-- Versteckter File-Input fuer Medien-Upload -->
   <input type="file" id="mediaUpload" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" style="display:none" />
 
+  <script src="/tools/assets/jv-bridge.js" data-tool="plattform"></script>
+  <script src="/tools/assets/geo-admin.js"></script>
   <script src="/dachcheck/config.js"></script>
   <script src="/dachcheck/assets/admin.js"></script>
   <script src="/krv/config.js"></script>
   <script src="/krv/assets/admin.js"></script>
   <script src="/dachcheck/assets/bildansicht.js"></script>
   <script>
-    var STORAGE_KEY = 'jv_admin_pwd';
     var API = '/.netlify/functions';
     var $ = function(id) { return document.getElementById(id); };
 
@@ -586,19 +402,26 @@
       var el = $(elId);
       if (el) el.innerHTML = text ? '<div class="msg ' + type + '">' + text + '</div>' : '';
     }
-    function getPwd() { return sessionStorage.getItem(STORAGE_KEY) || ''; }
-    function setPwd(p) { sessionStorage.setItem(STORAGE_KEY, p); }
-    function clearPwd() { sessionStorage.removeItem(STORAGE_KEY); }
+    // Anmeldung: Sitzungs-Cookie der Plattform (netlify/functions/sitzung.js, Anmeldefenster aus
+    // /tools/assets/jv-bridge.js). Das frühere Passwort im sessionStorage wird nicht mehr gebraucht.
+    try { sessionStorage.removeItem('jv_admin_pwd'); } catch (e) { /* egal */ }
 
-    function apiCall(path, options) {
+    // Aufruf der Admin-Functions mit dem Sitzungs-Cookie. Der Header X-JV-Sitzung schützt vor
+    // fremden Seiten (CSRF). Bei abgelaufener Sitzung: Anmeldefenster, danach einmal wiederholen.
+    function apiCall(path, options, wiederholt) {
       options = options || {};
-      var h = { 'Authorization': 'Bearer ' + getPwd() };
+      var h = { 'X-JV-Sitzung': '1' };
       if (options.body && typeof options.body === 'string') h['Content-Type'] = 'application/json';
       return fetch(API + path, {
         method: options.method || 'GET',
         headers: h,
+        credentials: 'same-origin',
+        cache: 'no-store',
         body: options.body || undefined
       }).then(function(res) {
+        if (res.status === 401 && !wiederholt && window.JVBridge) {
+          return window.JVBridge.anmelden().then(function() { return apiCall(path, options, true); });
+        }
         return res.json().catch(function() { return {}; }).then(function(data) {
           if (!res.ok) {
             var err = new Error(data.error || 'Fehler ' + res.status);
@@ -679,81 +502,28 @@
     }
 
     // ============================================================
-    // LOGIN
+    // BEREICHE (geöffnet vom Router in /assets/plattform.js)
     // ============================================================
-    function tryLogin(pwd) {
-      setPwd(pwd);
-      return apiCall('/list-links').then(function() {
-        return true;
-      }).catch(function(e) {
-        if (e.status === 401) { clearPwd(); return false; }
-        return true;
-      });
-    }
-
-    function doLogin() {
-      var pwd = $('pwd') ? $('pwd').value : '';
-      if (!pwd) { showMsg('loginMsg', 'Passwort eingeben.', 'error'); return; }
-      showMsg('loginMsg', 'Pruefe...', 'info');
-      tryLogin(pwd).then(function(ok) {
-        if (ok) { showMsg('loginMsg','',''); showApp(); }
-        else { showMsg('loginMsg', 'Passwort falsch.', 'error'); }
-      }).catch(function(e) {
-        showMsg('loginMsg', 'Fehler: ' + e.message, 'error');
-      });
-    }
-
-    function showApp() {
-      $('login').classList.add('hidden');
-      $('app').classList.remove('hidden');
-      loadKunden();
-      loadPunkteCheckboxes();
-      loadAnsprechpersonenDropdown();
-    }
-    function showLogin() {
-      $('app').classList.add('hidden');
-      $('login').classList.remove('hidden');
-      if ($('pwd')) $('pwd').focus();
-    }
-
-    // Enter-Taste im Passwortfeld
-    if ($('pwd')) {
-      $('pwd').onkeydown = function(e) { if (e.key === 'Enter') doLogin(); };
-    }
-    if ($('logoutBtn')) {
-      $('logoutBtn').onclick = function() { clearPwd(); showLogin(); };
-    }
-
-    // ============================================================
-    // TABS (Kunden, Katalog, Drohnen-Check, KRV-Check)
-    // ============================================================
-    document.querySelector('.tabs').addEventListener('click', function(ev) {
-      var btn = ev.target.closest('button[data-tab]');
-      if (!btn) return;
-      var tab = btn.dataset.tab;
-      document.querySelectorAll('.tabs button').forEach(function(b) { b.classList.remove('active'); });
-      document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
-      btn.classList.add('active');
-      $('tab-' + tab).classList.add('active');
-      if (tab === 'kunden') { loadKunden(); loadPunkteCheckboxes(); }
-      if (tab === 'katalog') loadKatalog();
-      if (tab === 'dachcheck') {
-        // Übersicht aus public/dachcheck/assets/admin.js
+    function bereichOeffnen(name) {
+      if (name === 'kunden') { loadKunden(); loadPunkteCheckboxes(); loadAnsprechpersonenDropdown(); }
+      if (name === 'katalog') loadKatalog();
+      if (name === 'drohnencheck') {
+        // Übersicht aus public/dachcheck/assets/admin.js (Anmeldung über das Sitzungs-Cookie)
         window.DCAdmin.mount($('dc-admin-root'), {
-          getPwd: getPwd,
+          getPwd: function() { return ''; },
           api: API,
-          onUnauthorized: function() { clearPwd(); showLogin(); }
+          onUnauthorized: function() { window.JVBridge.anmelden(); }
         });
       }
-      if (tab === 'krv') {
+      if (name === 'krv') {
         // Übersicht aus public/krv/assets/admin.js
         window.KRVAdmin.mount($('krv-admin-root'), {
-          getPwd: getPwd,
+          getPwd: function() { return ''; },
           api: API,
-          onUnauthorized: function() { clearPwd(); showLogin(); }
+          onUnauthorized: function() { window.JVBridge.anmelden(); }
         });
       }
-    });
+    }
 
     // ============================================================
     // DOKUMENTE-Hilfsfunktionen (werden im Detail-Panel benutzt)
@@ -771,7 +541,6 @@
         var data = await apiCall('/list-kunden');
         renderKunden(data.kunden || []);
       } catch(e) {
-        if (e.status === 401) { clearPwd(); showLogin(); return; }
         showMsg('kundenMsg','Fehler: '+e.message,'error');
       }
     }
@@ -779,7 +548,7 @@
     function renderKunden(kunden) {
       var body = $('kundenBody');
       if (!kunden.length) {
-        body.innerHTML = '<tr><td colspan="7" class="muted">Noch keine Kunden.</td></tr>';
+        body.innerHTML = '<tr><td colspan="8" class="muted">Noch keine Kunden.</td></tr>';
         return;
       }
       body.innerHTML = kunden.map(function(k) {
@@ -794,6 +563,7 @@
           : '<span class="muted">--</span>';
         return '<tr>'
           + '<td><strong>'+name+'</strong><br><span class="token-short">'+k.access_token.slice(0,8)+'...</span></td>'
+          + '<td>'+(window.JVP ? JVP.projektZelle(k.projekt_id) : '')+'</td>'
           + '<td>'+escapeHtml(k.projekt_adresse||'')+'</td>'
           + '<td>'+(k.termin_datum ? fmtDateShort(k.termin_datum) + (k.termin_uhrzeit ? ' '+k.termin_uhrzeit.slice(0,5) : '') : '--')+'</td>'
           + '<td>'+besuchInfo+'</td>'
@@ -804,7 +574,7 @@
             + '<button data-kaction="link" data-token="'+k.access_token+'">Link</button>'
             + '<button data-kaction="swipe" data-token="'+k.access_token+'">Swipe</button>'
             + '<button data-kaction="toggle" data-id="'+k.id+'" data-status="'+k.status+'">'+(k.status==='aktiv'?'Deaktivieren':'Aktivieren')+'</button>'
-            + '<button class="danger" data-kaction="delete" data-id="'+k.id+'" data-name="'+name+'">Loeschen</button>'
+            + '<button class="danger" data-kaction="delete" data-id="'+k.id+'" data-name="'+name+'">Löschen</button>'
           + '</div></td></tr>';
       }).join('');
     }
@@ -839,11 +609,11 @@
         return;
       }
       if (action === 'delete') {
-        if (!confirm('Kunde wirklich loeschen? Alle Interessen, Logs und Dokumente (PDFs) werden entfernt.')) return;
+        if (!confirm('Kunde wirklich löschen? Alle Interessen, Logs und Dokumente (PDFs) werden entfernt.')) return;
         btn.disabled = true;
         try {
           await apiCall('/delete-kunde', { method:'POST', body: JSON.stringify({ id:btn.dataset.id }) });
-          await loadKunden(); showMsg('kundenMsg','Geloescht.','success');
+          await loadKunden(); showMsg('kundenMsg','Gelöscht.','success');
         } catch(e) { showMsg('kundenMsg','Fehler: '+e.message,'error'); btn.disabled=false; }
       }
     });
@@ -890,8 +660,8 @@
           + '<div class="punkte-group-title" style="display:flex;justify-content:space-between;align-items:center">'
           + escapeHtml(titel)
           + '<span style="display:flex;gap:0.4rem">'
-          + '<a href="#" class="kat-toggle-all" data-kat-toggle="'+escapeHtml(k)+'" data-action="none" style="font-size:0.7rem;font-weight:400;text-transform:none;letter-spacing:0;color:#963030;text-decoration:none">Alle abwaehlen</a>'
-          + '<a href="#" class="kat-toggle-all" data-kat-toggle="'+escapeHtml(k)+'" data-action="all" style="font-size:0.7rem;font-weight:400;text-transform:none;letter-spacing:0;color:#2d7a2d;text-decoration:none">Alle waehlen</a>'
+          + '<a href="#" class="kat-toggle-all" data-kat-toggle="'+escapeHtml(k)+'" data-action="none" style="font-size:12px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--rot);text-decoration:none">Alle abwählen</a>'
+          + '<a href="#" class="kat-toggle-all" data-kat-toggle="'+escapeHtml(k)+'" data-action="all" style="font-size:12px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--gut);text-decoration:none">Alle wählen</a>'
           + '</span></div>';
         grouped[k].sort(function(a,b) { return a.reihenfolge - b.reihenfolge; }).forEach(function(p) {
           var isChecked = selectedIds === null || (Array.isArray(selectedIds) && selectedIds.indexOf(p.id) !== -1);
@@ -917,7 +687,7 @@
       });
     }
 
-    // Toggle fuer das Hauptformular
+    // Toggle für das Hauptformular
     $('punkteCheckboxes').addEventListener('click', function(ev) {
       var link = ev.target.closest('.kat-toggle-all');
       if (!link) return;
@@ -957,6 +727,7 @@
           email: $('k-email').value.trim(),
           telefon: $('k-telefon').value.trim(),
           projekt_adresse: $('k-adresse').value.trim(),
+          projekt_id: $('k-projekt').value || null,
           termin_datum: $('k-datum').value || null,
           termin_uhrzeit: $('k-uhrzeit').value || null,
           admin_notizen: $('k-notizen').value.trim(),
@@ -968,7 +739,7 @@
           'Kunde angelegt! Link: <a href="'+inspoUrl+'" target="_blank">'+inspoUrl+'</a>','success');
         $('k-vorname').value=''; $('k-nachname').value=''; $('k-email').value='';
         $('k-telefon').value=''; $('k-adresse').value=''; $('k-datum').value='';
-        $('k-notizen').value='';
+        $('k-notizen').value=''; $('k-projekt').value='';
         document.querySelectorAll('#punkteCheckboxes input:checked').forEach(function(c) { c.checked=false; });
         await loadKunden();
       } catch(e) { showMsg('kundeCreateMsg','Fehler: '+e.message,'error'); }
@@ -1015,6 +786,8 @@
         html += '<div><label for="dk-adresse">Projekt-Adresse</label>';
         html += '<input type="text" id="dk-adresse" value="'+escapeHtml(k.projekt_adresse||'')+'" autocomplete="off" /></div>';
         html += '</div>';
+        html += '<label for="dk-projekt">Projekt</label>';
+        html += '<select id="dk-projekt">'+(window.JVP ? JVP.projektOptionen(k.projekt_id) : '<option value="">– Kein Projekt –</option>')+'</select>';
         html += '<div class="detail-form-row">';
         html += '<div><label for="dk-email">E-Mail</label>';
         html += '<input type="email" id="dk-email" value="'+escapeHtml(k.email||'')+'" autocomplete="new-password" /></div>';
@@ -1036,10 +809,10 @@
         html += '<div style="display:flex;align-items:center;gap:0.8rem;margin-top:0.8rem">';
         html += '<span style="font-size:0.85rem;font-weight:500">Status:</span>';
         html += '<span class="status '+(statusActive?'active':'inactive')+'">'+escapeHtml(k.status)+'</span>';
-        html += '<button class="actions" style="display:inline" id="dk-toggle-status" data-status="'+k.status+'">'+(statusActive?'Deaktivieren':'Aktivieren')+'</button>';
+        html += '<button type="button" class="jvp-knopf jvp-knopf--klein" id="dk-toggle-status" data-status="'+k.status+'">'+(statusActive?'Deaktivieren':'Aktivieren')+'</button>';
         html += '</div>';
         html += '<div id="detailKundeMsg"></div>';
-        html += '<button class="primary" id="dk-save" style="margin-top:0.8rem">Speichern</button>';
+        html += '<button class="primary" id="dk-save">Speichern</button>';
         html += '</div>';
 
         // ---- Sektion 2: Links ----
@@ -1059,7 +832,7 @@
         html += '<p class="muted" style="margin:0 0 0.6rem">Haken entfernen = Kunde sieht diesen Punkt nicht.</p>';
         html += '<div id="detailPunkteCheckboxes" class="muted">Lade...</div>';
         html += '<div id="detailPunkteMsg"></div>';
-        html += '<button class="primary" id="dk-save-punkte" style="font-size:0.85rem;padding:0.5rem 1rem">Punkte speichern</button>';
+        html += '<button class="primary" id="dk-save-punkte">Punkte speichern</button>';
         html += '</div>';
 
         // ---- Sektion 4: Dokumente ----
@@ -1072,8 +845,8 @@
             html += '<div><span class="doc-name">'+escapeHtml(d.note||d.customer_name||'Dokument')+'</span><br><span class="doc-meta">'+fmtDate(d.created_at)+' &middot; '+d.view_count+' Aufrufe</span></div>';
             html += '<div class="doc-actions">';
             html += '<span class="status '+(d.is_active?'active':'inactive')+'">'+(d.is_active?'Aktiv':'Inaktiv')+'</span>';
-            html += '<button style="border:1px solid #929A9D;background:#fff;color:#4B575D;padding:0.2rem 0.4rem;border-radius:3px;cursor:pointer;font-size:0.72rem;margin-left:0.3rem" data-doc-toggle="'+d.id+'" data-doc-active="'+(d.is_active?'1':'0')+'">'+(d.is_active?'Deakt.':'Aktiv.')+'</button>';
-            html += '<button class="danger" style="border:1px solid #929A9D;background:#fff;color:#963030;padding:0.2rem 0.4rem;border-radius:3px;cursor:pointer;font-size:0.72rem;margin-left:0.2rem" data-doc-delete="'+d.id+'">X</button>';
+            html += '<button data-doc-toggle="'+d.id+'" data-doc-active="'+(d.is_active?'1':'0')+'">'+(d.is_active?'Deakt.':'Aktiv.')+'</button>';
+            html += '<button class="danger" data-doc-delete="'+d.id+'">X</button>';
             html += '</div>';
             html += '</div>';
           });
@@ -1084,7 +857,7 @@
         html += '<label for="detail-doc-note" style="font-size:0.8rem">Bezeichnung</label>';
         html += '<input type="text" id="detail-doc-note" placeholder="z.B. Visualisierung Bad OG" style="margin-bottom:0.4rem;font-size:0.85rem" autocomplete="off" />';
         html += '<input type="file" id="detail-doc-file" accept="application/pdf" style="font-size:0.85rem" />';
-        html += '<button class="primary" id="detail-doc-upload" style="font-size:0.85rem;padding:0.5rem 1rem;margin-top:0.5rem">PDF hochladen</button>';
+        html += '<button class="primary" id="detail-doc-upload">PDF hochladen</button>';
         html += '<div id="detailDocMsg"></div>';
         html += '</div>';
         html += '</div>';
@@ -1111,15 +884,15 @@
         // ---- Sektion 6: Aktivitaet (zusammengeklappt) ----
         var log = data.log || [];
         html += '<div class="detail-section">';
-        html += '<h3>Aktivitaet</h3>';
+        html += '<h3>Aktivität</h3>';
         if (log.length) {
-          html += '<button id="dk-show-log" style="border:1px solid #929A9D;background:#fff;color:#4B575D;padding:0.35rem 0.7rem;border-radius:3px;cursor:pointer;font-size:0.8rem">Historie anzeigen ('+log.length+' Eintraege)</button>';
+          html += '<button type="button" class="jvp-knopf jvp-knopf--klein" id="dk-show-log">Historie anzeigen ('+log.length+' Einträge)</button>';
           html += '<div id="dk-log-entries" class="hidden" style="margin-top:0.6rem">';
           var aktionLabels = {
-            'seite_geoeffnet': 'Seite geoeffnet',
+            'seite_geoeffnet': 'Seite geöffnet',
             'punkt_markiert': 'Punkt markiert',
             'punkt_demarkiert': 'Punkt demarkiert',
-            'kommentar_hinzu': 'Kommentar hinzugefuegt',
+            'kommentar_hinzu': 'Kommentar hinzugefügt',
           };
           log.forEach(function(l) {
             var label = aktionLabels[l.aktion] || l.aktion;
@@ -1135,15 +908,15 @@
           });
           html += '</div>';
         } else {
-          html += '<p class="muted">Noch keine Aktivitaet.</p>';
+          html += '<p class="muted">Noch keine Aktivität.</p>';
         }
         html += '</div>';
 
         $('detailContent').innerHTML = html;
 
-        // --- Event-Handler fuer Detail-Panel aufsetzen ---
+        // --- Event-Handler für Detail-Panel aufsetzen ---
 
-        // Ansprechpersonen-Dropdown befuellen
+        // Ansprechpersonen-Dropdown befüllen
         var apSel = $('dk-ansprechperson');
         if (apSel && ansprechpersonenList.length) {
           ansprechpersonenList.forEach(function(a) {
@@ -1176,12 +949,14 @@
               email: $('dk-email').value.trim(),
               telefon: $('dk-telefon').value.trim(),
               projekt_adresse: $('dk-adresse').value.trim(),
+              projekt_id: $('dk-projekt') ? ($('dk-projekt').value || null) : undefined,
               termin_datum: $('dk-datum').value || null,
               termin_uhrzeit: $('dk-uhrzeit').value || null,
               admin_notizen: $('dk-notizen').value.trim(),
               ansprechperson_id: $('dk-ansprechperson').value || null,
             }) });
             showMsg('detailKundeMsg','Gespeichert.','success');
+            if (window.JVP) JVP.kundeGeaendert();
             await loadKunden();
           } catch(e) { showMsg('detailKundeMsg','Fehler: '+e.message,'error'); }
           finally { this.disabled = false; }
@@ -1240,40 +1015,14 @@
         $('detail-doc-upload').addEventListener('click', async function() {
           var file = $('detail-doc-file').files[0];
           var label = $('detail-doc-note').value.trim() || 'Dokument';
-          if (!file) { showMsg('detailDocMsg','Bitte PDF auswaehlen.','error'); return; }
-          this.disabled = true; this.textContent = 'Laedt hoch...';
+          if (!file) { showMsg('detailDocMsg','Bitte PDF auswählen.','error'); return; }
+          this.disabled = true; this.textContent = 'Lädt hoch...';
           showMsg('detailDocMsg','','');
           try {
             await uploadPdf(file, label, detailKundeToken);
             showMsg('detailDocMsg','Hochgeladen!','success');
             setTimeout(function() { openKundeDetail(id); }, 600);
           } catch(e) { showMsg('detailDocMsg','Fehler: '+e.message,'error'); this.disabled=false; this.textContent='PDF hochladen'; }
-        });
-
-        // Dokument-Aktionen (Toggle / Loeschen) via Event-Delegation
-        $('detailContent').addEventListener('click', async function(ev) {
-          // Dokument-Status-Toggle
-          var toggleDocBtn = ev.target.closest('button[data-doc-toggle]');
-          if (toggleDocBtn) {
-            toggleDocBtn.disabled = true;
-            try {
-              await apiCall('/toggle-link', { method:'POST', body: JSON.stringify({ id: toggleDocBtn.dataset.docToggle, is_active: toggleDocBtn.dataset.docActive !== '1' }) });
-              openKundeDetail(id);
-            } catch(e) { showMsg('detailDocMsg','Fehler: '+e.message,'error'); toggleDocBtn.disabled = false; }
-            return;
-          }
-          // Dokument loeschen
-          var delDocBtn = ev.target.closest('button[data-doc-delete]');
-          if (delDocBtn) {
-            if (!confirm('Dokument wirklich loeschen?')) return;
-            delDocBtn.disabled = true;
-            try {
-              await apiCall('/delete-link', { method:'POST', body: JSON.stringify({ id: delDocBtn.dataset.docDelete }) });
-              showMsg('detailDocMsg','Geloescht.','success');
-              openKundeDetail(id);
-            } catch(e) { showMsg('detailDocMsg','Fehler: '+e.message,'error'); delDocBtn.disabled = false; }
-            return;
-          }
         });
 
         // Aktivitaets-Log aufklappen
@@ -1286,7 +1035,7 @@
               this.textContent = 'Historie ausblenden';
             } else {
               entries.classList.add('hidden');
-              this.textContent = 'Historie anzeigen ('+log.length+' Eintraege)';
+              this.textContent = 'Historie anzeigen ('+log.length+' Einträge)';
             }
           });
         }
@@ -1303,6 +1052,37 @@
     }
     $('detailClose').addEventListener('click', closeDetail);
     $('detailOverlay').addEventListener('click', closeDetail);
+    document.addEventListener('keydown', function(ev) {
+      if (ev.key === 'Escape' && $('detailPanel').classList.contains('open')) closeDetail();
+    });
+
+    // Dokument-Aktionen (Aktivieren / Löschen) im Detail-Panel: einmal registriert (Event-Delegation)
+    $('detailContent').addEventListener('click', async function(ev) {
+      var id = detailKundeId;
+      if (!id) return;
+      // Dokument-Status-Toggle
+      var toggleDocBtn = ev.target.closest('button[data-doc-toggle]');
+      if (toggleDocBtn) {
+        toggleDocBtn.disabled = true;
+        try {
+          await apiCall('/toggle-link', { method:'POST', body: JSON.stringify({ id: toggleDocBtn.dataset.docToggle, is_active: toggleDocBtn.dataset.docActive !== '1' }) });
+          openKundeDetail(id);
+        } catch(e) { showMsg('detailDocMsg','Fehler: '+e.message,'error'); toggleDocBtn.disabled = false; }
+        return;
+      }
+      // Dokument löschen
+      var delDocBtn = ev.target.closest('button[data-doc-delete]');
+      if (delDocBtn) {
+        if (!confirm('Dokument wirklich löschen?')) return;
+        delDocBtn.disabled = true;
+        try {
+          await apiCall('/delete-link', { method:'POST', body: JSON.stringify({ id: delDocBtn.dataset.docDelete }) });
+          showMsg('detailDocMsg','Gelöscht.','success');
+          openKundeDetail(id);
+        } catch(e) { showMsg('detailDocMsg','Fehler: '+e.message,'error'); delDocBtn.disabled = false; }
+        return;
+      }
+    });
 
     // ============================================================
     // KATALOG
@@ -1367,8 +1147,8 @@
     // Hero-Hintergrundbild hochladen
     $('heroBgUpload').addEventListener('click', async function() {
       var file = $('heroBgFile').files[0];
-      if (!file) { showMsg('heroBgMsg','Bitte Bild auswaehlen.','error'); return; }
-      this.disabled = true; this.textContent = 'Laedt hoch...';
+      if (!file) { showMsg('heroBgMsg','Bitte Bild auswählen.','error'); return; }
+      this.disabled = true; this.textContent = 'Lädt hoch...';
       showMsg('heroBgMsg','','');
       try {
         var base64 = await fileToBase64(file);
@@ -1396,7 +1176,7 @@
           vorteil: $('np-vorteil').value.trim(),
           zu_bedenken: $('np-bedenken').value.trim(),
         }) });
-        showMsg('npMsg','Punkt hinzugefuegt.','success');
+        showMsg('npMsg','Punkt hinzugefügt.','success');
         $('np-titel').value=''; $('np-kurz').value=''; $('np-vorteil').value=''; $('np-bedenken').value='';
         punkteCache = [];
         await loadKatalog();
@@ -1450,7 +1230,7 @@
       if (!file || !mediaUploadTarget) return;
 
       if (mediaUploadType === 'med-bild' || mediaUploadType === 'med-video') {
-        showMsg('medMsg', 'Laedt hoch...', 'info');
+        showMsg('medMsg', 'Lädt hoch...', 'info');
         try {
           var base64 = await fileToBase64(file);
           await apiCall('/upload-punkt-medium-file', { method:'POST', body: JSON.stringify({
@@ -1463,7 +1243,7 @@
           if (currentEditPunktId) loadPunktMedien(currentEditPunktId);
         } catch(e) { showMsg('medMsg', 'Fehler: '+e.message, 'error'); }
       } else if (mediaUploadType === 'ap-foto') {
-        showMsg('apMsg', 'Laedt Foto hoch...', 'info');
+        showMsg('apMsg', 'Lädt Foto hoch...', 'info');
         try {
           var base64 = await fileToBase64(file);
           await apiCall('/upload-ansprechperson-foto', { method:'POST', body: JSON.stringify({
@@ -1475,7 +1255,7 @@
           await loadAnsprechpersonen();
         } catch(e) { showMsg('apMsg', 'Fehler: '+e.message, 'error'); }
       } else {
-        showMsg('katalogMsg', 'Laedt hoch...', 'info');
+        showMsg('katalogMsg', 'Lädt hoch...', 'info');
         try {
           var base64 = await fileToBase64(file);
           await apiCall('/upload-inspiration-media', { method:'POST', body: JSON.stringify({
@@ -1497,6 +1277,7 @@
       var p = katalogPunkte.find(function(x) { return x.id === id; });
       if (!p) return;
       currentEditPunktId = id;
+      detailKundeId = null;
       $('detailContent').innerHTML = '<h3>Punkt bearbeiten</h3>'
         + '<label>Kategorie</label><input type="text" id="ed-kat" list="kat-vorschlaege" value="'+escapeHtml(p.kategorie)+'" />'
         + '<label>Titel</label><input type="text" id="ed-titel" value="'+escapeHtml(p.titel)+'" />'
@@ -1511,7 +1292,7 @@
         + '<div id="medienList" class="medien-list"><span class="muted">Lade...</span></div>'
         + '<div style="display:flex;gap:0.5rem;align-items:end;margin-top:0.5rem">'
         + '<div style="flex:1"><label style="font-size:0.78rem">Name (z.B. Farbe)</label><input type="text" id="med-name" placeholder="Naturstein grau" style="font-size:0.85rem" autocomplete="off" /></div>'
-        + '<button class="primary" id="medAddBtn" style="margin:0;font-size:0.8rem;padding:0.4rem 0.8rem">Slide hinzufuegen</button>'
+        + '<button type="button" class="jvp-knopf jvp-knopf--primaer" id="medAddBtn">Slide hinzufügen</button>'
         + '</div>'
         + '<div id="medMsg"></div>';
       $('detailPanel').classList.add('open');
@@ -1560,7 +1341,7 @@
         var data = await apiCall('/list-punkt-medien?punkt_id=' + punktId);
         var medien = data.medien || [];
         if (!medien.length) {
-          el.innerHTML = '<span class="muted">Noch keine Slides. Fuege oben welche hinzu.</span>';
+          el.innerHTML = '<span class="muted">Noch keine Slides. Füge oben welche hinzu.</span>';
           return;
         }
         el.innerHTML = medien.map(function(m) {
@@ -1651,7 +1432,7 @@
       }).join('');
     }
 
-    // Dropdown im Kunden-Formular befuellen
+    // Dropdown im Kunden-Formular befüllen
     function updateAnsprechDropdown(list) {
       var sel = $('k-ansprechperson');
       if (!sel) return;
@@ -1676,7 +1457,7 @@
           await apiCall('/create-ansprechperson', { method:'POST', body: JSON.stringify({
             name: name, email: $('ap-email').value.trim(), telefon: $('ap-telefon').value.trim()
           }) });
-          showMsg('apMsg','Hinzugefuegt.','success');
+          showMsg('apMsg','Hinzugefügt.','success');
           $('ap-name').value=''; $('ap-email').value=''; $('ap-telefon').value='';
           await loadAnsprechpersonen();
         } catch(e) { showMsg('apMsg','Fehler: '+e.message,'error'); }
@@ -1732,7 +1513,7 @@
           + '<input type="text" value="'+escapeHtml(k.titel)+'" data-kat-field="titel" placeholder="Titel" />'
           + '<textarea data-kat-field="intro" placeholder="Intro-Text">'+escapeHtml(k.intro||'')+'</textarea>'
           + '<div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.5rem">'
-            + '<button class="primary" data-kat-save="'+escapeHtml(k.id)+'" style="margin:0;font-size:0.8rem;padding:0.35rem 0.8rem">Speichern</button>'
+            + '<button type="button" class="jvp-knopf jvp-knopf--primaer jvp-knopf--klein" data-kat-save="'+escapeHtml(k.id)+'">Speichern</button>'
           + '</div></div>';
       }).join('');
 
@@ -1762,7 +1543,8 @@
 
     function setupDragDrop() {
       var grid = $('katalogGrid');
-      if (!grid) return;
+      if (!grid || grid._dndBereit) return;
+      grid._dndBereit = true;
 
       grid.addEventListener('dragstart', function(e) {
         var card = e.target.closest('.kat-card');
@@ -1818,7 +1600,8 @@
     // ============================================================
     function setupKatDragDrop() {
       var container = $('kategorienBody');
-      if (!container) return;
+      if (!container || container._dndBereit) return;
+      container._dndBereit = true;
       var dragKatItem = null;
 
       container.addEventListener('dragstart', function(e) {
@@ -1868,18 +1651,10 @@
         } catch(e) { alert('Fehler: '+e.message); }
       });
     }
-
-    // ============================================================
-    // INIT - Auto-Login falls Passwort im sessionStorage
-    // ============================================================
-    if (getPwd()) {
-      tryLogin(getPwd()).then(function(ok) {
-        if (ok) showApp();
-        else showLogin();
-      });
-    } else {
-      showLogin();
-    }
   </script>
+  <script src="/assets/feedback.js" data-seite="plattform" data-name="JV-Plattform"></script>
+  <script src="/assets/feedback-board.js"></script>
+  <script src="/assets/zugaenge.js"></script>
+  <script src="/assets/plattform.js"></script>
 </body>
 </html>

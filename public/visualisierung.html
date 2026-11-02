@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="color-scheme" content="light" />
+  <title>Badvisualisierung · Jäggi Vollmer</title>
+  <link rel="icon" href="/dachcheck/assets/icon/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="/dachcheck/assets/icon/favicon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/dachcheck/assets/icon/apple-touch-icon.png">
+  <style>
+    /* Kundenansicht einer Badvisualisierung: Aufbau und Farben wie im Tool «JV Badvisualisierungen»
+       (Vorher/Nachher-Regler, Farbwahl, Beschrieb). Bilder nur als Canvas mit Wasserzeichen,
+       geladen über kurzlebige signierte Adressen (siehe netlify/functions/get-visualisierung.js). */
+    @font-face { font-family: "Fraunces"; font-weight: 400; font-display: swap; src: url("/assets/fonts/fraunces-latin-400-normal.woff2") format("woff2"); }
+    @font-face { font-family: "Fraunces"; font-weight: 600; font-display: swap; src: url("/assets/fonts/fraunces-latin-600-normal.woff2") format("woff2"); }
+    @font-face { font-family: "Instrument Sans"; font-weight: 400; font-display: swap; src: url("/assets/fonts/instrument-sans-latin-400-normal.woff2") format("woff2"); }
+    @font-face { font-family: "Instrument Sans"; font-weight: 500; font-display: swap; src: url("/assets/fonts/instrument-sans-latin-500-normal.woff2") format("woff2"); }
+    @font-face { font-family: "Instrument Sans"; font-weight: 600; font-display: swap; src: url("/assets/fonts/instrument-sans-latin-600-normal.woff2") format("woff2"); }
+    :root {
+      color-scheme: light;
+      --bg: #f7f3ee; --fg: #2e261f; --muted: #6f604f; --line: #ddd0c0; --accent: #94621f; --chip: #ebe3d8; --card: #fbf8f4;
+      --display: "Fraunces", Georgia, serif; --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.5;
+      -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+    }
+    [hidden] { display: none !important; }
+    .shell { max-width: 1180px; margin: 0 auto; padding-block: 22px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+    .top img { height: 40px; width: auto; display: block; pointer-events: none; }
+    .top .hinweis { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+    .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+    h1 { font-family: var(--display); font-weight: 600; font-size: clamp(28px, 4vw, 40px); line-height: 1.1; margin: 6px 0 12px; text-wrap: balance; }
+    .lead { color: var(--muted); max-width: 56ch; margin: 0 0 24px; }
+    .wrap { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+    .wrap.portrait { grid-template-columns: minmax(0, 600px) minmax(0, 1fr); }
+    @media (max-width: 860px) { .wrap, .wrap.portrait { grid-template-columns: 1fr; gap: 24px; } }
+    .stage { position: relative; max-width: 100%; border-radius: 6px; overflow: hidden; touch-action: none; cursor: ew-resize; background: var(--chip); }
+    .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .stage .before { clip-path: inset(0 calc(100% - var(--pos, 50%)) 0 0); }
+    .handle { position: absolute; top: 0; bottom: 0; left: var(--pos, 50%); width: 2px; margin-left: -1px; background: #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .15); }
+    .knob { position: absolute; top: 50%; left: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, .25); display: grid; place-items: center; }
+    .knob svg { width: 22px; height: 22px; }
+    .tag { position: absolute; top: 14px; padding: 4px 10px; border-radius: 3px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; background: rgba(30, 24, 20, .62); color: #fff; }
+    .tag.l { left: 14px; } .tag.r { right: 14px; }
+    .range { width: 100%; margin-top: 14px; accent-color: var(--accent); }
+    .range:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    dl { margin: 0; display: grid; grid-template-columns: auto 1fr; border-top: 1px solid var(--line); }
+    dt, dd { padding: 11px 0; border-bottom: 1px solid var(--line); margin: 0; }
+    dt { color: var(--muted); font-size: 13px; padding-right: 20px; white-space: nowrap; }
+    dd { min-width: 0; }
+    .sw { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 6px; border: 1px solid rgba(0, 0, 0, .12); }
+    .picker { margin: 0 0 22px; }
+    .picker-label { font-size: 13px; color: var(--muted); margin-bottom: 8px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+    .picker-label strong { color: var(--fg); font-weight: 600; font-size: 15px; }
+    .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+    .swatches button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(0, 0, 0, .18); cursor: pointer; padding: 0; position: relative; transition: transform .15s; }
+    .swatches button:hover { transform: scale(1.08); }
+    .swatches button[aria-pressed="true"] { outline: 2px solid var(--fg); outline-offset: 3px; }
+    .swatches button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .swatches button.gloss::after { content: ""; position: absolute; top: 6px; left: 8px; width: 10px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, .9); transform: rotate(-30deg); }
+    .mock { grid-column: 1 / -1; margin-top: 8px; position: relative; border-radius: 6px; overflow: hidden; background: var(--chip); aspect-ratio: 4 / 3; }
+    .mock canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .note { grid-column: 1 / -1; margin-top: 6px; font-size: 13px; color: var(--muted); max-width: 70ch; }
+    .laedt::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, .35) 50%, transparent 70%); background-size: 200% 100%; animation: glanz 1.2s linear infinite; }
+    @keyframes glanz { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+    @media (prefers-reduced-motion: reduce) { .laedt::after { animation: none; } .swatches button { transition: none; } }
+    @media (prefers-reduced-motion: no-preference) { .stage.anim .before, .stage.anim .handle { transition: clip-path .6s ease, left .6s ease; } }
+    #status { max-width: 620px; margin: 48px auto; text-align: center; color: var(--muted); }
+    #status.fehler { text-align: left; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 22px 24px; color: var(--fg); }
+    #status h2 { font-family: var(--display); font-weight: 600; margin: 0 0 8px; font-size: 22px; }
+    #status p { margin: 0; color: var(--muted); }
+    #status button { margin-top: 16px; font: 600 15px/1 var(--body); padding: 12px 18px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+    footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); text-align: center; }
+    @media print { html, body { display: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <img src="/dachcheck/assets/logo-jaeggi-vollmer.svg" alt="Jäggi Vollmer – Spenglerei, Sanitär, Planung" draggable="false" />
+      <span class="hinweis">Badplanung · vertraulich</span>
+    </header>
+    <main>
+      <div id="status" role="status">Visualisierung wird geladen …</div>
+      <div class="wrap" id="inhalt" hidden>
+        <div>
+          <div class="stage anim" id="stage" style="--pos:50%">
+            <canvas id="c-nachher" aria-label="Nachher"></canvas>
+            <canvas class="before" id="c-vorher" aria-label="Vorher"></canvas>
+            <div class="handle"><div class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="#2e261f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6"/></svg></div></div>
+            <span class="tag l">Vorher</span><span class="tag r">Nachher</span>
+          </div>
+          <input class="range" id="range" type="range" min="0" max="100" value="50" aria-label="Vorher/Nachher-Regler" />
+        </div>
+        <div>
+          <div class="eyebrow" id="eyebrow"></div>
+          <h1 id="titel"></h1>
+          <p class="lead" id="lead"></p>
+          <div class="picker" id="picker" hidden>
+            <div class="picker-label">Keramikfarbe <strong id="cname"></strong> <span id="cfin"></span></div>
+            <div class="swatches" id="sw" role="group" aria-label="Keramikfarbe wählen"></div>
+          </div>
+          <dl id="spec"></dl>
+        </div>
+        <div class="mock" id="mockBox" hidden><canvas id="c-mock" aria-label="Mockup der Teile"></canvas></div>
+        <p class="note" id="hinweis"></p>
+      </div>
+    </main>
+    <footer>© Jäggi Vollmer GmbH, Horburgstrasse 96, 4057 Basel · Vertrauliche Visualisierung. Weitergabe untersagt.</footer>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // --- Schutzmassnahmen gegen einfaches Abgreifen (wie view.html) ---
+    document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    document.addEventListener('keydown', function (e) {
+      var k = (e.key || '').toLowerCase();
+      if ((e.ctrlKey || e.metaKey) && (k === 's' || k === 'p' || k === 'u')) e.preventDefault();
+      if (k === 'f12') e.preventDefault();
+    });
+    document.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
+    var $ = function (id) { return document.getElementById(id); };
+    var token = new URLSearchParams(location.search).get('t') || '';
+    var MAX_PX = 1800;          // Canvas-Breite höchstens (Schärfe vs. Speicher)
+    var objekt = null;
+    var wasserzeichen = '';
+    var logo = null;
+    var bitmaps = {};           // Schlüssel (vorher, room-x, mock-x) → ImageBitmap/Bild
+    var gewaehlt = null;
+    var lauf = 0;
+
+    function status(html, fehler) {
+      var el = $('status');
+      el.innerHTML = html;
+      el.className = fehler ? 'fehler' : '';
+      el.hidden = false;
+    }
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
+    }
+
+    function logoLaden() {
+      return new Promise(function (fertig) {
+        var img = new Image();
+        img.onload = function () { logo = img; fertig(); };
+        img.onerror = function () { fertig(); };
+        img.src = '/logo.png';
+      });
+    }
+
+    // Bild über die signierte Adresse holen und dekodieren. Die Adresse erscheint nie im DOM.
+    function bildHolen(url) {
+      return fetch(url, { cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' }).then(function (r) {
+        if (!r.ok) throw new Error('Bild nicht verfügbar (' + r.status + ')');
+        return r.blob();
+      }).then(function (blob) {
+        if (window.createImageBitmap) return createImageBitmap(blob);
+        return new Promise(function (fertig, fehler) {
+          var u = URL.createObjectURL(blob);
+          var img = new Image();
+          img.onload = function () { URL.revokeObjectURL(u); fertig(img); };
+          img.onerror = function () { URL.revokeObjectURL(u); fehler(new Error('Bild nicht lesbar')); };
+          img.src = u;
+        });
+      });
+    }
+
+    function bilderLaden(urls) {
+      var schluessel = Object.keys(urls || {});
+      return Promise.all(schluessel.map(function (k) {
+        return bildHolen(urls[k]).then(function (b) { bitmaps[k] = b; });
+      }));
+    }
+
+    function fehlendeLaden(keys) {
+      var fehlend = keys.filter(function (k) { return !bitmaps[k]; });
+      if (!fehlend.length) return Promise.resolve();
+      return fetch('/.netlify/functions/get-visualisierung?t=' + encodeURIComponent(token) + '&bilder=' + fehlend.join(','), { cache: 'no-store' })
+        .then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (j) {
+            if (!r.ok) { var e = new Error(j.error || 'Fehler ' + r.status); e.status = r.status; throw e; }
+            return bilderLaden(j.bilder);
+          });
+        });
+    }
+
+    // Bild «cover» in die Leinwand zeichnen, danach Wasserzeichen darüber
+    function zeichnen(canvas, bild, verhaeltnis) {
+      var box = canvas.parentNode.getBoundingClientRect();
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var w = Math.min(MAX_PX, Math.round((box.width || 800) * dpr), (bild && bild.width) || MAX_PX);
+      var h = Math.round(w / verhaeltnis);
+      canvas.width = w;
+      canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ebe3d8';
+      ctx.fillRect(0, 0, w, h);
+      if (bild) {
+        var s = Math.max(w / bild.width, h / bild.height);
+        var bw = bild.width * s, bh = bild.height * s;
+        ctx.drawImage(bild, (w - bw) / 2, (h - bh) / 2, bw, bh);
+      }
+      wasserzeichenZeichnen(ctx, w, h);
+    }
+
+    // Wasserzeichen: Logo und «Vertraulich – Name · Datum», diagonal, halbtransparent, gekachelt
+    function wasserzeichenZeichnen(ctx, w, h) {
+      var text = (wasserzeichen ? '«Vertraulich – ' + wasserzeichen + '»' : '«Vertraulich»') + ' · ' + new Date().toLocaleDateString('de-CH');
+      var logoW = w / 4.2;
+      var logoH = logo ? logoW * (logo.height / logo.width) : logoW / 3.3;
+      var stepX = logoW * 1.6, stepY = logoH * 2.9;
+      var diag = Math.sqrt(w * w + h * h);
+      var cols = Math.ceil(diag / stepX) + 2, rows = Math.ceil(diag / stepY) + 2;
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+      ctx.rotate(-Math.PI / 6);
+      if (logo) {
+        ctx.globalAlpha = 0.16;
+        for (var r = -rows; r <= rows; r++) {
+          for (var c = -cols; c <= cols; c++) ctx.drawImage(logo, c * stepX - logoW / 2, r * stepY - logoH / 2, logoW, logoH);
+        }
+      }
+      ctx.globalAlpha = 0.5;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = '600 ' + Math.max(12, Math.round(w / 48)) + 'px "Instrument Sans", sans-serif';
+      ctx.lineWidth = Math.max(2, w / 700);
+      ctx.strokeStyle = 'rgba(30, 26, 22, .45)';
+      ctx.fillStyle = 'rgba(255, 255, 255, .85)';
+      for (var r2 = -rows; r2 <= rows; r2++) {
+        for (var c2 = -cols; c2 <= cols; c2++) {
+          var x = c2 * stepX + stepX / 2, y = r2 * stepY + stepY / 2;
+          ctx.strokeText(text, x, y);
+          ctx.fillText(text, x, y);
+        }
+      }
+      ctx.restore();
+    }
+
+    function verhaeltnis() {
+      var t = String(objekt.aspect || '4/3').split('/');
+      return (+t[0] || 4) / (+t[1] || 3);
+    }
+
+    function allesZeichnen() {
+      if (!objekt) return;
+      var v = verhaeltnis();
+      zeichnen($('c-vorher'), bitmaps.vorher, v);
+      zeichnen($('c-nachher'), bitmaps['room-' + gewaehlt], v);
+      var mock = bitmaps['mock-' + gewaehlt];
+      $('mockBox').hidden = !mock;
+      if (mock) zeichnen($('c-mock'), mock, 4 / 3);
+    }
+
+    function farbeWaehlen(id) {
+      var c = objekt.varianten.filter(function (x) { return x.id === id; })[0];
+      if (!c) return;
+      gewaehlt = id;
+      $('cname').textContent = c.name;
+      $('cfin').textContent = c.glossy ? 'glänzend' : 'matt';
+      Array.prototype.forEach.call($('sw').querySelectorAll('button'), function (b) {
+        b.setAttribute('aria-pressed', b.dataset.id === id ? 'true' : 'false');
+      });
+      try { localStorage.setItem('jv-vis-farbe-' + token, id); } catch (e) { /* egal */ }
+      var nr = ++lauf;
+      $('stage').classList.add('laedt');
+      fehlendeLaden(['room-' + id, 'mock-' + id]).then(function () {
+        if (nr === lauf) allesZeichnen();
+      }).catch(function (e) {
+        if (e.status === 403 || e.status === 404) return fehlerZeigen(e.status, e.message);
+      }).then(function () {
+        if (nr === lauf) $('stage').classList.remove('laedt');
+      });
+    }
+
+    function aufbauen() {
+      var o = objekt;
+      document.title = (o.raum ? o.raum + ' · ' : '') + 'Badvisualisierung · Jäggi Vollmer';
+      $('inhalt').classList.toggle('portrait', o.aspect === '3/4');
+      $('stage').style.aspectRatio = o.aspect;
+      $('eyebrow').textContent = [o.raum, o.datum].filter(Boolean).join(' · ');
+      $('titel').textContent = o.titel;
+      $('lead').textContent = o.lead;
+      $('hinweis').textContent = o.hinweis;
+      $('spec').innerHTML = o.spec.map(function (z) {
+        return '<dt>' + esc(z.k) + '</dt><dd>' + (z.farbe ? '<span class="sw" style="background:' + esc(z.farbe) + '"></span>' : '') + esc(z.text) + '</dd>';
+      }).join('');
+      var mehrere = o.varianten.length > 1;
+      $('picker').hidden = !mehrere;
+      $('sw').innerHTML = '';
+      o.varianten.forEach(function (c) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.dataset.id = c.id;
+        b.style.background = c.swatch;
+        b.title = c.name + (c.glossy ? ' (glänzend)' : ' (matt)');
+        b.setAttribute('aria-label', b.title);
+        if (c.glossy) b.classList.add('gloss');
+        b.addEventListener('click', function () { farbeWaehlen(c.id); });
+        $('sw').appendChild(b);
+      });
+    }
+
+    // Vorher/Nachher-Regler (wie im Tool)
+    function reglerEinrichten() {
+      var st = $('stage'), rg = $('range');
+      var setzen = function (p, anim) {
+        p = Math.max(0, Math.min(100, p));
+        st.classList.toggle('anim', !!anim);
+        st.style.setProperty('--pos', p + '%');
+        rg.value = p;
+      };
+      var fx = function (e) { var r = st.getBoundingClientRect(); return (e.clientX - r.left) / r.width * 100; };
+      var ziehen = false;
+      st.addEventListener('pointerdown', function (e) { ziehen = true; st.setPointerCapture(e.pointerId); setzen(fx(e), true); });
+      st.addEventListener('pointermove', function (e) { if (ziehen) setzen(fx(e), false); });
+      st.addEventListener('pointerup', function () { ziehen = false; });
+      st.addEventListener('pointercancel', function () { ziehen = false; });
+      rg.addEventListener('input', function () { setzen(+rg.value, false); });
+    }
+
+    function fehlerZeigen(code, text) {
+      $('inhalt').hidden = true;
+      if (code === 404) {
+        status('<h2>Link nicht gefunden</h2><p>Dieser Link ist ungültig oder wurde entfernt. Bitte kontaktieren Sie Jäggi Vollmer.</p>', true);
+      } else if (code === 403) {
+        status('<h2>Link deaktiviert</h2><p>' + esc(text || 'Dieser Link wurde deaktiviert. Bitte kontaktieren Sie Jäggi Vollmer.') + '</p>', true);
+      } else {
+        status('<h2>Laden nicht möglich</h2><p>' + esc(text || 'Bitte Internetverbindung prüfen und erneut versuchen.') + '</p><button type="button" id="nochmal">Erneut versuchen</button>', true);
+        $('nochmal').addEventListener('click', start);
+      }
+    }
+
+    function start() {
+      if (!/^[a-f0-9]{32}$/.test(token)) {
+        status('<h2>Kein gültiger Link</h2><p>Dieser Link scheint unvollständig zu sein. Bitte kontaktieren Sie Jäggi Vollmer.</p>', true);
+        return;
+      }
+      status('Visualisierung wird geladen …');
+      bitmaps = {};
+      Promise.all([
+        logoLaden(),
+        document.fonts && document.fonts.load ? document.fonts.load('600 20px "Instrument Sans"').catch(function () {}) : null,
+        fetch('/.netlify/functions/get-visualisierung?t=' + encodeURIComponent(token), { cache: 'no-store' }).then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (j) {
+            if (!r.ok) { var e = new Error(j.error || 'Fehler ' + r.status); e.status = r.status; throw e; }
+            return j;
+          });
+        })
+      ]).then(function (erg) {
+        var j = erg[2];
+        objekt = j.objekt;
+        wasserzeichen = j.watermark || '';
+        if (!objekt || !objekt.varianten || !objekt.varianten.length) throw new Error('Visualisierung unvollständig');
+        return bilderLaden(j.bilder);
+      }).then(function () {
+        aufbauen();
+        var v0 = objekt.varianten[objekt.start] || objekt.varianten[0];
+        var id = v0.id;
+        try {
+          var gemerkt = localStorage.getItem('jv-vis-farbe-' + token);
+          if (gemerkt && objekt.varianten.some(function (v) { return v.id === gemerkt; })) id = gemerkt;
+        } catch (e) { /* egal */ }
+        $('status').hidden = true;
+        $('inhalt').hidden = false;
+        // Startfarbe ist schon geladen; eine gemerkte andere Farbe lädt farbeWaehlen nach
+        gewaehlt = v0.id;
+        allesZeichnen();
+        farbeWaehlen(id);
+      }).catch(function (e) {
+        fehlerZeigen(e.status, e.status ? e.message : '');
+      });
+    }
+
+    var uhr = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(uhr);
+      uhr = setTimeout(allesZeichnen, 200);
+    });
+
+    reglerEinrichten();
+    start();
+  })();
+  </script>
+</body>
+</html>

@@ -119,6 +119,20 @@
   status = 200
   force = true
 
+# Tools (public/tools/): Dateien aus dem privaten Bucket «tools», nur mit Sitzungs-Cookie der Plattform.
+# /_blob/<id> sind dieselben Adressen wie im claude.ai-Speicher, die Tools laufen damit unverändert.
+[[redirects]]
+  from = "/_blob/*"
+  to = "/.netlify/functions/tool-blob/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/gaeste-wc/scan.json"
+  to = "/.netlify/functions/tool-blob?datei=gaeste-wc-scan"
+  status = 200
+  force = true
+
 # Redirects: saubere URLs für die Functions
 [[redirects]]
   from = "/api/*"

@@ -1,6 +1,6 @@
 // dachcheck-admin-liste.js — Alle Drohnen-Check-Anfragen und die Warteliste für die Übersicht (Admin)
 const { antwort, rest } = require('./_lib/dachcheck');
-const { checkAuth } = require('./_lib/auth');
+const { anmeldung } = require('./_lib/auth');
 
 // ip_hash bleibt serverseitig
 const SPALTEN = [
@@ -16,7 +16,7 @@ const SPALTEN = [
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return antwort(405, { error: 'Methode nicht erlaubt' });
-  if (!checkAuth(event)) return antwort(401, { error: 'Nicht autorisiert' });
+  if (!(await anmeldung(event, 'anfragen'))) return antwort(401, { error: 'Nicht autorisiert' });
 
   try {
     const [anfragen, warteliste] = await Promise.all([

@@ -29,18 +29,31 @@ Internes Tool für Jäggi Vollmer GmbH (Basel) zur sicheren Weitergabe von Badez
 ```
 docs.jaeggivollmer.ch/
 ├── public/                 → EINZIGER ausgelieferter Ordner (publish = "public")
-│   ├── index.html          → Admin-Panel (Kunden, Katalog, Ansprechpersonen, Dokumente)
+│   ├── index.html          → JV-Plattform (intern): Übersicht, Projekte, Kunden, Katalog, Anfragen, Verwaltung
 │   ├── view.html           → Kunden-Viewer für PDFs (Token-basiert)
+│   ├── visualisierung.html → Kunden-Viewer für Badvisualisierungen (Token, Canvas, Wasserzeichen)
 │   ├── inspiration.html    → Kunden-Inspirationsseite (Token, Supabase-RPCs)
 │   ├── swipe.html          → Inspiration als Swipe-Karten (Token, Supabase-RPCs)
+│   ├── tools/              → Michis Tools (Terminplaner, Badvisualisierungen, Gäste-WC 3D, Story, Reel)
+│   │   └── assets/jv-bridge.js → Speicher der Tools (statt claude.ai) + Anmeldefenster der Plattform
+│   ├── assets/plattform.js|css → Plattform (Router, Projekte, Rechte im Menü, Daten übernehmen)
+│   ├── assets/feedback.js  → Feedback-Knopf mit Bildausschnitt (Plattform und Tools)
+│   ├── assets/feedback-board.js, zugaenge.js → Verwaltung: Feedback-Board, Logins
+│   ├── assets/vendor/      → html2canvas-pro (MIT, für die Feedback-Bilder)
 │   └── assets/, logo.png
 ├── netlify.toml            → Routing, Function-Config, Sicherheits-Header
 ├── supabase/               → SQL-Migrationen (manuell im SQL-Editor ausführen)
+├── werkzeuge/tools_einbinden.py → neue Version eines Tools von Michi übernehmen (entfernt Personendaten)
 └── netlify/functions/
-    ├── _lib/auth.js        → Gemeinsame Admin-Passwortprüfung (zeitkonstant)
+    ├── _lib/auth.js        → Anmeldung: Hauptpasswort, Mitarbeiter-Logins, Sitzungs-Cookie, Bereiche
+    ├── sitzung.js          → Anmelden, Abmelden, eigenes Passwort ändern
+    ├── zugaenge.js         → Logins verwalten (nur Admins)
+    ├── feedback.js         → Feedback speichern (alle), Board und Export (nur Admins)
+    ├── tool-db.js, tool-asset.js, tool-blob.js → Speicher und Dateien der Tools
+    ├── visualisierung-links.js, get-visualisierung.js → Kundenlinks für Badvisualisierungen
     ├── get-pdf.js          → Sichere PDF-Auslieferung (signierte URL, prüft Kundenstatus)
     ├── create-link.js      → PDF-Upload in 2 Schritten (prepare/finalize, Admin)
-    ├── ...                 → weitere Admin-Functions für Kunden, Katalog, Medien
+    ├── ...                 → weitere Admin-Functions für Kunden, Katalog, Medien, Anfragen
 ```
 
 Dateien ausserhalb von `public/` (Doku, Migrationen, Function-Quellcode) werden nie ausgeliefert. Neue öffentliche Dateien gehören nach `public/`.
@@ -87,11 +100,18 @@ CREATE TABLE doc_links (
 );
 ```
 
+Weitere Tabellen der Plattform (alle mit RLS ohne Policies, nur über Functions):
+- `tool_docs` (migration_015): Dokumente der Tools, Pfad wie im claude.ai-Speicher (`projects/<id>`, `config/main`)
+- `visualisierung_links` (migration_015): Kundenlinks für Badvisualisierungen, `kunden.projekt_id` = «ein Projekt für alles»
+- `plattform_feedback` (migration_016): Feedback mit Status, «umsetzen», Bildpfad
+- `mitarbeiter`, `anmelde_fehler` (migration_017): Logins (scrypt-Hash) und Fehlversuche pro gehashter IP
+
 ### Storage
 
 - Bucket-Name: `pdfs`
 - Bucket-Typ: **privat** (kein öffentlicher Zugriff)
 - Dateipfad-Konvention: `{token}/{original-filename}.pdf`
+- Weitere private Buckets: `tools` (Dateien der Tools, Anzeige über `/_blob/<id>` → signierte URL), `feedback` (Bildausschnitte, JPEG)
 
 ### Row Level Security (RLS)
 
@@ -116,20 +136,29 @@ SUPABASE_SERVICE_KEY=eyJ...   ← service_role, geheim
 ADMIN_PASSWORD=...             ← selbst gewählt, mind. 16 Zeichen
 ```
 
-### Authentifizierung Admin-Panel
+### Authentifizierung (Plattform und Admin-Functions)
 
-Kein JWT, kein OAuth. Einfaches Passwort-Vergleich:
-- Frontend sendet Passwort im `Authorization: Bearer PASSWORT` Header
-- Jede Function nutzt `checkAuth` aus `netlify/functions/_lib/auth.js` (zeitkonstanter Vergleich mit `process.env.ADMIN_PASSWORD`)
-- Bei Misserfolg: 401
+Kein Supabase Auth, kein OAuth. Zwei Arten von Zugängen (`netlify/functions/_lib/auth.js`):
+- **Hauptzugang** `ADMIN_PASSWORD`: gilt immer als Admin. In der Plattform anmelden mit leerer E-Mail; die Admin-Seiten auf den Subdomains (dachcheck., krv.) senden es weiterhin als `Authorization: Bearer PASSWORT`.
+- **Mitarbeiter-Logins** (Tabelle `mitarbeiter`, Verwaltung «Logins»): E-Mail + eigenes Passwort (scrypt N=65536). Startpasswort wird einmal angezeigt und muss beim ersten Login ersetzt werden. Rolle `admin` (alles) oder `mitarbeiter` mit Bereichen `projekte`, `kunden`, `katalog`, `anfragen`. Logins und Feedback-Board (`verwaltung`) nur für Admins.
+- Nach der Anmeldung (`/api/sitzung`) trägt der Browser das signierte Cookie `__Host-jv_sitzung` (HttpOnly, Secure, SameSite=Strict, 12 h oder 30 Tage). Jede Anfrage prüft Signatur, Ablauf und bei Logins in der Datenbank `aktiv` und `sitzung_version` (Sperren, neues Passwort, andere Rechte → sofort abgemeldet).
+- `fetch()`-Aufrufe brauchen zusätzlich den Header `X-JV-Sitzung: 1` (CSRF-Schutz). Nur Bilder/Dateien ohne eigenen Header (`/_blob/…`, Feedback-Bilder) nutzen `anmeldungDatei`.
+- Fehlversuche: 5 pro Login → 15 Minuten gesperrt; 10 pro IP (gehasht) in 15 Minuten → 429.
+- In jeder Admin-Function: `if (!(await anmeldung(event, 'bereich'))) return 401`. **Immer mit `await`** (die Funktion ist asynchron; ohne `await` wäre das Promise immer «wahr»). Neue Functions brauchen einen passenden Bereich.
+- Bei Misserfolg: 401 (nicht angemeldet oder Bereich fehlt), 403 für Verwaltung ohne Admin-Rolle.
 
 ---
 
 ## Frontend-Verhalten
 
-### Admin-Panel (`index.html`)
+### Plattform (`index.html`)
 
-- Passwort-Eingabe beim ersten Aufruf, gespeichert in `sessionStorage`
+Einrichtung, Rechte, Feedback und Datenschutz für Robin: `README_Plattform.md`.
+
+- Anmeldefenster aus `jv-bridge.js` (E-Mail + Passwort, «angemeldet bleiben»), Benutzermenü oben rechts mit «Passwort ändern» und «Abmelden»
+- Navigation und Kacheln zeigen nur die Bereiche des Logins (`data-bereich`, `data-nur-admin`); der Server prüft trotzdem jede Anfrage
+- Feedback: Knopf «Feedback» (oben rechts, in den Tools am rechten Rand, in offenen Dialogen als kleiner Knopf) → Bereich aufziehen, markieren, beschreiben. Wartet offline im Browser und wird nachgesendet. Board unter Verwaltung «Feedback»: Status, «Umsetzen», Markdown-Export für Claude Code mit eingebetteten Bildern
+- Michis Tools in `public/tools/` nicht von Hand umbauen: neue Versionen mit `werkzeuge/tools_einbinden.py` übernehmen (sonst gehen Änderungen beim nächsten Einbinden verloren)
 - PDF-Upload via `<input type="file">` → Base64 → an `create-link.js`
 - Tabelle aller Links mit:
   - Kundenname, Notiz, Erstelldatum
@@ -181,7 +210,7 @@ Diese Features sind **noch nicht gebaut**, aber die Architektur soll sie ermögl
 - [ ] **Drag & Drop Upload** — im Admin-Panel
 
 ### Langfristig
-- [ ] **Mehrbenutzer-Admin** — verschiedene Mitarbeiter mit eigenem Login
+- [x] **Mehrbenutzer-Admin** — Mitarbeiter-Logins mit Rollen und Bereichen (migration_017, Verwaltung «Logins»)
 - [ ] **Kategorien** — Links nach Projekt/Kunde gruppieren
 - [ ] **Statistik-Dashboard** — Öffnungsrate, aktivste Links
 - [ ] **WhatsApp/E-Mail-Versand** — direktes Versenden des Links aus dem Admin-Panel
@@ -213,6 +242,8 @@ Diese Features sind **noch nicht gebaut**, aber die Architektur soll sie ermögl
 3. **Token ist nicht erratbar** — 16 Bytes = 32 Hex-Zeichen Entropie
 4. **Zugang wird bei jedem Request geprüft** — nicht gecacht
 5. **Kein PDF im Browser-Cache** — `Cache-Control: no-store` Header
+6. **Passwörter nur als scrypt-Hash** — Startpasswörter erscheinen genau einmal, nie im Klartext gespeichert oder geloggt
+7. **Rechte serverseitig** — Bereiche werden in jeder Function geprüft, die Oberfläche blendet nur aus
 
 ---
 

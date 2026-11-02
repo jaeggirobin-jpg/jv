@@ -1,7 +1,7 @@
 // update-kunde.js — Kundendaten aktualisieren (Admin)
 
 const { createClient } = require('@supabase/supabase-js');
-const { checkAuth } = require('./_lib/auth');
+const { anmeldung } = require('./_lib/auth');
 
 function respond(statusCode, body) {
   return {
@@ -25,7 +25,7 @@ exports.handler = async (event) => {
     return respond(405, { error: 'Methode nicht erlaubt' });
   }
 
-  if (!checkAuth(event)) {
+  if (!(await anmeldung(event, 'kunden'))) {
     return respond(401, { error: 'Nicht autorisiert' });
   }
 
@@ -45,13 +45,21 @@ exports.handler = async (event) => {
   const allowedFields = [
     'anrede_typ', 'vorname', 'nachname', 'email', 'telefon',
     'projekt_adresse', 'termin_datum', 'termin_uhrzeit', 'admin_notizen', 'status',
-    'ansprechperson_id',
+    'ansprechperson_id', 'projekt_id',
   ];
   const updates = {};
 
   for (const field of allowedFields) {
     if (payload[field] !== undefined) {
       updates[field] = payload[field];
+    }
+  }
+
+  // Projekt (ID aus dem Terminplaner) oder null (keinem Projekt zugeordnet)
+  if (updates.projekt_id !== undefined) {
+    if (updates.projekt_id === '' || updates.projekt_id === null) updates.projekt_id = null;
+    else if (!/^[A-Za-z0-9_-]{1,60}$/.test(String(updates.projekt_id))) {
+      return respond(400, { error: 'Ungültige Projekt-ID' });
     }
   }
 

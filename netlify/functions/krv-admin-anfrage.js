@@ -3,7 +3,7 @@
 //   'fotos'     → kurz gültige Links zu allen Fotos im Bucket (auch nicht abgeschlossene Uploads)
 //   'speichern' → Status, Beurteilung, Text für den Kunden und interne Notiz
 const { antwort, rest, ordnerListe, signierteUrls, REFERENZ_RE } = require('./_lib/krvcheck');
-const { checkAuth } = require('./_lib/auth');
+const { anmeldung } = require('./_lib/auth');
 
 // Muss zum CHECK-Constraint in migration_013_krvcheck.sql passen
 const STATUS = ['neu', 'beurteilt', 'offerte', 'auftrag', 'abgeschlossen', 'abgesagt'];
@@ -13,7 +13,7 @@ const RUECKGABE = 'referenz,status,beurteilung,beurteilung_text,beurteilt_at,not
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return antwort(405, { error: 'Methode nicht erlaubt' });
-  if (!checkAuth(event)) return antwort(401, { error: 'Nicht autorisiert' });
+  if (!(await anmeldung(event, 'anfragen'))) return antwort(401, { error: 'Nicht autorisiert' });
 
   let b;
   try {

@@ -1,6 +1,6 @@
 // krv-admin-liste.js — Alle KRV-Check-Anfragen für die Übersicht (Admin)
 const { antwort, rest } = require('./_lib/krvcheck');
-const { checkAuth } = require('./_lib/auth');
+const { anmeldung } = require('./_lib/auth');
 
 // ip_hash und upload_token_hash bleiben serverseitig
 const SPALTEN = [
@@ -15,7 +15,7 @@ const SPALTEN = [
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return antwort(405, { error: 'Methode nicht erlaubt' });
-  if (!checkAuth(event)) return antwort(401, { error: 'Nicht autorisiert' });
+  if (!(await anmeldung(event, 'anfragen'))) return antwort(401, { error: 'Nicht autorisiert' });
 
   try {
     let anfragen;

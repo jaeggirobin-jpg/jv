@@ -1,13 +1,13 @@
 // dachcheck-admin-update.js — Status, Termin und interne Notiz einer Anfrage ändern (Admin)
 const { antwort, rest } = require('./_lib/dachcheck');
-const { checkAuth } = require('./_lib/auth');
+const { anmeldung } = require('./_lib/auth');
 
 // Muss zum CHECK-Constraint in migration_010_drohnencheck.sql passen
 const STATUS = ['neu', 'termin', 'geflogen', 'report', 'auftrag', 'abgeschlossen', 'abgesagt'];
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return antwort(405, { error: 'Methode nicht erlaubt' });
-  if (!checkAuth(event)) return antwort(401, { error: 'Nicht autorisiert' });
+  if (!(await anmeldung(event, 'anfragen'))) return antwort(401, { error: 'Nicht autorisiert' });
 
   let b;
   try {
