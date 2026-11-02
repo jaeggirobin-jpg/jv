@@ -6,7 +6,7 @@ const { checkAuth } = require('./_lib/auth');
 const SPALTEN = [
   'id', 'referenz', 'status', 'created_at', 'updated_at',
   'strasse', 'hausnummer', 'plz', 'ort',
-  'vorname', 'nachname', 'telefon', 'email', 'rolle', 'iwb_brief', 'bemerkung',
+  'vorname', 'nachname', 'telefon', 'email', 'rolle', 'iwb_brief', 'offerte_gewuenscht', 'bemerkung',
   'fotos', 'keine_fotos', 'fotos_abgeschlossen_at',
   'beurteilung', 'beurteilung_text', 'beurteilt_at', 'einwilligung',
   'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_extra',
@@ -18,7 +18,15 @@ exports.handler = async (event) => {
   if (!checkAuth(event)) return antwort(401, { error: 'Nicht autorisiert' });
 
   try {
-    const anfragen = await rest('krvcheck_anfragen?select=' + SPALTEN + '&order=created_at.desc');
+    let anfragen;
+    try {
+      anfragen = await rest('krvcheck_anfragen?select=' + SPALTEN + '&order=created_at.desc');
+    } catch (err) {
+      // Solange migration_014 nicht ausgeführt ist, fehlt die Spalte offerte_gewuenscht:
+      // dann ohne sie laden, damit die Übersicht weiter funktioniert.
+      const ohne = SPALTEN.replace(',offerte_gewuenscht', '');
+      anfragen = await rest('krvcheck_anfragen?select=' + ohne + '&order=created_at.desc');
+    }
     return antwort(200, { anfragen });
   } catch (err) {
     console.error(err);

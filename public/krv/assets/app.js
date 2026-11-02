@@ -478,7 +478,7 @@
       return jsonPost('/api/krv-anfrage', {
         vorname: w.vorname, nachname: w.nachname, email: w.email, telefon: w.telefon,
         strasse: w.strasse, hausnummer: w.hausnummer, plz: w.plz, ort: w.ort,
-        rolle: w.rolle, iwb_brief: w.iwb_brief === 'ja', bemerkung: w.bemerkung || '',
+        rolle: w.rolle, iwb_brief: w.iwb_brief === 'ja', offerte_gewuenscht: w.offerte !== 'nein', bemerkung: w.bemerkung || '',
         einwilligung: w.einwilligung === 'ja',
         keine_fotos: keine,
         fotos: fotos.map(function (f) { return { groesse: f.blob.size }; }),
