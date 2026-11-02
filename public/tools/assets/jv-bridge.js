@@ -3,7 +3,8 @@
 // Die Tools wurden als Claude-Artifacts gebaut und speichern über window.claude.use('db' | 'assets' |
 // 'downloads' | 'permissions'). Dieses Skript stellt dieselbe Schnittstelle bereit, speichert aber in
 // unserer Supabase-Datenbank (über die Netlify Functions tool-db, tool-asset, tool-blob). So bleiben die
-// Tools selbst unverändert.
+// Tools selbst unverändert. Für künftige Versionen mit KI gibt es zusätzlich use('sample'): Die Anfrage
+// geht über die Function ki an Claude, der Schlüssel bleibt auf dem Server.
 //
 // Einbinden VOR dem Skript des Tools:  <script src="/tools/assets/jv-bridge.js" data-tool="terminplaner"></script>
 // Anmeldung: persönliches Login (E-Mail und Passwort) oder Hauptzugang, danach Sitzungs-Cookie der Plattform.
@@ -227,6 +228,7 @@
   }
 
   // fetch mit Sitzung: bei 401 Anmeldefenster zeigen und einmal wiederholen
+  // optionen.signal (AbortSignal) bricht die Anfrage ab
   function anfrage(pfad, optionen, wiederholt) {
     optionen = optionen || {};
     var h = { 'X-JV-Sitzung': '1' };
@@ -236,7 +238,8 @@
       credentials: 'same-origin',
       cache: 'no-store',
       headers: h,
-      body: optionen.body ? JSON.stringify(optionen.body) : undefined
+      body: optionen.body ? JSON.stringify(optionen.body) : undefined,
+      signal: optionen.signal || undefined
     }).then(function (r) {
       if (r.status === 401 && !wiederholt) {
         return anmeldenZeigen().then(function () { return anfrage(pfad, optionen, true); });
@@ -549,15 +552,370 @@
     }
   };
 
-  // ── permissions: in der Plattform immer erlaubt (Anmeldung regelt den Zugang) ──
+  var gemeldet = {};
+  function einmalMelden(schluessel, text) {
+    if (gemeldet[schluessel]) return;
+    gemeldet[schluessel] = true;
+    try { console.warn('jv-bridge: ' + text); } catch (e) { /* ohne Konsole */ }
+  }
+
+  // ── sample: Claude für künftige Versionen der Tools ───────────────────
+  // Dieselbe Schnittstelle wie use('sample') in claude.ai-Artefakten:
+  //   sample(input, optionen)      → { text, truncated, modelTierApplied }
+  //   sample.json(input, optionen) → der Wert aus der Antwort (JSON, tolerant gelesen)
+  //   sample.limits()              → { maxPromptBytes, modelTiers }
+  // Fehler sind einfache Objekte { code, message, text? } mit den Codes des Vertrags.
+  // Abweichungen: keine Bilder (images_unavailable) und keine Werkzeuge (tools_unavailable). Die Antwort
+  // kommt am Stück: onText wird einmal mit der ganzen Antwort aufgerufen, kurz bevor das Ergebnis kommt.
+  // Gleiche Anfragen innerhalb von fünf Minuten liefert der Zwischenspeicher dieser Seite (cache: false
+  // fragt immer neu). Vor der ersten Anfrage fragt ein Fenster einmal je Browser, ob die KI verwendet
+  // werden darf. Wer ablehnt, bekommt bis zum Neuladen der Seite not_granted.
+  var SAMPLE_MAX_BYTES = 262144;          // 256 KiB wie im Vertrag (die Function prüft dasselbe)
+  var SAMPLE_STUFEN = ['default', 'complex', 'quick'];
+  var SAMPLE_CODES = ['invalid_request', 'prompt_too_large', 'not_granted', 'session_expired', 'sampling_disabled',
+    'rate_limited', 'refused', 'empty_completion', 'upstream_error'];
+  var SAMPLE_OPTIONEN = ['onText', 'signal', 'tools', 'images', 'modelTier', 'model', 'effort', 'fast', 'cache'];
+  var CACHE_MS = 300000, CACHE_MAX_MS = 86400000, CACHE_EINTRAEGE = 30, CACHE_MAX_ZEICHEN = 65536;
+  var KI_GLEICHZEITIG = 2, KI_WARTEND = 8;  // wie im Vertrag: zwei laufen, einige warten, danach rate_limited
+  var KI_OK = 'jv-ki-ok';
+  var ABGEBROCHEN = {};
+  var kiAbgelehnt = false;                // «Nicht jetzt» gilt bis zum Neuladen der Seite
+  var kiFrage = null;                     // offenes Zustimmungsfenster (Promise<boolean>)
+  var kiLaufend = 0;
+  var kiWarteschlange = [];
+  var sampleCache = [];                   // { schluessel, zeit, gcTime, ergebnis }, neueste zuletzt
+
+  function sampleFehler(code, meldung, text) {
+    var e = { code: code, message: meldung };
+    if (typeof text === 'string' && text) e.text = text;
+    return e;
+  }
+
+  function istObjekt(o) {
+    if (!o || typeof o !== 'object') return false;
+    var p = Object.getPrototypeOf(o);
+    return p === Object.prototype || p === null;
+  }
+
+  function gesetzt(x) { return x !== undefined && x !== null; }
+
+  var utf8 = typeof TextEncoder !== 'undefined' ? new TextEncoder() : null;
+  function bytes(s) { return utf8 ? utf8.encode(s).length : s.length * 3; }
+
+  // Eingabe prüfen und kopieren: Text oder [{ role: 'user'|'assistant', content }], beginnt und endet mit 'user'
+  function eingabePruefen(input) {
+    var liste = [];
+    if (typeof input === 'string') {
+      if (!input.trim()) return { fehler: sampleFehler('invalid_request', 'Die Anfrage ist leer.') };
+      liste.push({ role: 'user', content: input });
+    } else if (Array.isArray(input)) {
+      if (!input.length) return { fehler: sampleFehler('invalid_request', 'Die Anfrage ist leer.') };
+      for (var i = 0; i < input.length; i++) {
+        var n = input[i];
+        if (!n || typeof n !== 'object' || (n.role !== 'user' && n.role !== 'assistant')) {
+          return { fehler: sampleFehler('invalid_request', 'Nachricht ' + (i + 1) + ': Die Rolle muss «user» oder «assistant» sein.') };
+        }
+        if (typeof n.content !== 'string' || !n.content.trim()) {
+          return { fehler: sampleFehler('invalid_request', 'Nachricht ' + (i + 1) + ': Der Inhalt muss ein nicht leerer Text sein.') };
+        }
+        liste.push({ role: n.role, content: n.content });
+      }
+      if (liste[0].role !== 'user' || liste[liste.length - 1].role !== 'user') {
+        return { fehler: sampleFehler('invalid_request', 'Die Nachrichten müssen mit der Rolle «user» beginnen und enden.') };
+      }
+    } else {
+      var tipp = istObjekt(input) && typeof input.prompt === 'string' ? ' Statt { prompt } den Text direkt übergeben: sample(text, optionen).' : '';
+      return { fehler: sampleFehler('invalid_request', 'Die Anfrage muss ein Text oder eine Liste von Nachrichten sein.' + tipp) };
+    }
+    var summe = 0;
+    liste.forEach(function (m) { summe += bytes(m.content); });
+    if (summe > SAMPLE_MAX_BYTES) return { fehler: sampleFehler('prompt_too_large', 'Die Anfrage ist zu lang (höchstens 256 KiB Text).') };
+    return { nachrichten: liste };
+  }
+
+  function cacheEinstellung(c) {
+    if (!gesetzt(c) || c === true) return { gcTime: CACHE_MS };
+    if (c === false) return { aus: true };
+    if (istObjekt(c)) {
+      var g = c.gcTime === undefined ? CACHE_MS : c.gcTime;
+      if (typeof g !== 'number' || !isFinite(g) || g <= 0) {
+        return { fehler: sampleFehler('invalid_request', 'cache.gcTime muss eine Zahl grösser als 0 sein (Millisekunden).') };
+      }
+      if (c.refresh !== undefined && typeof c.refresh !== 'boolean') {
+        return { fehler: sampleFehler('invalid_request', 'cache.refresh muss true oder false sein.') };
+      }
+      return { gcTime: Math.min(g, CACHE_MAX_MS), refresh: c.refresh === true };
+    }
+    return { fehler: sampleFehler('invalid_request', 'cache muss true, false oder { gcTime, refresh } sein.') };
+  }
+
+  // Optionen prüfen (einfaches Objekt, alles freiwillig). Ergebnis: { o, cache } oder { fehler }
+  function optionenPruefen(o) {
+    if (!gesetzt(o)) o = {};
+    if (!istObjekt(o)) {
+      var tipp = typeof AbortController !== 'undefined' && o instanceof AbortController ? ' Gemeint ist wohl { signal: controller.signal }.'
+        : typeof o === 'function' ? ' Gemeint ist wohl { onText: funktion }.'
+        : (typeof Blob !== 'undefined' && o instanceof Blob) || (typeof FileList !== 'undefined' && o instanceof FileList) ? ' Bilder gehören in { images } (hier nicht verfügbar).'
+        : typeof o === 'string' ? ' Die Anfrage gehört ins erste Argument.' : '';
+      return { fehler: sampleFehler('invalid_request', 'Die Optionen müssen ein einfaches Objekt sein.' + tipp) };
+    }
+    Object.keys(o).forEach(function (k) {
+      if (SAMPLE_OPTIONEN.indexOf(k) < 0) einmalMelden('sample-option:' + k, 'sample: unbekannte Option «' + k + '» wird ignoriert.');
+    });
+    if (gesetzt(o.onText) && typeof o.onText !== 'function') return { fehler: sampleFehler('invalid_request', 'onText muss eine Funktion sein.') };
+    if (gesetzt(o.signal) && !(typeof AbortSignal !== 'undefined' && o.signal instanceof AbortSignal)) {
+      return { fehler: sampleFehler('invalid_request', 'signal muss ein AbortSignal sein (controller.signal, nicht der Controller).') };
+    }
+    if (gesetzt(o.modelTier) && SAMPLE_STUFEN.indexOf(o.modelTier) < 0) {
+      return { fehler: sampleFehler('invalid_request', 'Unbekannte modelTier «' + String(o.modelTier) + '» (möglich: default, complex, quick).') };
+    }
+    if (gesetzt(o.tools)) {
+      if (!Array.isArray(o.tools)) return { fehler: sampleFehler('invalid_request', 'tools muss eine Liste sein.') };
+      if (o.tools.length) return { fehler: sampleFehler('tools_unavailable', 'Werkzeuge (tools) gibt es in der JV-Plattform nicht.') };
+    }
+    if (gesetzt(o.images) && (typeof o.images.length === 'number' ? o.images.length > 0 : true)) {
+      return { fehler: sampleFehler('images_unavailable', 'Bilder gibt es für die KI in der JV-Plattform nicht.') };
+    }
+    var cache = cacheEinstellung(o.cache);
+    if (cache.fehler) return { fehler: cache.fehler };
+    if (gesetzt(o.fast) && o.fast !== 'auto' && o.fast !== false) einmalMelden('sample-fast', 'sample: fast muss «auto» oder false sein, der Wert wird ignoriert.');
+    if (gesetzt(o.model) || gesetzt(o.effort)) einmalMelden('sample-modell', 'sample: model und effort werden ignoriert, das Modell bestimmt die JV-Plattform.');
+    return { o: o, cache: cache };
+  }
+
+  function cacheLesen(schluessel, gcTime) {
+    for (var i = sampleCache.length - 1; i >= 0; i--) {
+      var c = sampleCache[i];
+      if (c.schluessel !== schluessel) continue;
+      if (Date.now() - c.zeit >= Math.min(c.gcTime, gcTime)) return null;
+      return { text: c.ergebnis.text, truncated: c.ergebnis.truncated, modelTierApplied: c.ergebnis.modelTierApplied };
+    }
+    return null;
+  }
+
+  function cacheSchreiben(schluessel, ergebnis, gcTime) {
+    if (schluessel.length > CACHE_MAX_ZEICHEN) return;   // lange Anfragen nicht im Speicher halten
+    sampleCache = sampleCache.filter(function (c) { return c.schluessel !== schluessel; });
+    sampleCache.push({ schluessel: schluessel, zeit: Date.now(), gcTime: gcTime, ergebnis: {
+      text: ergebnis.text, truncated: ergebnis.truncated, modelTierApplied: ergebnis.modelTierApplied
+    } });
+    if (sampleCache.length > CACHE_EINTRAEGE) sampleCache.shift();
+  }
+
+  // Antwort als JSON lesen: ganze Antwort, sonst ein einzelner Markdown-Block, sonst von der ersten
+  // { oder [ bis zur letzten } oder ]
+  function jsonLesen(text) {
+    function versuch(s) {
+      try { return { ok: true, wert: JSON.parse(s) }; } catch (e) { return { ok: false }; }
+    }
+    var t = String(text).trim();
+    var r = versuch(t);
+    if (r.ok) return r;
+    var bloecke = t.match(/```[^\n`]*\n?[\s\S]*?```/g);
+    if (bloecke && bloecke.length === 1) {
+      r = versuch(bloecke[0].replace(/^```[^\n`]*\n?/, '').replace(/```$/, '').trim());
+      if (r.ok) return r;
+    }
+    var a = t.search(/[{[]/);
+    var z = Math.max(t.lastIndexOf('}'), t.lastIndexOf(']'));
+    return a >= 0 && z > a ? versuch(t.slice(a, z + 1)) : { ok: false };
+  }
+
+  // Promise ablehnen, sobald das Signal auslöst (offene Fenster bleiben stehen)
+  function mitAbbruch(p, signal) {
+    if (!signal) return p;
+    return new Promise(function (ok, nein) {
+      function ab() { nein(ABGEBROCHEN); }
+      if (signal.aborted) { ab(); return; }
+      signal.addEventListener('abort', ab);
+      p.then(function (x) { signal.removeEventListener('abort', ab); ok(x); },
+        function (e) { signal.removeEventListener('abort', ab); nein(e); });
+    });
+  }
+
+  // Platz für eine Anfrage: höchstens KI_GLEICHZEITIG laufen, KI_WARTEND warten, sonst rate_limited.
+  // Ergebnis: Funktion zum Freigeben des Platzes.
+  function kiPlatz(signal) {
+    return new Promise(function (ok, nein) {
+      function nehmen() {
+        var frei = false;
+        ok(function () {
+          if (frei) return;
+          frei = true;
+          var naechster = kiWarteschlange.shift();
+          if (naechster) naechster.nehmen(); else kiLaufend--;
+        });
+      }
+      if (kiLaufend < KI_GLEICHZEITIG) { kiLaufend++; nehmen(); return; }
+      if (kiWarteschlange.length >= KI_WARTEND) {
+        nein(sampleFehler('rate_limited', 'Zu viele KI-Anfragen auf einmal. Bitte kurz warten und nochmals versuchen.'));
+        return;
+      }
+      var eintrag = { nehmen: nehmen };
+      kiWarteschlange.push(eintrag);
+      if (signal) signal.addEventListener('abort', function () {
+        var i = kiWarteschlange.indexOf(eintrag);
+        if (i >= 0) { kiWarteschlange.splice(i, 1); nein(ABGEBROCHEN); }
+      });
+    });
+  }
+
+  function kiZustand() {
+    try { if (localStorage.getItem(KI_OK) === '1') return 'granted'; } catch (e) { /* ohne localStorage: jedes Mal fragen */ }
+    return kiAbgelehnt ? 'denied' : 'prompt';
+  }
+
+  // Einmal je Browser fragen, ob die KI verwendet werden darf. Ergebnis: true/false
+  var KI_STIL =
+    '.bg.ki{background:rgba(35,42,48,.55)}' +
+    '.ki form{width:min(440px,100%);box-sizing:border-box;background:#fff;padding:24px;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.25)}' +
+    '.ki .knoepfe{display:flex;gap:10px;flex-wrap:wrap}.ki .knoepfe button{flex:1 1 150px}';
+  function kiZustimmung() {
+    var z = kiZustand();
+    if (z !== 'prompt') return Promise.resolve(z === 'granted');
+    if (kiFrage) return kiFrage;
+    kiFrage = new Promise(function (fertig) {
+      var host = document.createElement('div');
+      host.setAttribute('data-jv-ki', '');
+      var root = host.attachShadow ? host.attachShadow({ mode: 'open' }) : host;
+      root.innerHTML = '<style>' + STIL + KI_STIL + '</style>' +
+        '<div class="bg ki" role="dialog" aria-modal="true" aria-labelledby="ki-titel"><form novalidate>' +
+        '<h1 id="ki-titel">KI verwenden?</h1>' +
+        '<p>Für diese Funktion schickt das Tool Angaben an Claude, die KI von Anthropic (USA). Es geht nur mit, ' +
+        'was die Funktion dafür zusammenstellt, keine Anmeldedaten und keine weiteren Daten der Plattform.</p>' +
+        '<p>Bitte die Funktion nicht für heikle Personendaten verwenden. Die Freigabe gilt für diesen Browser.</p>' +
+        '<div class="knoepfe"><button type="submit">KI verwenden</button><button type="button" class="leise" data-nein>Nicht jetzt</button></div>' +
+        '</form></div>';
+      document.documentElement.appendChild(host);
+      var ja = root.querySelector('button[type=submit]');
+      setTimeout(function () { ja.focus(); }, 30);
+      function antwort(erlaubt) {
+        host.remove();
+        kiFrage = null;
+        if (erlaubt) {
+          try { localStorage.setItem(KI_OK, '1'); } catch (e) { /* gilt dann nur für diese Seite */ }
+          kiAbgelehnt = false;
+        } else {
+          kiAbgelehnt = true;
+        }
+        fertig(erlaubt);
+      }
+      root.querySelector('form').addEventListener('submit', function (ev) { ev.preventDefault(); antwort(true); });
+      root.querySelector('[data-nein]').addEventListener('click', function () { antwort(false); });
+      root.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') antwort(false); });
+    });
+    return kiFrage;
+  }
+
+  function textMelden(onText, text) {
+    if (!onText) return;
+    function melden(e) { try { console.error('jv-bridge: Fehler in onText', e); } catch (x) { /* ohne Konsole */ } }
+    try {
+      var r = onText({ text: text, delta: text });
+      if (r && typeof r.then === 'function') r.then(null, melden);
+    } catch (e) {
+      melden(e);
+    }
+  }
+
+  function alsSampleFehler(e) {
+    if (e === ABGEBROCHEN || (e && e.name === 'AbortError')) return sampleFehler('cancelled', 'Abgebrochen.');
+    if (istObjekt(e) && typeof e.code === 'string' && typeof e.message === 'string') return e;   // schon im Vertragsformat
+    if (e instanceof TypeError) return sampleFehler('upstream_error', 'Keine Verbindung zur Plattform. Bitte später nochmals versuchen.');
+    var code = e && e.code === 'quota_exceeded' ? 'prompt_too_large' : e && e.code;
+    if (SAMPLE_CODES.indexOf(code) < 0) code = 'upstream_error';
+    return sampleFehler(code, (e && e.message) || 'Die KI-Anfrage ist fehlgeschlagen.');
+  }
+
+  function sampleAufruf(verb, input, optionen) {
+    var p = optionenPruefen(optionen);
+    if (p.fehler) return Promise.reject(p.fehler);
+    var e = eingabePruefen(input);   // die Eingabe wird jetzt gelesen; spätere Änderungen zählen nicht
+    if (e.fehler) return Promise.reject(e.fehler);
+    var o = p.o;
+    var signal = o.signal || null;
+    var stufe = o.modelTier || 'default';
+    var onText = typeof o.onText === 'function' ? o.onText : null;
+    var schluessel = verb + '|' + stufe + '|' + JSON.stringify(e.nachrichten);
+    if (signal && signal.aborted) return Promise.reject(sampleFehler('cancelled', 'Abgebrochen.'));
+
+    return Promise.resolve().then(function () {
+      // Erst im nächsten Mikrotask: ein abort() im selben Ablauf schickt nichts ab
+      if (signal && signal.aborted) throw ABGEBROCHEN;
+      var gemerkt = !p.cache.aus && !p.cache.refresh ? cacheLesen(schluessel, p.cache.gcTime) : null;
+      if (gemerkt) return gemerkt;
+      return mitAbbruch(kiZustimmung(), signal).then(function (erlaubt) {
+        if (!erlaubt) throw sampleFehler('not_granted', 'Die KI wurde nicht freigegeben. Nach dem Neuladen der Seite wird wieder gefragt.');
+        return kiPlatz(signal);
+      }).then(function (freigeben) {
+        if (signal && signal.aborted) { freigeben(); throw ABGEBROCHEN; }
+        var laeuft = anfrage('/ki', {
+          method: 'POST',
+          body: { action: 'sample', nachrichten: e.nachrichten, json: verb === 'json', stufe: stufe },
+          signal: signal
+        });
+        laeuft.then(freigeben, freigeben);
+        return mitAbbruch(laeuft, signal);
+      }).then(function (r) {
+        if (!r || typeof r.text !== 'string' || !r.text.trim()) throw sampleFehler('empty_completion', 'Die KI hat keinen Text geliefert.');
+        return { text: r.text, truncated: r.gekuerzt === true, modelTierApplied: SAMPLE_STUFEN.indexOf(r.stufe) >= 0 ? r.stufe : stufe };
+      });
+    }).then(function (ergebnis) {
+      if (signal && signal.aborted) throw ABGEBROCHEN;
+      textMelden(onText, ergebnis.text);
+      if (signal && signal.aborted) throw sampleFehler('cancelled', 'Abgebrochen.', ergebnis.text);
+      var wert;
+      if (verb === 'json') {
+        if (ergebnis.truncated) throw sampleFehler('invalid_json', 'Die Antwort wurde abgeschnitten, bevor das JSON vollständig war.', ergebnis.text);
+        var gelesen = jsonLesen(ergebnis.text);
+        if (!gelesen.ok) throw sampleFehler('invalid_json', 'Die Antwort enthält keinen lesbaren JSON-Wert.', ergebnis.text);
+        wert = gelesen.wert;
+      }
+      if (!p.cache.aus) cacheSchreiben(schluessel, ergebnis, p.cache.gcTime);
+      return verb === 'json' ? wert : { text: ergebnis.text, truncated: ergebnis.truncated, modelTierApplied: ergebnis.modelTierApplied };
+    }).catch(function (err) {
+      throw alsSampleFehler(err);
+    });
+  }
+
+  function sample(input, optionen) { return sampleAufruf('sample', input, optionen); }
+  sample.json = function (input, optionen) { return sampleAufruf('json', input, optionen); };
+  sample.limits = function () {
+    return Promise.resolve({ maxPromptBytes: SAMPLE_MAX_BYTES, modelTiers: SAMPLE_STUFEN.slice() });
+  };
+  Object.freeze(sample);
+
+  // Ältere Artefakte: window.claude.complete(prompt) → Text der Antwort
+  function complete(prompt) {
+    return sampleAufruf('sample', prompt, { cache: false }).then(function (r) { return r.text; });
+  }
+
+  // ── permissions: Anmeldung regelt den Zugang; nur die KI fragt einmal nach ──
+  var IMMER_ERLAUBT = ['db', 'assets', 'downloads'];
+  function erlaubnis(name) {
+    if (name === 'sample') return kiZustand();
+    return IMMER_ERLAUBT.indexOf(name) >= 0 ? 'granted' : 'unavailable';
+  }
   var permissions = {
-    state: function () { return Promise.resolve('granted'); },
-    request: function (namen) {
-      var r = {};
-      (namen || []).forEach(function (n) { r[n] = 'granted'; });
-      return Promise.resolve(r);
+    state: function (name) {
+      if (name === undefined) {
+        var alle = {};
+        IMMER_ERLAUBT.concat('sample').forEach(function (n) { alle[n] = erlaubnis(n); });
+        return Promise.resolve(alle);
+      }
+      return Promise.resolve(erlaubnis(name));
     },
-    manage: function () { return Promise.resolve(); }
+    request: function (namen) {
+      var liste = Array.isArray(namen) ? namen.slice() : IMMER_ERLAUBT.concat('sample');
+      var fragen = liste.indexOf('sample') >= 0 && kiZustand() === 'prompt' ? kiZustimmung() : Promise.resolve();
+      return fragen.then(function () {
+        var r = {};
+        liste.forEach(function (n) { r[n] = erlaubnis(n); });
+        return r;
+      });
+    },
+    // «Nicht jetzt» zurücknehmen: die nächste KI-Anfrage fragt wieder
+    manage: function () { kiAbgelehnt = false; return Promise.resolve(); }
   };
 
   var speicher = {};
@@ -574,14 +932,18 @@
   function use(name) {
     if (name === 'downloads') return Promise.resolve(downloads);
     if (name === 'permissions') return Promise.resolve(permissions);
-    if (!TOOL) return Promise.reject(fehler('Kein Tool angegeben', 'unavailable'));
-    // Erst anmelden, dann Daten: so lädt kein Tool mit leerem Speicher und überschreibt Gespeichertes
-    if (name === 'db') return sitzungSicherstellen().then(function () { return speicherFuer(TOOL); });
-    if (name === 'assets') return sitzungSicherstellen().then(function () { return dateienFuer(TOOL); });
-    return Promise.reject(fehler('Nicht verfügbar: ' + name, 'unavailable'));
+    if (name === 'sample') return Promise.resolve(sample);
+    if (name === 'db' || name === 'assets') {
+      if (!TOOL) return Promise.reject(fehler('Kein Tool angegeben', 'unavailable'));
+      // Erst anmelden, dann Daten: so lädt kein Tool mit leerem Speicher und überschreibt Gespeichertes
+      return sitzungSicherstellen().then(function () { return name === 'db' ? speicherFuer(TOOL) : dateienFuer(TOOL); });
+    }
+    // Wie in claude.ai: was es hier nicht gibt, ergibt null (das Tool blendet die Funktion aus)
+    einmalMelden('use:' + name, 'use("' + name + '") gibt es in der JV-Plattform nicht, Ergebnis null.');
+    return Promise.resolve(null);
   }
 
-  window.claude = Object.assign(window.claude || {}, { use: use });
+  window.claude = Object.assign(window.claude || {}, { use: use, complete: complete });
   // Für die Plattform (Datenübernahme, Projekte): direkter Zugriff auf Speicher und Dateien
   window.JVBridge = {
     tool: TOOL,

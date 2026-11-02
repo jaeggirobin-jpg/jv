@@ -78,8 +78,8 @@ Für lokale Tests eine Datei `.env` im Repo-Root mit den Variablen unten anlegen
    | `DC_ABSENDER` | optional, überschreibt die Absender-Adresse |
    | `DC_RATE_LIMIT` | optional, Anfragen pro Stunde und IP (Standard 5) |
    | `DC_LIMIT_GESAMT` | optional, Anfragen pro Stunde über alle Absender (Standard 30, gilt auch für die Warteliste) |
-   | `ANTHROPIC_API_KEY` | für die KI-Knöpfe im Bericht (korrigieren, umschreiben). Fehlt er, funktioniert alles andere normal |
-   | `DC_KI_MODELL` | optional, Claude-Modell für die KI-Knöpfe (Standard `claude-haiku-5-5`, schnell genug für das 10-Sekunden-Limit der Functions) |
+   | `ANTHROPIC_API_KEY` | für die KI-Knöpfe im Bericht (korrigieren, umschreiben), gilt für alle KI-Funktionen der Plattform (`README_Plattform.md`, «KI»). Fehlt er, funktioniert alles andere normal |
+   | `JV_KI_MODELL` | optional, anderes Claude-Modell für alle KI-Funktionen (das frühere `DC_KI_MODELL` gilt weiter). Vorgabe ist ein schnelles Modell, wegen des 10-Sekunden-Limits der Functions |
 
 5. **Werbelinks** mit UTM-Parametern, z. B.
    `https://dachcheck.jaeggivollmer.ch/?utm_source=instagram&utm_medium=paid&utm_campaign=rinnencheck-herbst`

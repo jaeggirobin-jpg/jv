@@ -35,7 +35,7 @@ docs.jaeggivollmer.ch/
 │   ├── inspiration.html    → Kunden-Inspirationsseite (Token, Supabase-RPCs)
 │   ├── swipe.html          → Inspiration als Swipe-Karten (Token, Supabase-RPCs)
 │   ├── tools/              → Michis Tools (Terminplaner, Badvisualisierungen, Gäste-WC 3D, Story, Reel)
-│   │   └── assets/jv-bridge.js → Speicher der Tools (statt claude.ai) + Anmeldefenster der Plattform
+│   │   └── assets/jv-bridge.js → Speicher der Tools (statt claude.ai), KI für die Tools (`use('sample')`) + Anmeldefenster der Plattform
 │   ├── assets/plattform.js|css → Plattform (Router, Projekte, Rechte im Menü, Daten übernehmen)
 │   ├── assets/feedback.js  → Feedback-Knopf mit Bildausschnitt (Plattform und Tools)
 │   ├── assets/zurueck.js   → Lasche «Zurück» in Tools und Seiten (alles öffnet im selben Tab)
@@ -47,6 +47,8 @@ docs.jaeggivollmer.ch/
 ├── werkzeuge/tools_einbinden.py → neue Version eines Tools von Michi übernehmen (entfernt Personendaten)
 └── netlify/functions/
     ├── _lib/auth.js        → Anmeldung: Hauptpasswort, Mitarbeiter-Logins, Sitzungs-Cookie, Bereiche
+    ├── _lib/ki.js          → gemeinsamer KI-Zugang (Claude über das Anthropic-SDK): Frist, Fehlercodes, Texthilfe
+    ├── ki.js               → KI der Plattform: Texthilfe im Katalog, `sample` für Michis Tools
     ├── sitzung.js          → Anmelden, Abmelden, eigenes Passwort ändern
     ├── zugaenge.js         → Logins verwalten (nur Admins)
     ├── feedback.js         → Feedback speichern (alle), Board und Export (nur Admins)
@@ -135,7 +137,15 @@ Alle Functions verwenden den `service_role` Key (aus Environment Variable), niem
 SUPABASE_URL=https://xyz.supabase.co
 SUPABASE_SERVICE_KEY=eyJ...   ← service_role, geheim
 ADMIN_PASSWORD=...             ← selbst gewählt, mind. 16 Zeichen
+ANTHROPIC_API_KEY=sk-ant-...  ← für alle KI-Funktionen, geheim (fehlt er, melden nur die KI-Knöpfe einen Fehler)
+JV_KI_MODELL=...              ← optional, anderes Claude-Modell (früher DC_KI_MODELL, gilt weiter)
 ```
+
+### KI (Claude)
+
+- Jede KI-Anfrage läuft über `_lib/ki.js` (offizielles SDK, Streaming, Frist 8.5 s wegen des 10-s-Limits der Functions; danach Teilantwort mit `gekuerzt`). Nie direkt `fetch` an die API, nie Texte loggen (nur Status, Fehlertyp, request-id; bei 400/404 die Meldung der API).
+- Heute: Drohnen-Check und KRV-Begründung (Bereich `anfragen`), Katalog (`ki.js` Aktion `text`, Bereich `katalog`), Michis Tools (`ki.js` Aktion `sample`, Bereich `projekte`). Die Knöpfe schicken nur den Text des Feldes (dazu Titel, Beurteilung bzw. Ampel), nie Namen, Adressen, Fotos; bei `sample` bestimmt das Tool den Inhalt.
+- `jv-bridge.js` bildet `window.claude.use('sample')` nach (Fehler als `{ code, message }`, 5 Min Zwischenspeicher, 2 gleichzeitig, Freigabe-Fenster einmal je Browser `jv-ki-ok`); Tools nie von Hand auf KI umbauen.
 
 ### Authentifizierung (Plattform und Admin-Functions)
 
