@@ -8,8 +8,8 @@
 
   // Rahmen pro Schritt (x, y, Breite, Höhe im viewBox 0 0 400 240)
   var RAHMEN = [
-    { x: 126, y: 88, b: 82, h: 86 },    // 1. Wasserzähler finden
-    { x: 30, y: 70, b: 300, h: 116 },   // 2. ganze Stelle
+    { x: 126, y: 92, b: 82, h: 76 },    // 1. Wasserzähler finden (Unterkante über der Beschriftung)
+    { x: 30, y: 66, b: 300, h: 128 },   // 2. ganze Stelle (inkl. Beschriftungen)
     { x: 222, y: 70, b: 92, h: 112 },   // 3. Ventile nach dem Zähler
     { x: 136, y: 100, b: 62, h: 58 }    // 4. Zählernummer (Nahaufnahme Zähler)
   ];
@@ -55,7 +55,7 @@
       // Beschriftungen
       '<g font-family="Inter, Arial, sans-serif" font-size="11" fill="#5C636B" text-anchor="middle">' +
         '<text x="88" y="168">Absperrung</text>' +
-        '<text x="167" y="176" font-weight="600" fill="#25292E">Wasserzähler</text>' +
+        '<text x="167" y="186" font-weight="600" fill="#25292E">Wasserzähler</text>' +
         '<text x="268" y="84" class="sz-label-nach">nach dem Zähler</text>' +
         '<text x="372" y="60" transform="rotate(-90 372 60)" font-size="10">ins Haus</text>' +
         '<text x="56" y="230" font-size="10" fill="#6E655A" text-anchor="start">vom Netz</text>' +
