@@ -7,7 +7,7 @@
 //   'entfernen'  → kein Anleitungsvideo mehr, Dateien werden gelöscht
 const crypto = require('crypto');
 const { antwort, rest, medienUploadUrl, medienListe, medienLoeschen, oeffentlicheUrl } = require('./_lib/krvcheck');
-const { checkAuth } = require('./_lib/auth');
+const { anmeldung } = require('./_lib/auth');
 
 const ORDNER = 'anleitung';
 const SCHLUESSEL = 'anleitung';
@@ -27,7 +27,7 @@ function mitUrls(w) {
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return antwort(405, { error: 'Methode nicht erlaubt' });
-  if (!checkAuth(event)) return antwort(401, { error: 'Nicht autorisiert' });
+  if (!(await anmeldung(event, 'anfragen'))) return antwort(401, { error: 'Nicht autorisiert' });
 
   let b;
   try {

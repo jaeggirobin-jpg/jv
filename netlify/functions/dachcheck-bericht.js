@@ -12,7 +12,7 @@
 
 const crypto = require('crypto');
 const { antwort, rest, uploadUrl, signierteUrls, ordnerListe, bilderLoeschen } = require('./_lib/dachcheck');
-const { checkAuth } = require('./_lib/auth');
+const { anmeldung } = require('./_lib/auth');
 
 const AMPEL = ['gut', 'beobachten', 'handlung'];
 const TYPEN = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
@@ -60,7 +60,7 @@ function text(v, max) {
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return antwort(405, { error: 'Methode nicht erlaubt' });
-  if (!checkAuth(event)) return antwort(401, { error: 'Nicht autorisiert' });
+  if (!(await anmeldung(event, 'anfragen'))) return antwort(401, { error: 'Nicht autorisiert' });
 
   let b;
   try {

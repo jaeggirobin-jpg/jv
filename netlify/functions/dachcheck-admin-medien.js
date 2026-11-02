@@ -8,7 +8,7 @@
 //   'entfernen'  → kein Titelvideo mehr, Dateien werden gelöscht
 const crypto = require('crypto');
 const { antwort, rest, uploadUrl, ordnerListe, bilderLoeschen, oeffentlicheUrl, BUCKET_MEDIEN } = require('./_lib/dachcheck');
-const { checkAuth } = require('./_lib/auth');
+const { anmeldung } = require('./_lib/auth');
 
 const ORDNER = 'hero';
 const TYPEN = { 'video/mp4': 'mp4', 'video/webm': 'webm', 'image/jpeg': 'jpg' };
@@ -27,7 +27,7 @@ function mitUrls(w) {
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return antwort(405, { error: 'Methode nicht erlaubt' });
-  if (!checkAuth(event)) return antwort(401, { error: 'Nicht autorisiert' });
+  if (!(await anmeldung(event, 'anfragen'))) return antwort(401, { error: 'Nicht autorisiert' });
 
   let b;
   try {

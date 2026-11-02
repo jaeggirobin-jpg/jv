@@ -1,7 +1,7 @@
 // create-kunde.js — Neuen Kunden anlegen (Admin)
 
 const { createClient } = require('@supabase/supabase-js');
-const { checkAuth } = require('./_lib/auth');
+const { anmeldung } = require('./_lib/auth');
 
 function respond(statusCode, body) {
   return {
@@ -25,7 +25,7 @@ exports.handler = async (event) => {
     return respond(405, { error: 'Methode nicht erlaubt' });
   }
 
-  if (!checkAuth(event)) {
+  if (!(await anmeldung(event, 'kunden'))) {
     return respond(401, { error: 'Nicht autorisiert' });
   }
 
@@ -39,13 +39,14 @@ exports.handler = async (event) => {
   const vorname = (payload.vorname || '').trim();
   const nachname = (payload.nachname || '').trim();
 
-  if (!vorname || !nachname) {
+  // Bei «Familie» genügt der Nachname (z. B. Kundenzugang aus einem Projekt mit Bauherrschaft «Familie Muster»)
+  if (!nachname || (!vorname && payload.anrede_typ !== 'familie')) {
     return respond(400, { error: 'Vorname und Nachname sind erforderlich' });
   }
 
   // Felder für den neuen Kunden zusammenstellen
   const insert = {
-    vorname,
+    vorname: vorname || null,
     nachname,
   };
 
@@ -60,6 +61,14 @@ exports.handler = async (event) => {
 
   // Ansprechperson zuweisen
   if (payload.ansprechperson_id) insert.ansprechperson_id = payload.ansprechperson_id;
+
+  // Projekt (ID aus dem Terminplaner): ein Projekt für alles
+  if (payload.projekt_id) {
+    if (!/^[A-Za-z0-9_-]{1,60}$/.test(String(payload.projekt_id))) {
+      return respond(400, { error: 'Ungültige Projekt-ID' });
+    }
+    insert.projekt_id = String(payload.projekt_id);
+  }
 
   // Sichtbare Punkte: Array von UUIDs, oder null für alle
   if (Array.isArray(payload.sichtbare_punkte) && payload.sichtbare_punkte.length > 0) {

@@ -163,9 +163,11 @@
 
     function aufruf(pfad, optionen) {
       optionen = optionen || {};
-      var h = { Authorization: 'Bearer ' + getPwd() };
+      // Passwort (eigene Seite admin.html) oder Sitzungs-Cookie der JV-Plattform (Header X-JV-Sitzung)
+      var pw = getPwd ? getPwd() : '';
+      var h = pw ? { Authorization: 'Bearer ' + pw } : { 'X-JV-Sitzung': '1' };
       if (optionen.body) h['Content-Type'] = 'application/json';
-      return fetch(api + pfad, { method: optionen.method || 'GET', headers: h, body: optionen.body }).then(function (res) {
+      return fetch(api + pfad, { method: optionen.method || 'GET', headers: h, body: optionen.body, credentials: 'same-origin' }).then(function (res) {
         return res.json().catch(function () { return {}; }).then(function (j) {
           if (res.status === 401) { onUnauthorized(); throw new Error('Nicht angemeldet'); }
           if (!res.ok) throw new Error(j.error || 'Fehler ' + res.status);
