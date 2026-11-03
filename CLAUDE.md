@@ -37,14 +37,18 @@ docs.jaeggivollmer.ch/
 │   ├── tools/              → Michis Tools (Terminplaner, Badvisualisierungen, Gäste-WC 3D, Story, Reel)
 │   │   └── assets/jv-bridge.js → Speicher der Tools (statt claude.ai), KI für die Tools (`use('sample')`) + Anmeldefenster der Plattform
 │   ├── assets/plattform.js|css → Plattform (Router, Projekte, Rechte im Menü, Daten übernehmen)
+│   ├── assets/badvis-editor.js → Badvisualisierungen erstellen, bearbeiten, löschen (Route `#/visualisierung/…`)
 │   ├── assets/feedback.js  → Feedback-Knopf mit Bildausschnitt (Plattform und Tools)
 │   ├── assets/zurueck.js   → Lasche «Zurück» in Tools und Seiten (alles öffnet im selben Tab)
 │   ├── assets/feedback-board.js, zugaenge.js → Verwaltung: Feedback-Board, Logins
 │   ├── assets/vendor/      → html2canvas-pro (MIT, für die Feedback-Bilder)
+│   ├── manifest.webmanifest, sw.js, offline.html, assets/app.js → Plattform als App (PWA), siehe «App (PWA)»
+│   ├── assets/app/         → App-Symbole (generiert mit werkzeuge/app_symbole.py)
 │   └── assets/, logo.png
 ├── netlify.toml            → Routing, Function-Config, Sicherheits-Header
 ├── supabase/               → SQL-Migrationen (manuell im SQL-Editor ausführen)
 ├── werkzeuge/tools_einbinden.py → neue Version eines Tools von Michi übernehmen (entfernt Personendaten)
+├── werkzeuge/app_symbole.py → App-Symbole aus logo.png (`--pruefen` = Dateien aktuell?)
 └── netlify/functions/
     ├── _lib/auth.js        → Anmeldung: Hauptpasswort, Mitarbeiter-Logins, Sitzungs-Cookie, Bereiche
     ├── _lib/ki.js          → gemeinsamer KI-Zugang (Claude über das Anthropic-SDK): Frist, Fehlercodes, Texthilfe
@@ -171,6 +175,7 @@ Einrichtung, Rechte, Feedback und Datenschutz für Robin: `README_Plattform.md`.
 - Feedback: Knopf «Feedback» (oben rechts, in den Tools am rechten Rand, in offenen Dialogen als kleiner Knopf) → Bereich aufziehen, markieren, beschreiben. Wartet offline im Browser und wird nachgesendet. Board unter Verwaltung «Feedback»: Status, «Umsetzen», Markdown-Export für Claude Code mit eingebetteten Bildern
 - Michis Tools in `public/tools/` nicht von Hand umbauen: neue Versionen mit `werkzeuge/tools_einbinden.py` übernehmen (sonst gehen Änderungen beim nächsten Einbinden verloren)
 - Alles öffnet im selben Tab (Robin, 2.11.2026): Links zu Tools und eigenen Seiten ohne `target="_blank"`. Die Plattform merkt sich die Ansicht in `sessionStorage` (`jv-zurueck`), `assets/zurueck.js` zeigt dort die Lasche «Zurück» (nur Pfade der Plattform, Kundenseiten mit `data-nur-plattform` nur aus der Plattform). Nur externe Ziele (WhatsApp, Karte, E-Mail, fremde Webseiten) öffnen einen neuen Tab.
+- Badvisualisierungen (`assets/badvis-editor.js`, Robin 3.11.2026): «＋ Neue Visualisierung» im Projekt und oben rechts im Tool, dort auch «Bearbeiten» (`#/visualisierung/neu[?projekt=…][&von=tool]`, `#/visualisierung/<id>[?von=tool]`). Dokument `badvis/objekte/bv-…` wie im Tool (Varianten, Ausführung, Bilder = Asset-IDs im Bucket `tools`). Fotos werden im Browser neu als JPEG gezeichnet (max. 2000 px, ohne Kameradaten/GPS), ersetzte Fotos gelöscht; Löschen entfernt auch Kundenlinks und ungenutzte Fotos (`tool-db.js`). `tools/badvisualisierungen/daten.js` vereinheitlicht die Felder, lässt in der Ausführung nur Farbmuster und b/i/br als HTML zu und setzt die Knöpfe ins Tool
 - Terminplaner (`public/tools/terminplaner/plattform.js`): Karte der Projektadresse nur im PDF (schwarz-weiss, Kreis um die Adresse farbig, Punkt mittig zwischen Tabellenende und Legende, ohne Platz keine Karte); Knopf «Projekte» = Suche (Name, Adresse, Bauherrschaft, Tippfehler) statt Auswahlliste
 - PDF-Upload via `<input type="file">` → Base64 → an `create-link.js`
 - Tabelle aller Links mit:
@@ -180,6 +185,13 @@ Einrichtung, Rechte, Feedback und Datenschutz für Robin: `README_Plattform.md`.
   - Copy-Link-Button
   - Löschen-Button (inkl. Bestätigung)
 - Kein CSS-Framework, eigene schlichte Styles (Farben: `#BF853B`, `#4B575D`, `#929A9D`)
+
+### App (PWA)
+
+- Die Plattform (`/`, `/index.html`, `/tools/…`) ist installierbar: `manifest.webmanifest` (Kürzel Projekte, Bau-Terminplaner), Knopf «Als App installieren» bzw. Apple-Hinweis im Benutzermenü (`assets/app.js`)
+- `sw.js` speichert **nur** `/offline.html`, nie Seiten, Daten, Bilder oder PDFs; greift nur bei ganzen Seitenaufrufen der Plattform (Netz zuerst, ohne Netz die Offline-Seite; eingebettete Rahmen/iframes nie). Kundenseiten, Drohnen-Check, KRV-Check, `/api/`, `/_blob/` laufen am Worker vorbei und melden keinen an
+- Offline-Seite geändert → `VERSION` in `sw.js` hochzählen; sie fragt selbst nach (HEAD `/manifest.webmanifest`, 5 s, verdoppelt bis 60 s, sofort bei «online»/Sichtbarkeit) und lädt neu, sobald der Server antwortet
+- Symbole nur über `werkzeuge/app_symbole.py` erzeugen (`--pruefen` im Zweifel); `netlify.toml` setzt `no-cache` für `sw.js` und das Manifest
 
 ### Kunden-Viewer (`view.html`)
 

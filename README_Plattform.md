@@ -15,10 +15,12 @@ Mitarbeiterinnen und Mitarbeiter und ein gemeinsamer KI-Zugang (Claude) für all
 | Michis Tools | `public/tools/<tool>/index.html`; Speicher `tool-db.js`, `tool-asset.js`, `tool-blob.js`; Tabelle `tool_docs`, Bucket `tools` (`migration_015`) |
 | Karte und Adressvorschläge (swisstopo) | `public/tools/assets/geo-admin.js`, `public/tools/terminplaner/plattform.js` |
 | Lasche «Zurück» (alles öffnet im selben Tab) | `public/assets/zurueck.js`, Merker in `public/assets/plattform.js` |
+| Badvisualisierungen erstellen und bearbeiten | `public/assets/badvis-editor.js`; Knöpfe und Aufbereitung im Tool `public/tools/badvisualisierungen/daten.js` |
 | Kundenlink für Badvisualisierungen | `visualisierung-links.js`, `get-visualisierung.js`, `public/visualisierung.html`; Tabelle `visualisierung_links` |
 | Feedback | `public/assets/feedback.js` (Knopf, Bildausschnitt), `feedback-board.js` (Board, Export), Function `feedback.js`; Tabelle `plattform_feedback`, Bucket `feedback` (`migration_016`) |
 | KI (Claude) | `netlify/functions/_lib/ki.js` (gemeinsamer Zugang), `ki.js` (Katalog, Tools); KI für die Tools in `jv-bridge.js` |
 | Neue Tool-Version von Michi übernehmen | `werkzeuge/tools_einbinden.py` |
+| App (PWA): installierbar, Offline-Hinweis | `public/manifest.webmanifest`, `public/sw.js`, `public/offline.html`, `public/assets/app.js`; Symbole `public/assets/app/` aus `werkzeuge/app_symbole.py` |
 
 **Ein Projekt für alles:** Ein Projekt (Name, Adresse, Bauherrschaft, Projektleiter) gilt für Terminplan, Kundenzugang
 (Inspiration, Swipe, Dokumente) und Badvisualisierungen. Bestehende Kunden werden im Projekt unter «Kundenzugang» →
@@ -62,6 +64,26 @@ Das Repo ist öffentlich. Kundendaten, Kundenfotos, 3D-Scans und Personendaten k
   zur Übersicht. Kunden sehen die Lasche nicht (nur wenn die Seite aus der Plattform geöffnet wurde).
 - Externe Ziele bleiben in einem neuen Tab: WhatsApp, Karte, E-Mail, Telefon, Webseiten von Firmen und der IWB.
 
+## Als App installieren (PWA)
+
+Die Plattform lässt sich wie eine App auf den Home-Bildschirm, ins Dock oder in die Taskleiste legen. Sie öffnet dann
+in einem eigenen Fenster ohne Adressleiste, mit dem JV-Symbol.
+
+- **iPhone, iPad (Safari):** Teilen-Knopf (Quadrat mit Pfeil, in neueren Versionen unter «…») → «Zum Home-Bildschirm»
+  → «Hinzufügen». Den Weg zeigt auch das Benutzermenü oben rechts.
+- **Android, Chrome oder Edge am PC:** Benutzermenü oben rechts → «Als App installieren». Fehlt der Knopf, bietet der
+  Browser es gerade nicht an (schon installiert, privates Fenster); dann über das Menü des Browsers («App installieren»
+  bzw. «Zum Startbildschirm hinzufügen»).
+- **Mac mit Safari:** Menü «Ablage» → «Zum Dock hinzufügen».
+- Auf iPhone und iPad hat die App eine eigene Anmeldung (getrennt von Safari): beim ersten Öffnen einmal anmelden,
+  am besten mit «Angemeldet bleiben».
+- Langes Drücken bzw. Rechtsklick auf das Symbol (Android, PC) bietet die Kurzbefehle «Projekte» und «Bau-Terminplaner».
+- **Ohne Verbindung** zeigt die App «Keine Verbindung» statt einer Fehlerseite des Browsers. Sie lädt von selbst neu,
+  sobald der Server wieder antwortet (fragt alle paar Sekunden nach, später seltener); «Erneut versuchen» lädt sofort.
+- **Auf dem Gerät gespeichert wird nur dieser Hinweis.** Projekte, Kundendaten, Bilder und PDFs kommen immer frisch vom
+  Server, ohne Verbindung ist nichts davon sichtbar. Kundenlinks, Drohnen-Check und KRV-Check gehören nicht zur App.
+- **Neue Version:** erscheint in der App wie im Browser beim nächsten Öffnen.
+
 ## Terminplaner: Karte und Projektsuche
 
 - Die Karte der Projektadresse erscheint nur im PDF (Terminplan, Auswertung, Checklisten, Kontaktliste), nicht mehr am
@@ -72,6 +94,20 @@ Das Repo ist öffentlich. Kundendaten, Kundenfotos, 3D-Scans und Personendaten k
 - Knopf «Projekte»: der Cursor steht im Suchfeld. Gesucht wird in Name, Adresse, Bauherrschaft, Projektleiter und
   Status, kleine Tippfehler werden erkannt. ↑ ↓ wählen, Enter öffnet, Escape leert bzw. schliesst. Die Auswahlliste
   im Kopf gibt es nicht mehr.
+
+## Badvisualisierungen erstellen
+
+- **Neu:** im Projekt unter «Badvisualisierungen» auf «＋ Neue Visualisierung» oder im Tool oben rechts. Datum und
+  Hinweis sind vorbefüllt, aus dem Projekt auch der Kunde. Nötig sind Raum, Titel, ein Vorher-Foto und je Farbvariante ein Nachher-Foto; das
+  Mockup der Teile ist freiwillig. Ab zwei Farbvarianten braucht jede einen Namen und eine wird «zuerst gezeigt».
+- **Fotos:** JPG oder PNG, hineinziehen oder wählen. Vorher- und Nachher-Fotos brauchen dieselbe Sicht und dasselbe
+  Seitenverhältnis (quer 4:3 oder hoch 3:4), sonst erscheint ein Hinweis. Lässt sich ein iPhone-Foto (HEIC) nicht
+  lesen: Einstellungen › Kamera › Formate › «Maximale Kompatibilität».
+- **Ausführung:** je Zeile Bauteil und Beschreibung, auf Wunsch mit Farbmuster. Leere Zeilen fallen weg.
+- **Bearbeiten:** im Projekt bei der Visualisierung oder im Tool oben rechts «Bearbeiten». Wer mit ungespeicherten
+  Änderungen weggeht, wird gefragt.
+- **Kundenlink:** nur für Visualisierungen mit Projekt. Ohne Projekt gespeichert, später das Projekt wählen.
+- **Löschen:** im Editor unten «Löschen». Der Kundenlink und die Fotos gehen mit, das lässt sich nicht rückgängig machen.
 
 ## Logins und Rechte
 
@@ -131,6 +167,9 @@ sind, diese danach über «Daten übernehmen» einlesen.
   scrypt-Hash, Startpasswörter werden nie gespeichert. Es gibt kein Protokoll darüber, wer was bearbeitet
   (keine Verhaltensüberwachung im Sinne von Art. 26 ArGV 3; Bearbeitung im Arbeitsverhältnis nach Art. 328b OR).
 - **Fehlversuche:** nur ein Hash der IP-Adresse, nach einem Tag gelöscht.
+- **Fotos der Badvisualisierungen:** werden vor dem Hochladen im Browser neu gezeichnet (höchstens 2000 px). Dabei
+  fallen Kameradaten und GPS-Standort weg. Sie liegen im privaten Bucket `tools`; ersetzte Fotos und die Fotos einer
+  gelöschten Visualisierung werden gelöscht, ihr Kundenlink ebenfalls.
 - **Feedback:** Bildausschnitte können Kundendaten zeigen (Namen, Adressen, Fotos). Sie liegen im privaten Bucket und
   sind nur für Admins sichtbar. Mitarbeitende informieren: nur den nötigen Ausschnitt wählen. Erledigtes regelmässig
   mit «Aufräumen» löschen.

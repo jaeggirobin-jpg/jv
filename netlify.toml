@@ -164,6 +164,19 @@
   [headers.values]
     Cache-Control = "no-store"
 
+# App (PWA): Service Worker und Manifest bei jedem Start frisch prüfen, sonst bleibt eine alte Version hängen.
+# Der Worker speichert nur die Offline-Seite (public/sw.js), nie Daten oder PDFs.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json; charset=utf-8"
+    Cache-Control = "no-cache"
+
 # PDFs sollen nie indexiert werden
 [[headers]]
   for = "/*.pdf"
