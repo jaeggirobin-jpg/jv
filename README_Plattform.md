@@ -19,6 +19,7 @@ Mitarbeiterinnen und Mitarbeiter und ein gemeinsamer KI-Zugang (Claude) für all
 | Feedback | `public/assets/feedback.js` (Knopf, Bildausschnitt), `feedback-board.js` (Board, Export), Function `feedback.js`; Tabelle `plattform_feedback`, Bucket `feedback` (`migration_016`) |
 | KI (Claude) | `netlify/functions/_lib/ki.js` (gemeinsamer Zugang), `ki.js` (Katalog, Tools); KI für die Tools in `jv-bridge.js` |
 | Neue Tool-Version von Michi übernehmen | `werkzeuge/tools_einbinden.py` |
+| App (PWA): installierbar, Offline-Hinweis | `public/manifest.webmanifest`, `public/sw.js`, `public/offline.html`, `public/assets/app.js`; Symbole `public/assets/app/` aus `werkzeuge/app_symbole.py` |
 
 **Ein Projekt für alles:** Ein Projekt (Name, Adresse, Bauherrschaft, Projektleiter) gilt für Terminplan, Kundenzugang
 (Inspiration, Swipe, Dokumente) und Badvisualisierungen. Bestehende Kunden werden im Projekt unter «Kundenzugang» →
@@ -61,6 +62,26 @@ Das Repo ist öffentlich. Kundendaten, Kundenfotos, 3D-Scans und Personendaten k
   führt dorthin zurück, wo man in der Plattform war (Übersicht, Projekt, Kunden, Anfrage). Direkt aufgerufen führt sie
   zur Übersicht. Kunden sehen die Lasche nicht (nur wenn die Seite aus der Plattform geöffnet wurde).
 - Externe Ziele bleiben in einem neuen Tab: WhatsApp, Karte, E-Mail, Telefon, Webseiten von Firmen und der IWB.
+
+## Als App installieren (PWA)
+
+Die Plattform lässt sich wie eine App auf den Home-Bildschirm, ins Dock oder in die Taskleiste legen. Sie öffnet dann
+in einem eigenen Fenster ohne Adressleiste, mit dem JV-Symbol.
+
+- **iPhone, iPad (Safari):** Teilen-Knopf (Quadrat mit Pfeil, in neueren Versionen unter «…») → «Zum Home-Bildschirm»
+  → «Hinzufügen». Den Weg zeigt auch das Benutzermenü oben rechts.
+- **Android, Chrome oder Edge am PC:** Benutzermenü oben rechts → «Als App installieren». Fehlt der Knopf, bietet der
+  Browser es gerade nicht an (schon installiert, privates Fenster); dann über das Menü des Browsers («App installieren»
+  bzw. «Zum Startbildschirm hinzufügen»).
+- **Mac mit Safari:** Menü «Ablage» → «Zum Dock hinzufügen».
+- Auf iPhone und iPad hat die App eine eigene Anmeldung (getrennt von Safari): beim ersten Öffnen einmal anmelden,
+  am besten mit «Angemeldet bleiben».
+- Langes Drücken bzw. Rechtsklick auf das Symbol (Android, PC) bietet die Kurzbefehle «Projekte» und «Bau-Terminplaner».
+- **Ohne Verbindung** zeigt die App «Keine Verbindung» statt einer Fehlerseite des Browsers. Sie lädt von selbst neu,
+  sobald der Server wieder antwortet (fragt alle paar Sekunden nach, später seltener); «Erneut versuchen» lädt sofort.
+- **Auf dem Gerät gespeichert wird nur dieser Hinweis.** Projekte, Kundendaten, Bilder und PDFs kommen immer frisch vom
+  Server, ohne Verbindung ist nichts davon sichtbar. Kundenlinks, Drohnen-Check und KRV-Check gehören nicht zur App.
+- **Neue Version:** erscheint in der App wie im Browser beim nächsten Öffnen.
 
 ## Terminplaner: Karte und Projektsuche
 

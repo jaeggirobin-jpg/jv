@@ -41,10 +41,13 @@ docs.jaeggivollmer.ch/
 │   ├── assets/zurueck.js   → Lasche «Zurück» in Tools und Seiten (alles öffnet im selben Tab)
 │   ├── assets/feedback-board.js, zugaenge.js → Verwaltung: Feedback-Board, Logins
 │   ├── assets/vendor/      → html2canvas-pro (MIT, für die Feedback-Bilder)
+│   ├── manifest.webmanifest, sw.js, offline.html, assets/app.js → Plattform als App (PWA), siehe «App (PWA)»
+│   ├── assets/app/         → App-Symbole (generiert mit werkzeuge/app_symbole.py)
 │   └── assets/, logo.png
 ├── netlify.toml            → Routing, Function-Config, Sicherheits-Header
 ├── supabase/               → SQL-Migrationen (manuell im SQL-Editor ausführen)
 ├── werkzeuge/tools_einbinden.py → neue Version eines Tools von Michi übernehmen (entfernt Personendaten)
+├── werkzeuge/app_symbole.py → App-Symbole aus logo.png (`--pruefen` = Dateien aktuell?)
 └── netlify/functions/
     ├── _lib/auth.js        → Anmeldung: Hauptpasswort, Mitarbeiter-Logins, Sitzungs-Cookie, Bereiche
     ├── _lib/ki.js          → gemeinsamer KI-Zugang (Claude über das Anthropic-SDK): Frist, Fehlercodes, Texthilfe
@@ -180,6 +183,13 @@ Einrichtung, Rechte, Feedback und Datenschutz für Robin: `README_Plattform.md`.
   - Copy-Link-Button
   - Löschen-Button (inkl. Bestätigung)
 - Kein CSS-Framework, eigene schlichte Styles (Farben: `#BF853B`, `#4B575D`, `#929A9D`)
+
+### App (PWA)
+
+- Die Plattform (`/`, `/index.html`, `/tools/…`) ist installierbar: `manifest.webmanifest` (Kürzel Projekte, Bau-Terminplaner), Knopf «Als App installieren» bzw. Apple-Hinweis im Benutzermenü (`assets/app.js`)
+- `sw.js` speichert **nur** `/offline.html`, nie Seiten, Daten, Bilder oder PDFs; greift nur bei ganzen Seitenaufrufen der Plattform (Netz zuerst, ohne Netz die Offline-Seite; eingebettete Rahmen/iframes nie). Kundenseiten, Drohnen-Check, KRV-Check, `/api/`, `/_blob/` laufen am Worker vorbei und melden keinen an
+- Offline-Seite geändert → `VERSION` in `sw.js` hochzählen; sie fragt selbst nach (HEAD `/manifest.webmanifest`, 5 s, verdoppelt bis 60 s, sofort bei «online»/Sichtbarkeit) und lädt neu, sobald der Server antwortet
+- Symbole nur über `werkzeuge/app_symbole.py` erzeugen (`--pruefen` im Zweifel); `netlify.toml` setzt `no-cache` für `sw.js` und das Manifest
 
 ### Kunden-Viewer (`view.html`)
 

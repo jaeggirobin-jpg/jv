@@ -8,7 +8,14 @@
   <title>JV-Plattform</title>
   <link rel="icon" href="/dachcheck/assets/icon/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="icon" href="/dachcheck/assets/icon/favicon-192.png" type="image/png" sizes="192x192">
-  <link rel="apple-touch-icon" href="/dachcheck/assets/icon/apple-touch-icon.png">
+  <link rel="apple-touch-icon" href="/assets/app/apple-touch-icon.png">
+  <!-- Als App installierbar (PWA): Manifest, Farben, Name auf dem Home-Bildschirm (assets/app.js, sw.js) -->
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#f3f4f5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="JV-Plattform">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="preload" href="/assets/fonts/roboto-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/arimo-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/dachcheck/assets/admin.css" />
@@ -39,6 +46,8 @@
             <div class="jvp-benutzer__menue">
               <b id="benutzerName"></b>
               <span class="muted" id="benutzerInfo"></span>
+              <button type="button" class="jvp-knopf jvp-knopf--klein" id="appBtn" hidden>Als App installieren</button>
+              <span class="muted" id="appHinweis" hidden></span>
               <button type="button" class="jvp-knopf jvp-knopf--klein" id="passwortBtn" hidden>Passwort ändern</button>
               <button type="button" class="jvp-knopf jvp-knopf--klein" id="logoutBtn">Abmelden</button>
             </div>
@@ -1746,5 +1755,6 @@
   <script src="/assets/feedback-board.js"></script>
   <script src="/assets/zugaenge.js"></script>
   <script src="/assets/plattform.js"></script>
+  <script src="/assets/app.js"></script>
 </body>
 </html>
