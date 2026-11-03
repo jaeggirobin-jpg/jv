@@ -302,7 +302,14 @@
             }).join('') +
           '</fieldset>' +
           '<div><label for="krv-text">Begründung für den Kunden <span class="dc-optional">(kommt in die E-Mail)</span></label>' +
-            '<textarea id="krv-text" data-a="text" autocomplete="off" placeholder="z. B. Nach dem Zähler ist ein Absperrventil mit integriertem Rückflussverhinderer (Prüfstutzen sichtbar) eingebaut.">' + esc(a.beurteilung_text || '') + '</textarea></div>' +
+            '<textarea id="krv-text" data-a="text" autocomplete="off" placeholder="z. B. Nach dem Zähler ist ein Absperrventil mit integriertem Rückflussverhinderer (Prüfstutzen sichtbar) eingebaut.">' + esc(a.beurteilung_text || '') + '</textarea>' +
+            '<div class="dc-textfeld__knoepfe">' +
+              '<button type="button" class="dc-btn" data-a="ki-korrigieren">KI: korrigieren</button>' +
+              '<button type="button" class="dc-btn" data-a="ki-umschreiben">KI: umschreiben</button>' +
+              '<button type="button" class="dc-btn" data-a="ki-zurueck"' + (zustand.kiVorher && zustand.kiVorher.ref === a.referenz ? '' : ' hidden') + '>Rückgängig</button>' +
+            '</div>' +
+            '<p class="dc-gespeichert" data-a="ki-status" aria-live="polite"></p>' +
+            '<p class="dc-hinweis dc-ki-hinweis">KI-Knöpfe: Nur der Text dieses Feldes geht zur Überarbeitung an Anthropic (USA), keine Fotos und keine Angaben aus der Anfrage. Bitte keine Namen, Adressen oder Telefonnummern hineinschreiben.</p></div>' +
           '<div><label for="krv-status">Status</label><select id="krv-status" data-a="status">' +
             STATUS.map(function (s) { return '<option value="' + s.wert + '"' + (s.wert === a.status ? ' selected' : '') + '>' + esc(s.label) + '</option>'; }).join('') +
           '</select></div>' +
@@ -508,6 +515,51 @@
       });
     }
 
+    // ── KI für die Begründung (gemeinsamer KI-Zugang auf dem Server, netlify/functions/_lib/ki.js) ──
+    // zustand.kiVorher = { ref, text }: Text vor der letzten KI-Überarbeitung für «Rückgängig»
+    function kiStatus(text, istFehler) {
+      var s = el('ki-status');
+      if (!s) return;
+      s.textContent = text || '';
+      s.classList.toggle('dc-meldung-fehler', !!istFehler);
+    }
+    function kiText(modus, knopf) {
+      var a = aktuelleAnfrage();
+      var ta = el('text');
+      if (!a || !ta) return;
+      var text = ta.value.trim();
+      if (!text) { kiStatus('Bitte zuerst einen Text eingeben.', true); ta.focus(); return; }
+      var gewaehlt = root.querySelector('[data-a="beurteilung"]:checked');
+      var knoepfe = root.querySelectorAll('button[data-a^="ki-"]');
+      var beschriftung = knopf.textContent;
+      var ref = a.referenz;
+      knoepfe.forEach(function (k) { k.disabled = true; });
+      knopf.textContent = 'KI arbeitet …';
+      kiStatus('');
+      post('/krv-admin-anfrage', { action: 'ki', modus: modus, text: text, beurteilung: gewaehlt ? gewaehlt.value : '' }).then(function (r) {
+        var aktuell = el('text');
+        if (zustand.aktiv !== ref || !aktuell) return;
+        zustand.kiVorher = { ref: ref, text: aktuell.value };
+        aktuell.value = r.text;
+        el('ki-zurueck').hidden = false;
+        kiStatus(r.gekuerzt ? 'Die KI-Antwort war zu lang und wurde abgeschnitten. Bitte prüfen.' : 'Text von der KI überarbeitet. Bitte prüfen und dann speichern.', !!r.gekuerzt);
+      }).catch(function (e) {
+        if (zustand.aktiv === ref) kiStatus('KI: ' + e.message, true);
+      }).then(function () {
+        knoepfe.forEach(function (k) { k.disabled = false; });
+        knopf.textContent = beschriftung;
+      });
+    }
+    function kiZurueck() {
+      var v = zustand.kiVorher;
+      var ta = el('text');
+      if (!v || v.ref !== zustand.aktiv || !ta) return;
+      ta.value = v.text;
+      zustand.kiVorher = null;
+      el('ki-zurueck').hidden = true;
+      kiStatus('Text von vor der KI wiederhergestellt. Bitte speichern, falls er so bleiben soll.');
+    }
+
     // ════════════════════════════════════════════════════════════════
     // Anleitungsvideo: importieren, im Browser verkleinern, hochladen
     // (Verkleinern übernimmt window.DCAdmin.videoVerkleinern aus /dachcheck/assets/admin.js)
@@ -653,6 +705,9 @@
         case 'laden': zustand.fotos = {}; laden(); break;
         case 'csv': csv(); break;
         case 'speichern': speichern(); break;
+        case 'ki-korrigieren': kiText('korrigieren', t); break;
+        case 'ki-umschreiben': kiText('umschreiben', t); break;
+        case 'ki-zurueck': kiZurueck(); break;
         case 'karte': karte(false); break;
         case 'karte-mail': karte(true); break;
         case 'video-los': videoLos(); break;

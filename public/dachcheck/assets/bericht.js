@@ -31,6 +31,32 @@
     '<a href="mailto:' + esc(F.email) + '">' + esc(F.email) + '</a>';
   $('fuss-links').innerHTML = '<a href="' + esc(C.links.impressum) + '">Impressum</a><a href="' + esc(C.links.datenschutz) + '">Datenschutz</a>';
 
+  // Vorschau aus dem Admin (Robin, 2.11.2026: alles öffnet im selben Tab): Hinweis oben und Lasche
+  // «Zurück» am linken Rand wie in den Tools. Kundinnen und Kunden bekommen den Link ohne Marke.
+  var vorschau = /^#vorschau(-plattform|-admin)?$/.exec(location.hash);
+  var zurueckLasche = null;
+  function zurueckZiel(ref) {
+    var r = ref ? encodeURIComponent(ref) : '';
+    if (vorschau && vorschau[1] === '-plattform') {
+      return (C.links.plattform || 'https://docs.jaeggivollmer.ch/') + '#/drohnencheck' + (r ? '/' + r : '');
+    }
+    return 'admin.html' + (r ? '#' + r : '');
+  }
+  if (vorschau) {
+    var hinweis = document.createElement('p');
+    hinweis.className = 'vorschau-hinweis';
+    hinweis.textContent = 'Vorschau: So sieht die Kundin oder der Kunde den Bericht.';
+    document.body.insertBefore(hinweis, document.body.firstChild);
+    zurueckLasche = document.createElement('a');
+    zurueckLasche.className = 'vorschau-zurueck';
+    zurueckLasche.setAttribute('href', zurueckZiel(''));
+    zurueckLasche.setAttribute('title', 'Zurück zur Anfrage');
+    zurueckLasche.setAttribute('aria-label', 'Zurück zur Anfrage');
+    zurueckLasche.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" ' +
+      'stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span>Zurück</span>';
+    document.body.appendChild(zurueckLasche);
+  }
+
   function fehler(text) {
     $('bericht').innerHTML = '<h1>' + esc(T.bericht.titel) + '</h1><p class="bericht__fehler">' + esc(text) + '</p>' +
       '<p><a href="tel:' + esc(F.telefonLink) + '">' + esc(F.telefon) + '</a> · <a href="mailto:' + esc(F.email) + '">' + esc(F.email) + '</a></p>';
@@ -69,6 +95,7 @@
 
     $('bericht').innerHTML = html;
     document.title = T.bericht.titel + ' ' + b.referenz + ' | Jäggi Vollmer';
+    if (zurueckLasche) zurueckLasche.setAttribute('href', zurueckZiel(b.referenz));
   }
 
   // Kein Drucken / Speichern als PDF (Robins Vorgabe). Hohe Hürde, kein absoluter Schutz:

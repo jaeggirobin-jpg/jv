@@ -189,7 +189,7 @@
       '<b>' + esc(e.autor || 'Ohne Namen') + '</b>',
       '<span>' + esc(datumZeit(e.erstellt)) + '</span>'
     ];
-    if (url) kopf.push('<a href="' + esc(url) + '" target="_blank" rel="noopener" title="' + esc(url) + '">Seite öffnen ↗</a>');
+    if (url) kopf.push('<a href="' + esc(url) + '" title="' + esc(url) + '">Seite öffnen</a>');
     if (m.bildschirm) kopf.push('<span title="' + esc(m.browser || '') + '">' + esc(m.bildschirm) + '</span>');
     var metaZeile = '';
     if (e.seite === 'feedback-funktion' && m.aufgenommen_in) {

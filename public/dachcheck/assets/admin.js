@@ -466,6 +466,12 @@
       var b = zustand.bericht && zustand.bericht.daten;
       return b ? BERICHT_URL + '?t=' + b.token : '';
     }
+    // «Ansehen» öffnet im selben Tab (Robin, 2.11.2026); die Marke zeigt im Bericht die Leiste
+    // «Zurück zur Anfrage» (zur Plattform oder zum Admin der Subdomain, siehe bericht.js)
+    function vorschauLink() {
+      var link = kundenLink();
+      return link ? link + '#vorschau-' + (opts.vorschau === 'plattform' ? 'plattform' : 'admin') : '';
+    }
 
     function berichtZeigen() {
       var box = el('bericht');
@@ -522,7 +528,7 @@
           '<div class="dc-knoepfe">' +
             '<button type="button" class="dc-btn" data-a="link-kopieren">Link kopieren</button>' +
             '<a class="dc-btn dc-btn--primaer" href="' + esc(berichtMail(a)) + '">Per E-Mail senden</a>' +
-            '<a class="dc-btn" href="' + esc(kundenLink()) + '" target="_blank" rel="noopener">Ansehen</a>' +
+            '<a class="dc-btn" href="' + esc(vorschauLink()) + '">Ansehen</a>' +
           '</div></div>' : '');
 
       zustand.bericht.meldung = '';

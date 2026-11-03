@@ -5,7 +5,9 @@
 // JVGeo.vorschlaege(selektor|input, { beiAuswahl })
 //                                    → Vorschlagsliste unter Adressfeldern (auch für Felder, die ein Tool
 //                                      immer wieder neu zeichnet: Selektor wird über das Dokument verfolgt)
-// JVGeo.karte(e, n)                  → { url, quelle } Kartenausschnitt (WMS), Objekt unten in der Mitte
+// JVGeo.karte(e, n, ebene, ausschnitt) → { url, quelle } Kartenausschnitt (WMS), Objekt unten in der Mitte
+//                                      (ausschnitt: { px, mpp, fx, fy }, ohne Angabe JVGeo.KARTE)
+// JVGeo.ebeneVonUrl(url)             → Ebene einer Karte von wms.geo.admin.ch (Index für karte) oder -1
 // JVGeo.karteFuerAdresse(adresse)    → Promise { url, e, n, quelle, adresse } oder null
 //
 // Ohne Schlüssel, ohne Cookies. Ist geo.admin.ch nicht erreichbar, bleiben die Felder normal bedienbar.
@@ -117,14 +119,26 @@
     });
   }
 
-  function karte(e, n, ebene) {
+  // ausschnitt: { px, mpp, fx, fy } (Grösse in Pixeln, Meter pro Pixel, Lage des Objekts); ohne Angabe KARTE
+  function karte(e, n, ebene, ausschnitt) {
+    var A = ausschnitt || KARTE;
     var E = EBENEN[ebene || 0] || EBENEN[0];
-    var breite = KARTE.px * KARTE.mpp;
-    var bbox = [e - KARTE.fx * breite, n - (1 - KARTE.fy) * breite, e + (1 - KARTE.fx) * breite, n + KARTE.fy * breite]
+    var breite = A.px * A.mpp;
+    var bbox = [e - A.fx * breite, n - (1 - A.fy) * breite, e + (1 - A.fx) * breite, n + A.fy * breite]
       .map(function (v) { return Math.round(v * 10) / 10; });
     var url = WMS + '?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=FALSE&STYLES=' +
-      '&LAYERS=' + E.layer + '&CRS=EPSG%3A2056&BBOX=' + bbox.join('%2C') + '&WIDTH=' + KARTE.px + '&HEIGHT=' + KARTE.px;
+      '&LAYERS=' + E.layer + '&CRS=EPSG%3A2056&BBOX=' + bbox.join('%2C') + '&WIDTH=' + A.px + '&HEIGHT=' + A.px;
     return { url: url, quelle: E.quelle, layer: E.layer };
+  }
+
+  // Aus welcher Ebene stammt eine gespeicherte Karte? (nur Karten von wms.geo.admin.ch, sonst -1)
+  function ebeneVonUrl(url) {
+    var m = /^https:\/\/wms\.geo\.admin\.ch\/\?(?:[^#]*&)?LAYERS=([^&#]+)/.exec(String(url || ''));
+    if (!m) return -1;
+    var layer;
+    try { layer = decodeURIComponent(m[1]); } catch (e) { return -1; }
+    for (var i = 0; i < EBENEN.length; i++) if (EBENEN[i].layer === layer) return i;
+    return -1;
   }
 
   // Bild laden und prüfen, ob es mehr als eine leere Fläche zeigt. Lädt es mit CORS nicht,
@@ -367,6 +381,7 @@
     adresseFinden: adresseFinden,
     vorschlaege: vorschlaege,
     karte: karte,
+    ebeneVonUrl: ebeneVonUrl,
     karteFuerAdresse: karteFuerAdresse,
     QUELLEN: QUELLEN,
     KARTE: KARTE,

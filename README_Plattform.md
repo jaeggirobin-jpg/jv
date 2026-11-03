@@ -2,8 +2,8 @@
 
 Interne Startseite von Jäggi Vollmer: ein Login, Kacheln nach Kategorie (Planung, Badumbau, Marketing, Anfragen,
 Verwaltung) nach dem Vorbild von Michis Übersicht. Michis fünf Claude-Tools laufen unverändert in der Plattform und
-speichern neu in Supabase statt bei claude.ai. Dazu kommen ein Feedback-Knopf mit Bildausschnitt und eigene Logins für
-Mitarbeiterinnen und Mitarbeiter.
+speichern neu in Supabase statt bei claude.ai. Dazu kommen ein Feedback-Knopf mit Bildausschnitt, eigene Logins für
+Mitarbeiterinnen und Mitarbeiter und ein gemeinsamer KI-Zugang (Claude) für alle KI-Funktionen.
 
 ## Aufbau
 
@@ -14,8 +14,10 @@ Mitarbeiterinnen und Mitarbeiter.
 | Logins verwalten | `netlify/functions/zugaenge.js`, `public/assets/zugaenge.js`; Tabellen `mitarbeiter`, `anmelde_fehler` (`migration_017`) |
 | Michis Tools | `public/tools/<tool>/index.html`; Speicher `tool-db.js`, `tool-asset.js`, `tool-blob.js`; Tabelle `tool_docs`, Bucket `tools` (`migration_015`) |
 | Karte und Adressvorschläge (swisstopo) | `public/tools/assets/geo-admin.js`, `public/tools/terminplaner/plattform.js` |
+| Lasche «Zurück» (alles öffnet im selben Tab) | `public/assets/zurueck.js`, Merker in `public/assets/plattform.js` |
 | Kundenlink für Badvisualisierungen | `visualisierung-links.js`, `get-visualisierung.js`, `public/visualisierung.html`; Tabelle `visualisierung_links` |
 | Feedback | `public/assets/feedback.js` (Knopf, Bildausschnitt), `feedback-board.js` (Board, Export), Function `feedback.js`; Tabelle `plattform_feedback`, Bucket `feedback` (`migration_016`) |
+| KI (Claude) | `netlify/functions/_lib/ki.js` (gemeinsamer Zugang), `ki.js` (Katalog, Tools); KI für die Tools in `jv-bridge.js` |
 | Neue Tool-Version von Michi übernehmen | `werkzeuge/tools_einbinden.py` |
 
 **Ein Projekt für alles:** Ein Projekt (Name, Adresse, Bauherrschaft, Projektleiter) gilt für Terminplan, Kundenzugang
@@ -33,6 +35,7 @@ Das Repo ist öffentlich. Kundendaten, Kundenfotos, 3D-Scans und Personendaten k
    Kontrolle: Table Editor zeigt `tool_docs`, `visualisierung_links`, `plattform_feedback`, `mitarbeiter`,
    `anmelde_fehler`; Storage zeigt die Buckets `tools` und `feedback` (beide privat).
 2. **Merge:** «merge» im Thread schreiben. Netlify deployt automatisch. Neue Environment Variables braucht es keine.
+   Für die KI muss `ANTHROPIC_API_KEY` gesetzt sein (für den Drohnen-Check wohl schon der Fall, siehe «KI»).
 3. **Anmelden:** `https://docs.jaeggivollmer.ch` öffnen, **E-Mail leer lassen**, Hauptpasswort (`ADMIN_PASSWORD`)
    eingeben. Das Hauptpasswort gilt immer als Admin.
 4. **Daten übernehmen:** Verwaltung → «Daten übernehmen» → `JV_Tools.zip` wählen → Auswahl prüfen →
@@ -42,11 +45,33 @@ Das Repo ist öffentlich. Kundendaten, Kundenfotos, 3D-Scans und Personendaten k
    erscheint **genau einmal**: persönlich oder per SMS übergeben, nicht zusammen mit der E-Mail-Adresse per Mail.
    Beim ersten Login setzt die Person ein eigenes Passwort (mind. 10 Zeichen).
 6. **Live testen** (in der Cloud-Sitzung waren geo.admin.ch und Supabase nur mit Attrappen prüfbar):
-   - Terminplaner: Projekt öffnen, Karte der Adresse erscheint, Adressvorschläge beim Tippen, PDF mit Karte.
+   - Terminplaner: Knopf «Projekte» → Suchfeld (Name, Adresse, Bauherrschaft), Adressvorschläge beim Tippen,
+     PDF «Terminplan» mit schwarz-weisser Karte und farbigem Kreis um die Adresse.
+   - Aus der Plattform ein Tool öffnen: öffnet im selben Tab, die Lasche «Zurück» am linken Rand führt zurück.
    - Badvisualisierung: im Projekt Kundenlink erstellen, in einem privaten Fenster öffnen, Link deaktivieren → gesperrt.
    - Gäste-WC: 3D-Ansicht lädt den Scan.
    - Feedback: Knopf «Feedback» → Bereich aufziehen → markieren → senden → erscheint im Feedback-Board.
    - Mit einem Mitarbeiter-Login anmelden: nur die freigegebenen Bereiche sind sichtbar.
+   - KI: im Katalog bei einem neuen Punkt eine Kurzbeschreibung tippen → «KI: korrigieren»; in einer KRV-Anfrage die
+     Begründung → «KI: umschreiben». «Rückgängig» holt jeweils den alten Text zurück.
+
+## Navigation
+
+- Tools, Kundenseiten und Berichtsvorschauen öffnen im selben Tab. Am linken Rand erscheint die Lasche «Zurück»: sie
+  führt dorthin zurück, wo man in der Plattform war (Übersicht, Projekt, Kunden, Anfrage). Direkt aufgerufen führt sie
+  zur Übersicht. Kunden sehen die Lasche nicht (nur wenn die Seite aus der Plattform geöffnet wurde).
+- Externe Ziele bleiben in einem neuen Tab: WhatsApp, Karte, E-Mail, Telefon, Webseiten von Firmen und der IWB.
+
+## Terminplaner: Karte und Projektsuche
+
+- Die Karte der Projektadresse erscheint nur im PDF (Terminplan, Auswertung, Checklisten, Kontaktliste), nicht mehr am
+  Bildschirm. Sie ist schwarz-weiss, nur der Kreis um die Adresse ist farbig. Im Terminplan liegt der Punkt mittig
+  zwischen dem Ende der Tabelle und der Legende; ist eine Seite voll, bekommt nur die Seite mit Platz die Karte.
+- Das erste PDF nach einem Projektwechsel wartet höchstens 6 Sekunden auf die Karte (geo.admin.ch). Kommt sie nicht,
+  entsteht das PDF ohne Karte.
+- Knopf «Projekte»: der Cursor steht im Suchfeld. Gesucht wird in Name, Adresse, Bauherrschaft, Projektleiter und
+  Status, kleine Tippfehler werden erkannt. ↑ ↓ wählen, Enter öffnet, Escape leert bzw. schliesst. Die Auswahlliste
+  im Kopf gibt es nicht mehr.
 
 ## Logins und Rechte
 
@@ -72,6 +97,22 @@ Das Repo ist öffentlich. Kundendaten, Kundenfotos, 3D-Scans und Personendaten k
 - Für Michis Tools nennt der Export die Datei in `public/tools/`. Änderungen dort gehen beim nächsten Einbinden einer
   neuen Tool-Version verloren, also besser Michi informieren oder das Skript anpassen.
 
+## KI (Claude)
+
+- Alle KI-Funktionen laufen über einen gemeinsamen Zugang auf dem Server (offizielles Anthropic-SDK). Der Schlüssel
+  bleibt in Netlify, der Browser sieht ihn nie.
+- **Wo:** Drohnen-Check (Bericht, wie bisher), KRV-Check (Begründung für den Kunden, in der Plattform und auf
+  `krv.`), Katalog (Kurzbeschreibung, Vorteil, Zu bedenken, Einleitung einer Kategorie): «KI: korrigieren» korrigiert nur
+  Rechtschreibung, Grammatik und Zeichensetzung, «KI: umschreiben» formuliert neu, «Rückgängig» holt den alten Text zurück.
+- **Michis Tools:** Baut Michi in eine neue Version KI ein (`window.claude.use('sample')` wie bei claude.ai), läuft sie
+  nach dem Einbinden ohne Umbau. Beim ersten Mal fragt der Browser einmal «KI verwenden?». Nur für Logins mit dem
+  Bereich «Projekte».
+- **Netlify:** `ANTHROPIC_API_KEY` (Site configuration → Environment variables). Optional `JV_KI_MODELL` für ein
+  anderes Claude-Modell (das frühere `DC_KI_MODELL` gilt weiter). Vorgabe ist ein schnelles Modell, weil Netlify jede
+  Function nach 10 Sekunden abbricht. Ohne Schlüssel läuft alles andere normal, nur die KI-Knöpfe melden es.
+- **Grenzen:** Eine Antwort muss nach rund 8.5 Sekunden fertig sein, sonst kommt eine Teilantwort (Tools) bzw. eine
+  Meldung. Ist Claude ausgelastet, steht das in der Meldung; einfach später nochmals versuchen.
+
 ## Neue Version eines Tools von Michi
 
 Im Repo-Ordner (Windows, Eingabeaufforderung):
@@ -93,6 +134,14 @@ sind, diese danach über «Daten übernehmen» einlesen.
 - **Feedback:** Bildausschnitte können Kundendaten zeigen (Namen, Adressen, Fotos). Sie liegen im privaten Bucket und
   sind nur für Admins sichtbar. Mitarbeitende informieren: nur den nötigen Ausschnitt wählen. Erledigtes regelmässig
   mit «Aufräumen» löschen.
+- **KI-Knöpfe:** Es geht nur der Text des Feldes an Anthropic (USA), beim Katalog dazu der Titel, beim KRV-Check die
+  Beurteilung (vorhanden/fehlt/unklar), beim Drohnen-Check die Ampel; keine Fotos, keine Angaben aus der Anfrage. Auf dem Server wird kein Text
+  gespeichert oder protokolliert. Mitarbeitende informieren: keine Namen, Adressen oder Telefonnummern in diese Felder
+  schreiben (steht auch unter den Knöpfen). Die Bedingungen von Anthropic für die API (Commercial Terms mit Data
+  Processing Addendum) einmal prüfen, sie regeln die Auftragsbearbeitung (Art. 9 revDSG).
+- **KI in Michis Tools:** Was mitgeht, bestimmt das Tool. Schickt eine künftige Version Projektdaten mit
+  Personenbezug (Bauherrschaft, Adresse), ist das eine Bekanntgabe ins Ausland (Art. 16 revDSG): vorher mit Michi
+  klären, ob das nötig ist. Das Freigabe-Fenster weist darauf hin.
 - **Export an Claude Code:** Mit dem Export gehen Text und Bilder an Anthropic (USA). Bei Ausschnitten mit Kundendaten
   «Mit Bildausschnitten» abwählen oder bei diesem Punkt «Umsetzen» weglassen. Heruntergeladene Export-Dateien nach
   Gebrauch löschen.

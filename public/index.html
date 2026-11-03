@@ -59,15 +59,15 @@
         <div class="grid">
           <div class="kachel--gruppe">Planung</div>
           <a class="kachel" href="#/projekte" data-bereich="projekte"><span class="tag">Planung</span><span class="n">Projekte</span><span class="d">Alle Baustellen mit Adresse, Bauherrschaft und Projektleiter. Von hier aus zu Terminplan, Kundenzugang und Visualisierungen.</span><span class="go">Öffnen →</span></a>
-          <a class="kachel" href="/tools/terminplaner/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Planung</span><span class="n">Bau-Terminplaner JV</span><span class="d">Terminplanung der Baustellen, mit Karte der Projektadresse.</span><span class="go">Öffnen ↗</span></a>
+          <a class="kachel" href="/tools/terminplaner/" data-bereich="projekte"><span class="tag">Planung</span><span class="n">Bau-Terminplaner JV</span><span class="d">Terminplanung der Baustellen, mit Karte der Projektadresse.</span><span class="go">Öffnen →</span></a>
           <div class="kachel--gruppe">Badumbau</div>
-          <a class="kachel" href="/tools/badvisualisierungen/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Badumbau</span><span class="n">JV Badvisualisierungen</span><span class="d">Visualisierungen für Badumbauten.</span><span class="go">Öffnen ↗</span></a>
-          <a class="kachel" href="/tools/gaeste-wc/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Badumbau</span><span class="n">Gäste-WC Umbauvorschau</span><span class="d">Vorher/Nachher-Vorschau Gäste-WC.</span><span class="go">Öffnen ↗</span></a>
+          <a class="kachel" href="/tools/badvisualisierungen/" data-bereich="projekte"><span class="tag">Badumbau</span><span class="n">JV Badvisualisierungen</span><span class="d">Visualisierungen für Badumbauten.</span><span class="go">Öffnen →</span></a>
+          <a class="kachel" href="/tools/gaeste-wc/" data-bereich="projekte"><span class="tag">Badumbau</span><span class="n">Gäste-WC Umbauvorschau</span><span class="d">Vorher/Nachher-Vorschau Gäste-WC.</span><span class="go">Öffnen →</span></a>
           <a class="kachel" href="#/kunden" data-bereich="kunden"><span class="tag">Badumbau</span><span class="n">Kunden</span><span class="d">Kundenzugänge für Inspiration, Swipe und Dokumente.</span><span class="go">Öffnen →</span></a>
           <a class="kachel" href="#/katalog" data-bereich="katalog"><span class="tag">Badumbau</span><span class="n">Katalog</span><span class="d">Inspirations-Katalog mit Bildern, Videos und Ansprechpersonen.</span><span class="go">Öffnen →</span></a>
           <div class="kachel--gruppe">Marketing</div>
-          <a class="kachel" href="/tools/story/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Marketing</span><span class="n">JV Story Badumbau</span><span class="d">Story zum Badumbau.</span><span class="go">Öffnen ↗</span></a>
-          <a class="kachel" href="/tools/reel/" target="_blank" rel="noopener" data-bereich="projekte"><span class="tag">Marketing</span><span class="n">JV Reel-Generator</span><span class="d">Reels für Social Media erstellen.</span><span class="go">Öffnen ↗</span></a>
+          <a class="kachel" href="/tools/story/" data-bereich="projekte"><span class="tag">Marketing</span><span class="n">JV Story Badumbau</span><span class="d">Story zum Badumbau.</span><span class="go">Öffnen →</span></a>
+          <a class="kachel" href="/tools/reel/" data-bereich="projekte"><span class="tag">Marketing</span><span class="n">JV Reel-Generator</span><span class="d">Reels für Social Media erstellen.</span><span class="go">Öffnen →</span></a>
           <div class="kachel--gruppe">Anfragen</div>
           <a class="kachel" href="#/drohnencheck" data-bereich="anfragen"><span class="tag">Anfragen</span><span class="n">Drohnen-Check</span><span class="d">Anfragen von dachcheck.jaeggivollmer.ch, Berichte und Titelvideo.</span><span class="go">Öffnen →</span></a>
           <a class="kachel" href="#/krv" data-bereich="anfragen"><span class="tag">Anfragen</span><span class="n">KRV-Check</span><span class="d">Anfragen zum Rückflussverhinderer von krv.jaeggivollmer.ch.</span><span class="go">Öffnen →</span></a>
@@ -237,6 +237,7 @@
                 <input type="text" id="np-bedenken" placeholder="Was muss man wissen?" autocomplete="off" />
               </div>
             </div>
+            <p class="muted jvp-ki-hinweis">KI-Knöpfe: Nur der Text des Feldes und der Titel gehen zur Überarbeitung an Anthropic (USA). Bitte keine Namen, Adressen oder Telefonnummern hineinschreiben.</p>
             <div id="npMsg"></div>
             <button class="primary" id="npCreateBtn" type="button">Punkt hinzufügen</button>
           </div>
@@ -262,6 +263,7 @@
           <div class="card">
             <h2>Kategorien</h2>
             <p class="muted">Titel und Intro-Texte bearbeiten. Reihenfolge per Drag &amp; Drop ändern.</p>
+            <p class="muted jvp-ki-hinweis">KI-Knöpfe: Nur der Intro-Text und der Titel gehen zur Überarbeitung an Anthropic (USA).</p>
             <div id="kategorienBody" class="muted">Lade...</div>
           </div>
           <div class="card">
@@ -438,6 +440,61 @@
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
+    // KI-Texthilfe im Katalog (netlify/functions/ki.js, Aktion 'text'): unter dem Feld die Knöpfe
+    // «KI: korrigieren», «KI: umschreiben» und «Rückgängig». Nur der Text des Feldes und der Titel
+    // gehen an Anthropic (USA). feld._kiReset() setzt «Rückgängig» und die Meldung zurück.
+    function kiHilfe(feld, zweck, titelFn) {
+      if (!feld || feld._kiReset) return;
+      var reihe = document.createElement('div');
+      reihe.className = 'jvp-knopfreihe jvp-ki';
+      reihe.innerHTML = '<button type="button" class="jvp-knopf jvp-knopf--klein" data-ki="korrigieren">KI: korrigieren</button>'
+        + '<button type="button" class="jvp-knopf jvp-knopf--klein" data-ki="umschreiben">KI: umschreiben</button>'
+        + '<button type="button" class="jvp-knopf jvp-knopf--klein jvp-knopf--leise" data-ki="zurueck" hidden>Rückgängig</button>'
+        + '<span class="muted jvp-ki__status" aria-live="polite"></span>';
+      feld.insertAdjacentElement('afterend', reihe);
+      var status = reihe.querySelector('.jvp-ki__status');
+      var zurueck = reihe.querySelector('[data-ki="zurueck"]');
+      var vorher = null;
+      function melde(text, istFehler) {
+        status.textContent = text || '';
+        status.classList.toggle('jvp-ki__status--fehler', !!istFehler);
+      }
+      feld._kiReset = function () { vorher = null; zurueck.hidden = true; melde(''); };
+      reihe.addEventListener('click', function (e) {
+        var b = e.target.closest('button[data-ki]');
+        if (!b) return;
+        if (b.dataset.ki === 'zurueck') {
+          if (vorher === null) return;
+          feld.value = vorher;
+          vorher = null;
+          zurueck.hidden = true;
+          melde('Text von vor der KI wiederhergestellt.');
+          return;
+        }
+        var text = feld.value.trim();
+        if (!text) { melde('Bitte zuerst einen Text eingeben.', true); feld.focus(); return; }
+        var knoepfe = reihe.querySelectorAll('button');
+        var beschriftung = b.textContent;
+        knoepfe.forEach(function (k) { k.disabled = true; });
+        b.textContent = 'KI arbeitet …';
+        melde('');
+        apiCall('/ki', { method: 'POST', body: JSON.stringify({
+          action: 'text', zweck: zweck, modus: b.dataset.ki, text: text, titel: titelFn ? String(titelFn() || '') : ''
+        }) }).then(function (r) {
+          vorher = feld.value;
+          // Einzeilige Felder: Zeilenumbrüche der KI werden zu Leerzeichen
+          feld.value = feld.tagName === 'INPUT' ? String(r.text).replace(/\s*\n+\s*/g, ' ') : r.text;
+          zurueck.hidden = false;
+          melde(r.gekuerzt ? 'Die KI-Antwort war zu lang und wurde abgeschnitten. Bitte prüfen.' : 'Von der KI überarbeitet. Bitte prüfen und dann speichern.', !!r.gekuerzt);
+        }).catch(function (err) {
+          melde('KI: ' + err.message, true);
+        }).then(function () {
+          knoepfe.forEach(function (k) { k.disabled = false; });
+          b.textContent = beschriftung;
+        });
+      });
+    }
+
     function fmtDate(iso) {
       if (!iso) return '--';
       var d = new Date(iso);
@@ -504,6 +561,16 @@
     // ============================================================
     // BEREICHE (geöffnet vom Router in /assets/plattform.js)
     // ============================================================
+    // Offene Anfrage in der Adresse (#/drohnencheck/DC-2026-0001): «Zurück» aus der Vorschau des
+    // Berichts führt wieder zu dieser Anfrage
+    function refAusHash(bereich) {
+      var m = new RegExp('^#/' + bereich + '/(.+)$').exec(location.hash);
+      if (!m) return '';
+      try { return decodeURIComponent(m[1]); } catch (e) { return ''; }
+    }
+    function refInHash(bereich, ref) {
+      try { history.replaceState(null, '', '#/' + bereich + (ref ? '/' + encodeURIComponent(ref) : '')); } catch (e) { /* egal */ }
+    }
     function bereichOeffnen(name) {
       if (name === 'kunden') { loadKunden(); loadPunkteCheckboxes(); loadAnsprechpersonenDropdown(); }
       if (name === 'katalog') loadKatalog();
@@ -512,6 +579,9 @@
         window.DCAdmin.mount($('dc-admin-root'), {
           getPwd: function() { return ''; },
           api: API,
+          vorschau: 'plattform',
+          startReferenz: function() { return refAusHash('drohnencheck'); },
+          onDetail: function(ref) { refInHash('drohnencheck', ref); },
           onUnauthorized: function() { window.JVBridge.anmelden(); }
         });
       }
@@ -736,7 +806,7 @@
         }) });
         var inspoUrl = location.origin + '/inspiration.html?t=' + data.kunde.access_token;
         showMsg('kundeCreateMsg',
-          'Kunde angelegt! Link: <a href="'+inspoUrl+'" target="_blank">'+inspoUrl+'</a>','success');
+          'Kunde angelegt! Link: <a href="'+inspoUrl+'">'+inspoUrl+'</a>','success');
         $('k-vorname').value=''; $('k-nachname').value=''; $('k-email').value='';
         $('k-telefon').value=''; $('k-adresse').value=''; $('k-datum').value='';
         $('k-notizen').value=''; $('k-projekt').value='';
@@ -1162,6 +1232,14 @@
       finally { this.disabled = false; this.textContent = 'Hintergrund ersetzen'; }
     });
 
+    // KI-Texthilfe für die Texte eines neuen Punkts (der Titel gibt der KI den Zusammenhang)
+    (function() {
+      var npTitel = function() { return $('np-titel').value; };
+      kiHilfe($('np-kurz'), 'katalog-kurz', npTitel);
+      kiHilfe($('np-vorteil'), 'katalog-vorteil', npTitel);
+      kiHilfe($('np-bedenken'), 'katalog-bedenken', npTitel);
+    })();
+
     // Neuen Punkt anlegen
     $('npCreateBtn').addEventListener('click', async function() {
       var titel = $('np-titel').value.trim();
@@ -1178,6 +1256,7 @@
         }) });
         showMsg('npMsg','Punkt hinzugefügt.','success');
         $('np-titel').value=''; $('np-kurz').value=''; $('np-vorteil').value=''; $('np-bedenken').value='';
+        ['np-kurz','np-vorteil','np-bedenken'].forEach(function(f) { if ($(f)._kiReset) $(f)._kiReset(); });
         punkteCache = [];
         await loadKatalog();
         loadPunkteCheckboxes();
@@ -1281,9 +1360,10 @@
       $('detailContent').innerHTML = '<h3>Punkt bearbeiten</h3>'
         + '<label>Kategorie</label><input type="text" id="ed-kat" list="kat-vorschlaege" value="'+escapeHtml(p.kategorie)+'" />'
         + '<label>Titel</label><input type="text" id="ed-titel" value="'+escapeHtml(p.titel)+'" />'
-        + '<label>Kurzbeschreibung</label><textarea id="ed-kurz">'+(p.kurzbeschreibung||'')+'</textarea>'
-        + '<label>Vorteil</label><textarea id="ed-vorteil">'+(p.vorteil||'')+'</textarea>'
-        + '<label>Zu bedenken</label><textarea id="ed-bedenken">'+(p.zu_bedenken||'')+'</textarea>'
+        + '<label for="ed-kurz">Kurzbeschreibung</label><textarea id="ed-kurz">'+escapeHtml(p.kurzbeschreibung)+'</textarea>'
+        + '<label for="ed-vorteil">Vorteil</label><textarea id="ed-vorteil">'+escapeHtml(p.vorteil)+'</textarea>'
+        + '<label for="ed-bedenken">Zu bedenken</label><textarea id="ed-bedenken">'+escapeHtml(p.zu_bedenken)+'</textarea>'
+        + '<p class="muted jvp-ki-hinweis">KI-Knöpfe: Nur der Text des Feldes und der Titel gehen zur Überarbeitung an Anthropic (USA). Bitte keine Namen, Adressen oder Telefonnummern hineinschreiben.</p>'
         + '<label>Reihenfolge</label><input type="text" id="ed-order" value="'+p.reihenfolge+'" style="width:80px" />'
         + '<div id="edMsg"></div>'
         + '<button class="primary" id="edSave">Speichern</button>'
@@ -1297,6 +1377,11 @@
         + '<div id="medMsg"></div>';
       $('detailPanel').classList.add('open');
       $('detailOverlay').classList.add('open');
+
+      var edTitel = function() { return $('ed-titel') ? $('ed-titel').value : ''; };
+      kiHilfe($('ed-kurz'), 'katalog-kurz', edTitel);
+      kiHilfe($('ed-vorteil'), 'katalog-vorteil', edTitel);
+      kiHilfe($('ed-bedenken'), 'katalog-bedenken', edTitel);
 
       loadPunktMedien(id);
 
@@ -1516,6 +1601,11 @@
             + '<button type="button" class="jvp-knopf jvp-knopf--primaer jvp-knopf--klein" data-kat-save="'+escapeHtml(k.id)+'">Speichern</button>'
           + '</div></div>';
       }).join('');
+
+      el.querySelectorAll('[data-kat-id]').forEach(function(c) {
+        var titel = c.querySelector('[data-kat-field="titel"]');
+        kiHilfe(c.querySelector('[data-kat-field="intro"]'), 'katalog-intro', function() { return titel.value; });
+      });
 
       el.querySelectorAll('button[data-kat-save]').forEach(function(btn) {
         btn.addEventListener('click', async function() {

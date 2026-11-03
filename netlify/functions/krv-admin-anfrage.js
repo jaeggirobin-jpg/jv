@@ -2,14 +2,47 @@
 //
 //   'fotos'     → kurz gültige Links zu allen Fotos im Bucket (auch nicht abgeschlossene Uploads)
 //   'speichern' → Status, Beurteilung, Text für den Kunden und interne Notiz
+//   'ki'        → Begründung für den Kunden korrigieren oder umschreiben { modus, text, beurteilung }
+//                 (nur der Text des Feldes geht an Anthropic, USA; keine Referenz, keine Fotos)
 const { antwort, rest, ordnerListe, signierteUrls, REFERENZ_RE } = require('./_lib/krvcheck');
 const { anmeldung } = require('./_lib/auth');
+const ki = require('./_lib/ki');
 
 // Muss zum CHECK-Constraint in migration_013_krvcheck.sql passen
 const STATUS = ['neu', 'beurteilt', 'offerte', 'auftrag', 'abgeschlossen', 'abgesagt'];
 const BEURTEILUNG = ['vorhanden', 'fehlt', 'unklar'];
 const FOTO_SEKUNDEN = 3600;
 const RUECKGABE = 'referenz,status,beurteilung,beurteilung_text,beurteilt_at,notiz_intern,updated_at';
+const MAX_TEXT = 4000;
+
+// Ergebnis, das in der E-Mail vor der Begründung steht (siehe antwortMail in public/krv/assets/admin.js)
+const KI_ERGEBNIS = {
+  vorhanden: 'Ergebnis: Auf den Fotos ist nach dem Wasserzähler ein Rückflussverhinderer zu erkennen, es muss nichts eingebaut werden.',
+  fehlt: 'Ergebnis: Auf den Fotos ist nach dem Wasserzähler kein Rückflussverhinderer zu sehen.',
+  unklar: 'Ergebnis: Auf den Fotos lässt sich nicht sicher erkennen, ob ein Rückflussverhinderer eingebaut ist.'
+};
+
+async function kiBegruendung(b) {
+  const p = ki.textPruefen(b, MAX_TEXT);
+  if (p.fehler) return antwort(400, { error: p.fehler });
+  try {
+    const r = await ki.textUeberarbeiten({
+      modus: p.modus,
+      text: p.text,
+      kontext: 'Du überarbeitest die Begründung in einer kurzen Antwort-E-Mail einer Sanitärfirma in Basel an eine Hauseigentümerin oder einen Hauseigentümer. ' +
+        'Die Kundschaft hat Fotos des Wasserzählers geschickt. Wir haben geprüft, ob nach dem Wasserzähler ein Rückflussverhinderer eingebaut ist (Pflicht gemäss IWB). ' +
+        (KI_ERGEBNIS[b.beurteilung] ? KI_ERGEBNIS[b.beurteilung] + ' ' : '') +
+        'Die Begründung steht in der E-Mail direkt nach dem Satz mit dem Ergebnis und erklärt, was auf den Fotos zu sehen ist.',
+      umschreiben: 'Formuliere den Text klar, freundlich und fachlich korrekt um, in ein bis drei kurzen Sätzen. Schreib verständlich für Laien. ' +
+        'Füge keine Fakten, Bauteile, Masse, Preise oder Fristen hinzu, die nicht im Text stehen.'
+    });
+    return antwort(200, r);
+  } catch (e) {
+    if (e instanceof ki.KiFehler) return antwort(e.status, { error: e.message, code: e.code });
+    console.error('KI-Begründung fehlgeschlagen', e && e.name);
+    return antwort(500, { error: 'Die KI-Anfrage konnte nicht verarbeitet werden.' });
+  }
+}
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return antwort(405, { error: 'Methode nicht erlaubt' });
@@ -21,6 +54,8 @@ exports.handler = async (event) => {
   } catch (e) {
     return antwort(400, { error: 'Ungültige Anfrage' });
   }
+  if (b.action === 'ki') return kiBegruendung(b);
+
   const referenz = typeof b.referenz === 'string' ? b.referenz.trim() : '';
   if (!REFERENZ_RE.test(referenz)) return antwort(400, { error: 'Ungültige Referenz' });
 

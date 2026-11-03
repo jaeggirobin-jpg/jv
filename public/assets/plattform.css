@@ -126,6 +126,11 @@ body.jvp {
 .jvp-knopf:disabled, .jvp button.primary:disabled { opacity: .55; cursor: not-allowed; }
 .jvp button.primary { margin-top: 14px; }
 .jvp-knopfreihe { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+/* KI-Texthilfe unter Textfeldern (Katalog) */
+.jvp-ki { gap: 6px; margin: 6px 0 4px; }
+.jvp-ki__status { flex: 1 1 220px; min-width: 0; }
+.jvp-ki__status--fehler { color: var(--rot); }
+.jvp .jvp-ki-hinweis { margin: 8px 0 0; }
 
 /* ── Panels (bisherige .card des Admin-Panels) ─────────────────────────── */
 .jvp .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; margin: 0; box-shadow: none; min-width: 0; }
