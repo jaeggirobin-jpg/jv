@@ -6,6 +6,7 @@
 // POST /api/tool-db { tool, aktion: 'set',      pfad, daten }       Dokument speichern (ersetzt es)
 //                   { tool, aktion: 'patch',    pfad, daten }       einzelne Felder ändern
 //                   { tool, aktion: 'delete',   pfad }              löschen
+//                   (badvis/objekte/<id>: auch seine Kundenlinks und Bilder → { ok, links, dateien })
 //                   { tool, aktion: 'set_viele', docs: [{ pfad, daten }] }   mehrere (Datenübernahme)
 // Nur mit Admin-Anmeldung (Passwort oder Sitzungs-Cookie der Plattform).
 
@@ -17,6 +18,12 @@ const MAX_SAMMLUNGEN = 10;
 
 function istObjekt(x) {
   return x !== null && typeof x === 'object' && !Array.isArray(x);
+}
+
+// Bild-IDs eines Objekts der Badvisualisierungen (daten.bilder = { vorher, room-…, mock-… })
+function bilderVon(daten) {
+  const b = daten && istObjekt(daten.bilder) ? daten.bilder : {};
+  return Object.keys(b).map((k) => b[k]).filter((id) => typeof id === 'string' && t.ASSET_RE.test(id));
 }
 
 async function lesen(event) {
@@ -83,10 +90,35 @@ async function schreiben(event) {
   }
 
   if (b.aktion === 'delete') {
+    // Badvisualisierung: Kundenlinks und Bilder gehören zum Objekt und gehen mit
+    // (ein Link auf ein gelöschtes Objekt zeigt nur noch «nicht gefunden»)
+    const badvisObjekt = tool === 'badvis' && pfad.startsWith('objekte/') ? pfad.slice('objekte/'.length) : null;
+    let bilder = [];
+    let links = 0;
+    if (badvisObjekt) {
+      const alt = await t.docLesen(tool, pfad);
+      bilder = bilderVon(alt && alt.daten);
+      const weg = await t.rest('visualisierung_links?objekt_id=eq.' + encodeURIComponent(badvisObjekt) + '&select=id', { method: 'DELETE' });
+      links = Array.isArray(weg) ? weg.length : 0;
+    }
     await t.rest('tool_docs?tool=eq.' + tool + '&pfad=eq.' + encodeURIComponent(pfad), {
       method: 'PATCH', body: { daten: null, geloescht: true }, prefer: 'return=minimal'
     });
-    return t.json(200, { ok: true });
+    let dateien = 0;
+    if (bilder.length) {
+      // Bilder nur löschen, wenn kein anderes Objekt sie nutzt; Fehler hier lassen das Löschen gelten
+      try {
+        const andere = await t.rest('tool_docs?select=daten&tool=eq.badvis&sammlung=eq.objekte&geloescht=is.false');
+        const genutzt = new Set();
+        (andere || []).forEach((d) => bilderVon(d.daten).forEach((id) => genutzt.add(id)));
+        const frei = bilder.filter((id) => !genutzt.has(id));
+        if (frei.length) await t.dateienLoeschen(frei.map(t.assetPfad));
+        dateien = frei.length;
+      } catch (err) {
+        console.error('tool-db: Bilder des gelöschten Objekts nicht entfernt', err && err.message);
+      }
+    }
+    return t.json(200, badvisObjekt ? { ok: true, links, dateien } : { ok: true });
   }
 
   return t.json(400, { error: 'Unbekannte Aktion' });

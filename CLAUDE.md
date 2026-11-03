@@ -37,6 +37,7 @@ docs.jaeggivollmer.ch/
 │   ├── tools/              → Michis Tools (Terminplaner, Badvisualisierungen, Gäste-WC 3D, Story, Reel)
 │   │   └── assets/jv-bridge.js → Speicher der Tools (statt claude.ai), KI für die Tools (`use('sample')`) + Anmeldefenster der Plattform
 │   ├── assets/plattform.js|css → Plattform (Router, Projekte, Rechte im Menü, Daten übernehmen)
+│   ├── assets/badvis-editor.js → Badvisualisierungen erstellen, bearbeiten, löschen (Route `#/visualisierung/…`)
 │   ├── assets/feedback.js  → Feedback-Knopf mit Bildausschnitt (Plattform und Tools)
 │   ├── assets/zurueck.js   → Lasche «Zurück» in Tools und Seiten (alles öffnet im selben Tab)
 │   ├── assets/feedback-board.js, zugaenge.js → Verwaltung: Feedback-Board, Logins
@@ -174,6 +175,7 @@ Einrichtung, Rechte, Feedback und Datenschutz für Robin: `README_Plattform.md`.
 - Feedback: Knopf «Feedback» (oben rechts, in den Tools am rechten Rand, in offenen Dialogen als kleiner Knopf) → Bereich aufziehen, markieren, beschreiben. Wartet offline im Browser und wird nachgesendet. Board unter Verwaltung «Feedback»: Status, «Umsetzen», Markdown-Export für Claude Code mit eingebetteten Bildern
 - Michis Tools in `public/tools/` nicht von Hand umbauen: neue Versionen mit `werkzeuge/tools_einbinden.py` übernehmen (sonst gehen Änderungen beim nächsten Einbinden verloren)
 - Alles öffnet im selben Tab (Robin, 2.11.2026): Links zu Tools und eigenen Seiten ohne `target="_blank"`. Die Plattform merkt sich die Ansicht in `sessionStorage` (`jv-zurueck`), `assets/zurueck.js` zeigt dort die Lasche «Zurück» (nur Pfade der Plattform, Kundenseiten mit `data-nur-plattform` nur aus der Plattform). Nur externe Ziele (WhatsApp, Karte, E-Mail, fremde Webseiten) öffnen einen neuen Tab.
+- Badvisualisierungen (`assets/badvis-editor.js`, Robin 3.11.2026): «＋ Neue Visualisierung» im Projekt und oben rechts im Tool, dort auch «Bearbeiten» (`#/visualisierung/neu[?projekt=…][&von=tool]`, `#/visualisierung/<id>[?von=tool]`). Dokument `badvis/objekte/bv-…` wie im Tool (Varianten, Ausführung, Bilder = Asset-IDs im Bucket `tools`). Fotos werden im Browser neu als JPEG gezeichnet (max. 2000 px, ohne Kameradaten/GPS), ersetzte Fotos gelöscht; Löschen entfernt auch Kundenlinks und ungenutzte Fotos (`tool-db.js`). `tools/badvisualisierungen/daten.js` vereinheitlicht die Felder, lässt in der Ausführung nur Farbmuster und b/i/br als HTML zu und setzt die Knöpfe ins Tool
 - Terminplaner (`public/tools/terminplaner/plattform.js`): Karte der Projektadresse nur im PDF (schwarz-weiss, Kreis um die Adresse farbig, Punkt mittig zwischen Tabellenende und Legende, ohne Platz keine Karte); Knopf «Projekte» = Suche (Name, Adresse, Bauherrschaft, Tippfehler) statt Auswahlliste
 - PDF-Upload via `<input type="file">` → Base64 → an `create-link.js`
 - Tabelle aller Links mit:

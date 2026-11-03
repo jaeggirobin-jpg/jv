@@ -15,6 +15,7 @@ Mitarbeiterinnen und Mitarbeiter und ein gemeinsamer KI-Zugang (Claude) für all
 | Michis Tools | `public/tools/<tool>/index.html`; Speicher `tool-db.js`, `tool-asset.js`, `tool-blob.js`; Tabelle `tool_docs`, Bucket `tools` (`migration_015`) |
 | Karte und Adressvorschläge (swisstopo) | `public/tools/assets/geo-admin.js`, `public/tools/terminplaner/plattform.js` |
 | Lasche «Zurück» (alles öffnet im selben Tab) | `public/assets/zurueck.js`, Merker in `public/assets/plattform.js` |
+| Badvisualisierungen erstellen und bearbeiten | `public/assets/badvis-editor.js`; Knöpfe und Aufbereitung im Tool `public/tools/badvisualisierungen/daten.js` |
 | Kundenlink für Badvisualisierungen | `visualisierung-links.js`, `get-visualisierung.js`, `public/visualisierung.html`; Tabelle `visualisierung_links` |
 | Feedback | `public/assets/feedback.js` (Knopf, Bildausschnitt), `feedback-board.js` (Board, Export), Function `feedback.js`; Tabelle `plattform_feedback`, Bucket `feedback` (`migration_016`) |
 | KI (Claude) | `netlify/functions/_lib/ki.js` (gemeinsamer Zugang), `ki.js` (Katalog, Tools); KI für die Tools in `jv-bridge.js` |
@@ -94,6 +95,20 @@ in einem eigenen Fenster ohne Adressleiste, mit dem JV-Symbol.
   Status, kleine Tippfehler werden erkannt. ↑ ↓ wählen, Enter öffnet, Escape leert bzw. schliesst. Die Auswahlliste
   im Kopf gibt es nicht mehr.
 
+## Badvisualisierungen erstellen
+
+- **Neu:** im Projekt unter «Badvisualisierungen» auf «＋ Neue Visualisierung» oder im Tool oben rechts. Datum und
+  Hinweis sind vorbefüllt, aus dem Projekt auch der Kunde. Nötig sind Raum, Titel, ein Vorher-Foto und je Farbvariante ein Nachher-Foto; das
+  Mockup der Teile ist freiwillig. Ab zwei Farbvarianten braucht jede einen Namen und eine wird «zuerst gezeigt».
+- **Fotos:** JPG oder PNG, hineinziehen oder wählen. Vorher- und Nachher-Fotos brauchen dieselbe Sicht und dasselbe
+  Seitenverhältnis (quer 4:3 oder hoch 3:4), sonst erscheint ein Hinweis. Lässt sich ein iPhone-Foto (HEIC) nicht
+  lesen: Einstellungen › Kamera › Formate › «Maximale Kompatibilität».
+- **Ausführung:** je Zeile Bauteil und Beschreibung, auf Wunsch mit Farbmuster. Leere Zeilen fallen weg.
+- **Bearbeiten:** im Projekt bei der Visualisierung oder im Tool oben rechts «Bearbeiten». Wer mit ungespeicherten
+  Änderungen weggeht, wird gefragt.
+- **Kundenlink:** nur für Visualisierungen mit Projekt. Ohne Projekt gespeichert, später das Projekt wählen.
+- **Löschen:** im Editor unten «Löschen». Der Kundenlink und die Fotos gehen mit, das lässt sich nicht rückgängig machen.
+
 ## Logins und Rechte
 
 - **Admin:** alles, auch Logins, Feedback-Board und «Daten übernehmen».
@@ -152,6 +167,9 @@ sind, diese danach über «Daten übernehmen» einlesen.
   scrypt-Hash, Startpasswörter werden nie gespeichert. Es gibt kein Protokoll darüber, wer was bearbeitet
   (keine Verhaltensüberwachung im Sinne von Art. 26 ArGV 3; Bearbeitung im Arbeitsverhältnis nach Art. 328b OR).
 - **Fehlversuche:** nur ein Hash der IP-Adresse, nach einem Tag gelöscht.
+- **Fotos der Badvisualisierungen:** werden vor dem Hochladen im Browser neu gezeichnet (höchstens 2000 px). Dabei
+  fallen Kameradaten und GPS-Standort weg. Sie liegen im privaten Bucket `tools`; ersetzte Fotos und die Fotos einer
+  gelöschten Visualisierung werden gelöscht, ihr Kundenlink ebenfalls.
 - **Feedback:** Bildausschnitte können Kundendaten zeigen (Namen, Adressen, Fotos). Sie liegen im privaten Bucket und
   sind nur für Admins sichtbar. Mitarbeitende informieren: nur den nötigen Ausschnitt wählen. Erledigtes regelmässig
   mit «Aufräumen» löschen.

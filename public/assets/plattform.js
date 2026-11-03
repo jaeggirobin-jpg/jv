@@ -22,12 +22,13 @@
   var PIN = '<svg viewBox="0 0 18 26" aria-hidden="true"><path d="M9 25C9 25 1 15.5 1 9a8 8 0 0 1 16 0c0 6.5-8 16-8 16z" fill="#B98140" stroke="#fff" stroke-width="1.5"/><circle cx="9" cy="9" r="3" fill="#fff"/></svg>';
   var TITEL = {
     uebersicht: 'Übersicht', projekte: 'Projekte', projekt: 'Projekt', kunden: 'Kunden', katalog: 'Katalog',
-    drohnencheck: 'Drohnen-Check', krv: 'KRV-Check', 'import': 'Daten übernehmen', feedback: 'Feedback', zugaenge: 'Logins'
+    drohnencheck: 'Drohnen-Check', krv: 'KRV-Check', 'import': 'Daten übernehmen', feedback: 'Feedback', zugaenge: 'Logins',
+    visualisierung: 'Badvisualisierung'
   };
   // Welcher Bereich (Recht des Logins) zu welcher Ansicht gehört; «verwaltung» = nur Admins
   var VIEW_BEREICH = {
     projekte: 'projekte', projekt: 'projekte', kunden: 'kunden', katalog: 'katalog', drohnencheck: 'anfragen', krv: 'anfragen',
-    'import': 'verwaltung', feedback: 'verwaltung', zugaenge: 'verwaltung'
+    'import': 'verwaltung', feedback: 'verwaltung', zugaenge: 'verwaltung', visualisierung: 'projekte'
   };
 
   // ── Hilfen ────────────────────────────────────────────────────────────
@@ -286,8 +287,18 @@
   // ── Router ────────────────────────────────────────────────────────────
   var aktuell = null;
   var aktuellesProjekt = null;
+  var letzterHash = location.hash;
 
   function route() {
+    // Editor der Badvisualisierungen mit ungespeicherten Änderungen: erst fragen, sonst bleibt die Adresse
+    if (aktuell === 'visualisierung' && window.JVBadvisEditor) {
+      if (location.hash === letzterHash) return;   // Adresse wurde zurückgesetzt, der Editor ist noch offen
+      if (!window.JVBadvisEditor.verlassen()) {
+        history.replaceState(null, '', location.pathname + location.search + letzterHash);
+        return;
+      }
+    }
+    letzterHash = location.hash;
     var h = String(location.hash || '').replace(/^#\/?/, '');
     var teile = h.split('/');
     var name = teile[0] || 'uebersicht';
@@ -304,11 +315,11 @@
     });
     Array.prototype.forEach.call(document.querySelectorAll('.jvp-nav a'), function (a) {
       var n = a.getAttribute('data-nav');
-      if (n === name || (n === 'projekte' && name === 'projekt')) a.setAttribute('aria-current', 'page');
+      if (n === name || (n === 'projekte' && (name === 'projekt' || name === 'visualisierung'))) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
     });
     document.title = TITEL[name] + ' · JV-Plattform';
-    if (aktuell !== name || name === 'projekt') window.scrollTo(0, 0);
+    if (aktuell !== name || name === 'projekt' || name === 'visualisierung') window.scrollTo(0, 0);
     aktuell = name;
     if (window.JVFeedback) window.JVFeedback.seite('plattform-' + name, 'Plattform · ' + TITEL[name]);
     var menue = $('benutzerMenue');
@@ -320,6 +331,10 @@
     else if (name === 'import') importBereit();
     else if (name === 'feedback') window.JVFeedbackBoard.zeigen();
     else if (name === 'zugaenge') window.JVZugaenge.zeigen();
+    else if (name === 'visualisierung') {
+      if (window.JVBadvisEditor) window.JVBadvisEditor.zeigen(arg);
+      else $('visInhalt').innerHTML = '<p class="jvp-leer">Der Editor konnte nicht geladen werden. Bitte die Seite neu laden.</p>';
+    }
     else if (name === 'kunden') {
       laden(['projekte']).catch(function () { /* ohne Projekte: Kunden trotzdem zeigen */ }).then(function () {
         kundenProjektAuswahl();
@@ -501,6 +516,16 @@
       '</div>' +
       '<div class="jvp-panels">' + (darf('kunden') ? panelKunden(p) : '') + panelVisualisierungen(p) + panelWc(p) + panelTerminplan(p) + '</div>';
     if (aktiv && $(aktiv)) $(aktiv).focus();
+    // Meldung aus einer anderen Ansicht (z. B. «gespeichert» aus dem Editor der Badvisualisierungen)
+    if (spaeter && spaeter.projekt === id && spaeter.bis > Date.now()) {
+      panelMeldung(spaeter.bereich, spaeter.text, spaeter.art);
+      if (spaeter.scroll) {
+        spaeter.scroll = false;
+        var m = ziel.querySelector('[data-meldung="' + spaeter.bereich + '"]');
+        var abschnitt = m && m.closest('section');
+        if (abschnitt) abschnitt.scrollIntoView({ block: 'start' });
+      }
+    }
   }
 
   function kopfKarte(p) {
@@ -605,6 +630,7 @@
           '<span class="muted">' + esc([o.raum, o.kunde, o.datum].filter(Boolean).join(' · ')) + '</span></div>' +
           '<div class="actions">' +
             '<a class="jvp-knopf jvp-knopf--klein" href="/tools/badvisualisierungen/#' + encodeURIComponent(o.id) + '">Ansehen</a>' +
+            '<a class="jvp-knopf jvp-knopf--klein" href="#/visualisierung/' + encodeURIComponent(o.id) + '">Bearbeiten</a>' +
             (darf('kunden') ? '<button type="button" data-a="link-neu" data-objekt="' + esc(o.id) + '">Kundenlink erstellen</button>' : '') +
             '<button type="button" class="danger" data-a="vis-loesen" data-id="' + esc(o.id) + '">Vom Projekt lösen</button>' +
           '</div>';
@@ -638,8 +664,11 @@
       html += '<div class="jvp-zuordnen"><select id="pkVisWahl" aria-label="Visualisierung zuordnen"><option value="">Visualisierung zuordnen …</option>' +
         frei.map(function (o) { return '<option value="' + esc(o.id) + '">' + esc([o.kunde, o.raum, o.titel].filter(Boolean).join(' · ') || o.id) + '</option>'; }).join('') +
         '</select><button type="button" class="jvp-knopf jvp-knopf--klein" data-a="vis-zuordnen">Zuordnen</button></div>';
-    } else if (!objekteListe().length) {
-      html += '<p class="muted" style="margin-top:10px">Visualisierungen kommen aus dem Tool «JV Badvisualisierungen»' + (darf('verwaltung') ? ' (<a href="#/import">Daten übernehmen</a>)' : '') + '.</p>';
+    }
+    html += '<div class="jvp-knopfreihe" style="margin-top:14px"><a class="jvp-knopf" href="#/visualisierung/neu?projekt=' +
+      encodeURIComponent(p.id) + '">＋ Neue Visualisierung</a></div>';
+    if (!objekteListe().length && darf('verwaltung')) {
+      html += '<p class="muted" style="margin-top:10px">Bestehende Visualisierungen aus Michis Tool: <a href="#/import">Daten übernehmen</a>.</p>';
     }
     return html + '<div data-meldung="vis" aria-live="polite"></div></section>';
   }
@@ -687,6 +716,11 @@
     var el = document.querySelector('#projektInhalt [data-meldung="' + name + '"]');
     meldung(el, text, art);
   }
+  // Meldung für die Projektseite, die gleich geöffnet wird (bleibt 8 s, auch wenn sie neu gezeichnet wird)
+  var spaeter = null;
+  function spaeterMelden(projektId, bereich, text, art) {
+    spaeter = { projekt: projektId, bereich: bereich, text: text, art: art || 'success', bis: Date.now() + 8000, scroll: true };
+  }
 
   function wcZuordnen(wid, projektId) {
     if (D.wc[wid]) return toolSchreiben('gaeste-wc', 'patch', 'projects/' + wid, { projektId: projektId });
@@ -698,6 +732,7 @@
   $('projektInhalt').addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-a]');
     if (!b || b.tagName === 'SELECT') return;
+    spaeter = null;
     var a = b.getAttribute('data-a');
     var p = D.projekte[aktuellesProjekt];
     if (!p) return;
@@ -877,7 +912,16 @@
       return p ? '<a href="#/projekt/' + encodeURIComponent(pid) + '">' + esc(p.name || 'Ohne Namen') + '</a>' : '<span class="muted">–</span>';
     },
     projektOptionen: projektOptionen,
-    kundeGeaendert: function () { veraltet('kunden'); }
+    kundeGeaendert: function () { veraltet('kunden'); },
+    // für den Editor der Badvisualisierungen (assets/badvis-editor.js)
+    laden: laden,
+    veraltet: veraltet,
+    daten: function () { return D; },
+    toolSchreiben: toolSchreiben,
+    kundenVon: kundenVon,
+    kundeName: kundeName,
+    spaeterMelden: spaeterMelden,
+    neueId: neueId
   });
 
   // Adressvorschläge (geo.admin.ch) in allen Adressfeldern der Plattform
@@ -1337,13 +1381,15 @@
     }
     var texte = {
       uebersicht: 'Zurück zur Übersicht', projekte: 'Zurück zu den Projekten', kunden: 'Zurück zu den Kunden',
-      katalog: 'Zurück zum Katalog', feedback: 'Zurück zum Feedback-Board'
+      katalog: 'Zurück zum Katalog', feedback: 'Zurück zum Feedback-Board',
+      visualisierung: 'Zurück zur Badvisualisierung'
     };
     return texte[aktuell] || 'Zurück zu «' + (TITEL[aktuell] || 'Übersicht') + '»';
   }
   document.addEventListener('click', function (ev) {
     var a = ev.target && ev.target.closest ? ev.target.closest('a[href]') : null;
-    if (!a || a.hasAttribute('download') || (a.target && a.target !== '_self')) return;
+    // data-ohne-zurueck: Link führt dorthin zurück, woher man kam (sonst entstünde ein Kreis)
+    if (!a || a.hasAttribute('download') || a.hasAttribute('data-ohne-zurueck') || (a.target && a.target !== '_self')) return;
     var ziel;
     try { ziel = new URL(a.getAttribute('href'), location.href); } catch (e) { return; }
     if (ziel.origin !== location.origin || ziel.pathname === location.pathname ||
