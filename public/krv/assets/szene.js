@@ -41,7 +41,7 @@
         '<text x="0" y="12" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="9" font-weight="600" fill="#25292E">m³</text>' +
         '<path class="sz-zeiger" d="M0 4l7-3" stroke="#BD843A" stroke-width="1.6" stroke-linecap="round"/>' +
       '</g>' +
-      // Ventile nach dem Zähler: Absperrventil mit Rückflussverhinderer (KRV) und Prüfstutzen
+      // Ventile nach dem Zähler: Absperrventil mit Rückflussverhinderer (KRV) und Probenahmeventil
       '<g class="sz-krv" transform="translate(268 130)">' +
         '<path d="M-20-13L0 0-20 13zM20-13L0 0 20 13z" fill="url(#sz-messing)" stroke="#7A5019" stroke-width="1.5"/>' +
         '<rect x="-3" y="-30" width="6" height="17" fill="#7A5019"/><rect x="-15" y="-35" width="30" height="7" rx="3" fill="#BD843A"/>' +
