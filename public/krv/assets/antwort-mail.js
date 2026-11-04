@@ -125,7 +125,7 @@
       var zellen = w.kacheln.map(function (k, i) {
         return '<td class="kachel" valign="top" width="' + Math.floor(100 / w.kacheln.length) + '%" style="padding:12px 16px' + (i ? ';border-left:1px solid ' + F.linie : '') + '">' +
           '<a href="' + esc(k.url) + '" target="_blank" style="text-decoration:none;display:block">' +
-          '<span style="display:block;font-family:' + SCHRIFT + ';font-size:11px;letter-spacing:1px;text-transform:uppercase;color:' + F.kupferDunkel + ';font-weight:bold">' + esc(k.bereich) + '</span>' +
+          '<span style="display:block;font-family:' + SCHRIFT + ';font-size:11px;letter-spacing:1px;text-transform:uppercase;color:' + F.kupferDunkel + ';font-weight:bold">' + (k.symbol ? '<span style="font-size:14px;letter-spacing:0;margin-right:5px;font-family:\'Segoe UI Symbol\',\'Apple Symbols\',' + SCHRIFT + '">' + esc(k.symbol) + '</span>' : '') + esc(k.bereich) + '</span>' +
           '<span style="display:block;font-family:' + SCHRIFT + ';font-size:15px;line-height:20px;font-weight:bold;color:' + F.text + '">' + esc(k.titel) + ' <span style="color:' + F.kupfer + '">&rarr;</span></span>' +
           '</a></td>';
       }).join('');
