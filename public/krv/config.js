@@ -156,9 +156,10 @@
         fotosTitel: 'Drei Fotos beim Wasserzähler',
         fotosText: 'Gehen Sie zum Wasserzähler, meist im Keller, dort wo die Wasserleitung ins Haus kommt. Licht an, nichts auf- oder zudrehen. Dann diese drei Fotos machen:',
         // Geführte Fotos: Skizze zeigt mit dem Rahmen, was aufs Bild soll (szene = Schritt in assets/szene.js)
+        // beispiele: zeigt unter der Skizze die Beispielfotos aus anleitung.zaehler bzw. anleitung.ventile (wie im Erklärvideo)
         fotoSchritte: [
-          { titel: 'Die ganze Stelle', text: 'Etwa einen Meter zurückstehen. Auf dem Foto sind der Zähler und die Leitung links und rechts davon mit allen Ventilen.', szene: 1 },
-          { titel: 'Die Ventile nach dem Zähler', text: 'Näher ran an die Ventile direkt nach dem Zähler, auf der Seite, wo die Leitung ins Haus weitergeht. Kein Zoom, scharf stellen.', szene: 2 },
+          { titel: 'Die ganze Stelle', text: 'Etwa einen Meter zurückstehen. Auf dem Foto sind der Zähler und die Leitung links und rechts davon mit allen Ventilen.', szene: 1, beispiele: 'zaehler' },
+          { titel: 'Die Ventile nach dem Zähler', text: 'Näher ran an die Ventile direkt nach dem Zähler, auf der Seite, wo die Leitung ins Haus weitergeht. Kein Zoom, scharf stellen.', szene: 2, beispiele: 'ventile' },
           { titel: 'Die Zählernummer', text: 'Deckel des Wasserzählers aufklappen und nah ran, bis die Zählernummer gut lesbar ist. Sie steht meist auf dem Zifferblatt oder auf dem Gehäuse.', szene: 3 }
         ],
         fotoKnopf: 'Foto {n} aufnehmen',
