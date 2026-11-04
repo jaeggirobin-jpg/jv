@@ -87,7 +87,7 @@
       'Vielen Dank für Ihre Anfrage zum Gratis KRV-Check (' + a.referenz + ', ' + adresse(a) + ').\n\n' +
       r.absaetze.join('\n\n') + '\n\n' +
       (r.knopf ? r.knopf.text + ': ' + r.knopf.url + '\n\n' : '') +
-      'Freundliche Grüsse\nJäggi Vollmer\n' + (fi.telefon || '');
+      'Freundliche Grüsse\nJäggi Vollmer\n' + String(fi.website || '').replace(/^https?:\/\//, '') + '\n' + (fi.telefon || '');
     var w = werbung(cfg);
     if (w) {
       t += '\n\n— ' + w.titel + ' —\n' + w.kacheln.map(function (k) {
@@ -174,8 +174,8 @@
           (r.knopf ? '<div style="margin:4px 0 20px">' + knopf(r.knopf.text, r.knopf.url, F.kupferDunkel) + '</div>' : '') +
           absatz('Freundliche Grüsse') +
           '<p style="margin:0 0 24px;font-family:' + SCHRIFT + ';font-size:16px;line-height:24px;color:' + F.text + '"><strong>Jäggi Vollmer</strong><br>' +
-            '<a href="tel:' + esc(fi.telefonLink || '') + '" style="color:' + F.kupferDunkel + ';text-decoration:none">' + esc(fi.telefon || '') + '</a>' +
-            ' · <a href="mailto:' + esc(fi.email || '') + '" style="color:' + F.kupferDunkel + ';text-decoration:none">' + esc(fi.email || '') + '</a></p>' +
+            '<a href="' + esc(fi.website || '') + '" target="_blank" style="color:' + F.kupferDunkel + ';text-decoration:none">' + esc(String(fi.website || '').replace(/^https?:\/\//, '')) + '</a><br>' +
+            '<a href="tel:' + esc(fi.telefonLink || '') + '" style="color:' + F.kupferDunkel + ';text-decoration:none">' + esc(fi.telefon || '') + '</a></p>' +
         '</td></tr>' +
       '</table></td></tr>' +
 
