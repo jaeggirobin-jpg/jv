@@ -308,6 +308,16 @@
 
   function knopfText(vorlage, n) { return String(vorlage || '').replace('{n}', n); }
 
+  // Beispielfotos unter der Skizze (Wasserzähler- bzw. Ventiltypen wie im Erklärvideo)
+  function beispieleHtml(art) {
+    var b = art && T.anleitung && T.anleitung[art];
+    if (!b || !b.bilder || !b.bilder.length) return '';
+    return '<div class="krv-fotoplatz__beispiele"><p>' + esc(b.titel) + ':</p><ul>' +
+      b.bilder.map(function (z) {
+        return '<li><img src="' + esc(z.bild) + '" alt="' + esc(z.text) + '" width="480" height="480" loading="lazy"><span>' + esc(z.text) + '</span></li>';
+      }).join('') + '</ul></div>';
+  }
+
   // Fotoplätze einmal aufbauen: Nummer, Titel, Skizze mit Rahmen, Aufnahme-Knopf
   function fotoplaetzeAufbauen() {
     var schritte = T.formular.fotoSchritte || [];
@@ -323,6 +333,7 @@
           '<div class="krv-fotoplatz__skizze" data-skizze="' + i + '"></div>' +
           '<div class="krv-fotoplatz__foto" data-foto="' + i + '" hidden></div>' +
         '</div>' +
+        beispieleHtml(sch.beispiele) +
         '<label class="btn btn--sekundaer krv-foto-knopf">' + kamera +
           '<span data-knopf="' + i + '">' + esc(knopfText(T.formular.fotoKnopf, n)) + '</span>' +
           '<input type="file" accept="image/*" data-foto-input="' + i + '" aria-label="Foto ' + n + ': ' + esc(sch.titel) + '">' +
