@@ -94,40 +94,39 @@
     return f ? 'https://krv.jaeggivollmer.ch/' + f.datei : '';
   }
 
-  function antwortMail(a, beurteilung, text) {
-    var anrede = 'Guten Tag ' + a.vorname + ' ' + a.nachname + '\n\n' +
-      'Vielen Dank für Ihre Anfrage zum Gratis KRV-Check (' + a.referenz + ', ' + adresseVon(a) + ').\n\n';
-    var zusatz = text ? text.trim() + '\n\n' : '';
-    var vorbehalt = 'Bitte beachten Sie: Unsere Einschätzung beruht auf Ihren Fotos und ersetzt keine Kontrolle vor Ort.\n\n';
-    var gruss = 'Freundliche Grüsse\nJäggi Vollmer\n' + (CFG.firma ? CFG.firma.telefon : '');
-    var mieter = a.rolle === 'mieter'
-      ? 'Den Einbau muss die Eigentümerschaft oder die Verwaltung in Auftrag geben. Leiten Sie diese E-Mail gerne weiter.\n\n'
-      : '';
-    var betreff, body;
-    if (beurteilung === 'vorhanden') {
-      betreff = 'Ihr KRV-Check ' + a.referenz + ': Rückflussverhinderer vorhanden';
-      body = anrede +
-        'Gute Nachricht: Auf Ihren Fotos ist nach dem Wasserzähler ein Rückflussverhinderer zu erkennen. Sie müssen nichts einbauen.\n\n' + zusatz +
-        'Wir melden IWB per E-Mail, dass bei Ihnen bereits ein Rückflussverhinderer vorhanden ist. Sie müssen dafür nichts weiter tun.\n\n' +
-        vorbehalt + gruss;
-    } else if (beurteilung === 'fehlt') {
-      betreff = 'Ihr KRV-Check ' + a.referenz + ': Rückflussverhinderer fehlt';
-      body = anrede +
-        'Auf Ihren Fotos sehen wir nach dem Wasserzähler keinen Rückflussverhinderer.\n\n' + zusatz +
-        (a.offerte_gewuenscht === false
-          ? 'Gemäss IWB muss die Eigentümerschaft einen Rückflussverhinderer auf eigene Kosten einbauen lassen. Wenn Sie dafür eine Offerte möchten, antworten Sie einfach auf diese E-Mail. Den Einbau melden wir anschliessend direkt an IWB.\n\n'
-          : 'Gemäss IWB muss die Eigentümerschaft einen Rückflussverhinderer auf eigene Kosten einbauen lassen. Wie gewünscht erstellen wir Ihnen dafür eine Offerte. Den Einbau melden wir anschliessend direkt an IWB.\n\n' +
-            '[Die Offerte finden Sie im Anhang. / Wir senden Ihnen die Offerte in den nächsten Tagen.]\n\n') +
-        mieter + (flyerUrl(a.plz) ? 'Die Informationen von IWB dazu finden Sie im Flyer: ' + flyerUrl(a.plz) + '\n\n' : '') +
-        vorbehalt + gruss;
-    } else {
-      betreff = 'Ihr KRV-Check ' + a.referenz + ': noch ein Foto, bitte';
-      body = anrede +
-        'Auf Ihren Fotos können wir leider nicht sicher erkennen, ob ein Rückflussverhinderer eingebaut ist.\n\n' + zusatz +
-        'Können Sie uns noch ein Foto senden? Antworten Sie einfach auf diese E-Mail und hängen Sie das Foto an. Am besten von etwa einem Meter Abstand, mit dem Wasserzähler und allen Ventilen rechts und links davon. Alternativ kommen wir gerne kurz vorbei.\n\n' +
-        gruss;
-    }
-    return 'mailto:' + a.email + '?subject=' + encodeURIComponent(betreff) + '&body=' + encodeURIComponent(body);
+  // Texte und Gestaltung stehen in assets/antwort-mail.js (window.KRV_ANTWORT)
+  function antwortMail(a) {
+    var t = window.KRV_ANTWORT.text(a, CFG);
+    return 'mailto:' + a.email + '?subject=' + encodeURIComponent(t.betreff) + '&body=' + encodeURIComponent(t.text);
+  }
+  // Logo der Mail: auf krv.jaeggivollmer.ch unter /assets, in der Plattform unter /krv/assets
+  function mailAssets() {
+    return location.hostname.indexOf('krv.') === 0 ? '/assets/' : '/krv/assets/';
+  }
+  // Entwurf als .eml laden: Doppelklick öffnet ihn in Outlook als neue Mail (Logo als Inline-Bild angehängt)
+  function emlLaden(a) {
+    return fetch(mailAssets() + 'logo-mail.png').then(function (r) {
+      if (!r.ok) throw new Error('Logo ' + r.status);
+      return r.blob();
+    }).then(function (b) {
+      return new Promise(function (ok, nein) {
+        var fr = new FileReader();
+        fr.onload = function () { ok(String(fr.result).split(',')[1]); };
+        fr.onerror = nein;
+        fr.readAsDataURL(b);
+      });
+    }).catch(function () { return null; }).then(function (logo) {
+      var inhalt = window.KRV_ANTWORT.eml(a, CFG, { logoBase64: logo });
+      var url = URL.createObjectURL(new Blob([inhalt], { type: 'message/rfc822' }));
+      var link = document.createElement('a');
+      link.href = url;
+      link.download = 'Antwort ' + a.referenz + '.eml';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+      return !!logo;
+    });
   }
 
   // ════════════════════════════════════════════════════════════════════
@@ -361,7 +360,7 @@
           '<div><label for="krv-notiz">Interne Notiz</label><textarea id="krv-notiz" data-a="notiz" autocomplete="off">' + esc(a.notiz_intern || '') + '</textarea></div>' +
           '<p class="dc-gespeichert krv-autosave" data-a="gespeichert" aria-live="polite">Änderungen werden automatisch gespeichert.</p>' +
         '</div>' +
-        '<div class="dc-knoepfe" data-a="antwort">' + antwortKnopf(a) + '</div>' +
+        '<div class="dc-knoepfe" data-a="antwort" data-b="' + esc(a.beurteilung || '') + '">' + antwortKnopf(a) + '</div>' +
 
         '<h4>Meldung an IWB</h4><div class="dc-verwaltung krv-karte">' +
           '<p class="dc-hinweis">Die Meldung geht als E-Mail an die IWB-Installationskontrolle, eine Rückantwortkarte braucht es nicht.</p>' +
@@ -439,7 +438,11 @@
 
     function antwortKnopf(a) {
       if (!a.beurteilung) return '<p class="dc-hinweis">Sobald eine Beurteilung gewählt ist, erscheint hier der passende E-Mail-Entwurf an den Kunden.</p>';
-      return '<a class="dc-btn dc-btn--primaer" href="' + esc(antwortMail(a, a.beurteilung, a.beurteilung_text)) + '">Antwort per E-Mail (' + esc(label(BEURTEILUNG, a.beurteilung)) + ')</a>';
+      return '<button type="button" class="dc-btn dc-btn--primaer" data-a="antwort-eml">Antwort als Outlook-Entwurf (' + esc(label(BEURTEILUNG, a.beurteilung)) + ')</button>' +
+        '<button type="button" class="dc-btn" data-a="antwort-vorschau">Vorschau</button>' +
+        '<a class="dc-btn" href="' + esc(antwortMail(a)) + '">Nur Text (anderes Mailprogramm)</a>' +
+        '<p class="dc-hinweis krv-antwort-hinweis">Lädt eine .eml-Datei. Doppelklick darauf öffnet die gestaltete Mail in Outlook, prüfen und senden.</p>' +
+        '<div class="krv-vorschau" data-a="vorschau-box" hidden></div>';
     }
 
     function fotosLaden(a) {
@@ -527,7 +530,13 @@
       d.querySelectorAll('[data-status]').forEach(function (k) { k.setAttribute('aria-pressed', String(k.dataset.status === a.status)); });
       var loesch = d.querySelector('.dc-loeschung');
       if (loesch) loesch.textContent = loeschText(a);
-      el('antwort').innerHTML = antwortKnopf(a);
+      // Antwort-Knöpfe nur bei neuer Beurteilung neu aufbauen (sonst schlösse jede Speicherung die Vorschau)
+      var ant = el('antwort');
+      if (ant.dataset.b !== (a.beurteilung || '')) { ant.innerHTML = antwortKnopf(a); ant.dataset.b = a.beurteilung || ''; }
+      else {
+        var nurText = ant.querySelector('a.dc-btn');
+        if (nurText) nurText.href = antwortMail(a);
+      }
     }
     function loeschText(a) {
       return a.status === 'auftrag'
@@ -734,6 +743,31 @@
         case 'ki-korrigieren': kiText('korrigieren', t); break;
         case 'ki-umschreiben': kiText('umschreiben', t); break;
         case 'ki-zurueck': kiZurueck(); break;
+        case 'antwort-eml':
+        case 'antwort-vorschau':
+          var akt = aktuelleAnfrage();
+          if (!akt) break;
+          // Begründung so, wie sie gerade im Feld steht (Autosave kann noch ausstehen)
+          var feld = el('text');
+          var daten = Object.assign({}, akt, { beurteilung_text: feld ? feld.value : akt.beurteilung_text });
+          if (t.dataset.a === 'antwort-eml') {
+            jetztSpeichern();
+            emlLaden(daten).then(function (mitLogo) {
+              if (!mitLogo) fehler('Entwurf geladen, das Logo fehlt darin (konnte nicht geladen werden).');
+            });
+          } else {
+            var box = el('vorschau-box');
+            if (!box.hidden) { box.hidden = true; box.innerHTML = ''; t.textContent = 'Vorschau'; break; }
+            var fr = document.createElement('iframe');
+            fr.title = 'Vorschau der Antwort-Mail';
+            fr.setAttribute('sandbox', '');
+            fr.srcdoc = window.KRV_ANTWORT.html(daten, CFG, { logoUrl: mailAssets() + 'logo-mail.png' });
+            box.innerHTML = '<p class="dc-hinweis">An: ' + esc(daten.email) + ' · Betreff: ' + esc(window.KRV_ANTWORT.text(daten, CFG).betreff) + '</p>';
+            box.appendChild(fr);
+            box.hidden = false;
+            t.textContent = 'Vorschau schliessen';
+          }
+          break;
         case 'karte-mail':
           var aktuell = aktuelleAnfrage();
           if (aktuell) window.location.href = iwbMail(aktuell, karteAngaben());
