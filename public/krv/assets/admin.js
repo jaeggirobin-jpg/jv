@@ -348,7 +348,7 @@
             }).join('') +
           '</fieldset>' +
           '<div><label for="krv-text">Begründung für den Kunden <span class="dc-optional">(kommt in die E-Mail)</span></label>' +
-            '<textarea id="krv-text" data-a="text" autocomplete="off" placeholder="z. B. Nach dem Zähler ist ein Absperrventil mit integriertem Rückflussverhinderer (Prüfstutzen sichtbar) eingebaut.">' + esc(a.beurteilung_text || '') + '</textarea>' +
+            '<textarea id="krv-text" data-a="text" autocomplete="off" placeholder="z. B. Nach dem Zähler ist ein Absperrventil mit integriertem Rückflussverhinderer (Probenahmeventil sichtbar) eingebaut.">' + esc(a.beurteilung_text || '') + '</textarea>' +
             '<div class="dc-textfeld__knoepfe">' +
               '<button type="button" class="dc-btn" data-a="ki-korrigieren">KI: korrigieren</button>' +
               '<button type="button" class="dc-btn" data-a="ki-umschreiben">KI: umschreiben</button>' +
