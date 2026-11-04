@@ -32,7 +32,7 @@ Schriften, Grundgestaltung, Logo und die Video-Verkleinerung kommen aus `public/
 3. Der Browser lädt die Fotos direkt in den privaten Bucket, dann schliesst `krv-fotos` ab und sendet die Info-Mail an info@ (ohne Personendaten, nur Referenz und Link).
 4. Option «Ich finde den Wasserzähler nicht, bitte anrufen»: Anfrage ohne Fotos, Info-Mail sofort.
 5. Bricht der Upload ab, holt die tägliche `krv-loeschroutine` die Info-Mail nach. Im Admin sind auch nicht abgeschlossene Uploads sichtbar.
-6. Im Admin: Fotos ansehen, Beurteilung «vorhanden / fehlt / unklar» mit Begründung speichern, dann «Antwort per E-Mail» öffnet einen fertigen Entwurf im eigenen Mailprogramm. Bei «vorhanden» gibt es bewusst keine Bestätigung an IWB, der Kunde nutzt die Rückantwortkarte selbst.
+6. Im Admin: Fotos ansehen, Beurteilung «vorhanden / fehlt / unklar» mit Begründung speichern, dann «Antwort per E-Mail» öffnet einen fertigen Entwurf im eigenen Mailprogramm. Status per Knopf, alles wird automatisch gespeichert. «Mail an IWB» öffnet einen Entwurf an die IWB-Installationskontrolle (KRV vorhanden oder durch uns eingebaut, mit Zählernummer). Eine Rückantwortkarte braucht es nicht, IWB akzeptiert die Meldung per E-Mail (Robin, 4.11.2026).
 7. Löschung ohne Auftrag nach 90 Tagen (Anfrage und Fotos), ausser Status «Auftrag».
 
 ## Einrichtung (einmalig, durch Robin)
