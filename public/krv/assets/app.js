@@ -53,10 +53,15 @@
       el.addEventListener('click', function () { formularOeffnen(); });
     });
 
-    // Unterlagen von IWB (Broschüre, Online-Formular), nur wenn in config.js gesetzt
+    // Unterlagen von IWB (Flyer je Wohnort, Online-Formular), nur wenn in config.js gesetzt
     var iwb = T.iwb || {};
     var iwbLinks = [];
-    if (iwb.broschuere) iwbLinks.push('<a href="' + esc(iwb.broschuere) + '" target="_blank" rel="noopener">IWB-Broschüre herunterladen (PDF)</a>');
+    if (iwb.flyer && iwb.flyer.length) {
+      iwbLinks.push('<span class="krv-flyer"><span>' + esc(iwb.flyerTitel) + '</span><span class="krv-flyer__knoepfe">' +
+        iwb.flyer.map(function (f) {
+          return '<a class="krv-flyer__knopf" href="' + esc(f.datei) + '" target="_blank" rel="noopener">' + esc(f.orte) + '</a>';
+        }).join('') + '</span></span>');
+    }
     if (iwb.formular) iwbLinks.push('<a href="' + esc(iwb.formular) + '" target="_blank" rel="noopener">Schon eingebaut? Online-Formular von IWB</a>');
     if (iwbLinks.length) { $('iwb-links').innerHTML = iwbLinks.join(''); $('iwb-links').hidden = false; }
 

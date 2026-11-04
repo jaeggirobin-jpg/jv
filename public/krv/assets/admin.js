@@ -80,6 +80,20 @@
   // ════════════════════════════════════════════════════════════════════
   // Antwort an den Kunden als E-Mail-Entwurf (eigenes Mailprogramm, kein Versanddienst)
   // ════════════════════════════════════════════════════════════════════
+  // Passender IWB-Flyer zur PLZ der Liegenschaft (config.js texte.iwb.flyer), als volle Adresse für die E-Mail
+  function flyerUrl(plz) {
+    var n = parseInt(plz, 10);
+    var liste = (CFG.texte && CFG.texte.iwb && CFG.texte.iwb.flyer) || [];
+    var f = liste.filter(function (x) {
+      return (x.plz || []).some(function (e) {
+        if (typeof e === 'number') return e === n;
+        var t = String(e).split('-');
+        return n >= parseInt(t[0], 10) && n <= parseInt(t[1] || t[0], 10);
+      });
+    })[0];
+    return f ? 'https://krv.jaeggivollmer.ch/' + f.datei : '';
+  }
+
   function antwortMail(a, beurteilung, text) {
     var anrede = 'Guten Tag ' + a.vorname + ' ' + a.nachname + '\n\n' +
       'Vielen Dank für Ihre Anfrage zum Gratis KRV-Check (' + a.referenz + ', ' + adresseVon(a) + ').\n\n';
@@ -104,7 +118,8 @@
           ? 'Gemäss IWB muss die Eigentümerschaft einen Rückflussverhinderer auf eigene Kosten einbauen lassen. Wenn Sie dafür eine Offerte möchten, antworten Sie einfach auf diese E-Mail. Den Einbau melden wir anschliessend direkt an IWB.\n\n'
           : 'Gemäss IWB muss die Eigentümerschaft einen Rückflussverhinderer auf eigene Kosten einbauen lassen. Wie gewünscht erstellen wir Ihnen dafür eine Offerte. Den Einbau melden wir anschliessend direkt an IWB.\n\n' +
             '[Die Offerte finden Sie im Anhang. / Wir senden Ihnen die Offerte in den nächsten Tagen.]\n\n') +
-        mieter + vorbehalt + gruss;
+        mieter + (flyerUrl(a.plz) ? 'Die Informationen von IWB dazu finden Sie im Flyer: ' + flyerUrl(a.plz) + '\n\n' : '') +
+        vorbehalt + gruss;
     } else {
       betreff = 'Ihr KRV-Check ' + a.referenz + ': noch ein Foto, bitte';
       body = anrede +

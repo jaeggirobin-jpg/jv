@@ -71,21 +71,26 @@
       },
 
       // Unterlagen von IWB (IWB-Mail vom 29.10.2026). Leer = Link wird nicht angezeigt.
-      // broschuere: PDF z. B. unter 'assets/iwb-broschuere-rueckflussverhinderer.pdf' ablegen.
+      // flyer: je Gebiet ein eigener IWB-Flyer (Stand 10/2026, von Robin 4.11.2026), Auswahl nach Wohnort.
+      //        plz wie beim Einzugsgebiet; auch für den Link in der Antwort-Mail im Admin.
       // formular: Link auf das Online-Formular von IWB für die Rückmeldung «schon vorhanden».
-      // Keine IWB-Kontaktdaten selbst angeben: Kontakt steht in der Broschüre (Wunsch IWB).
+      // Keine IWB-Kontaktdaten selbst angeben: Kontakt steht im Flyer (Wunsch IWB).
       iwb: {
-        broschuere: '',
+        flyerTitel: 'IWB-Flyer zum Rückflussverhinderer (PDF), je nach Wohnort:',
+        flyer: [
+          { orte: 'Basel, Riehen, Bettingen', datei: 'assets/iwb-flyer-basel-stadt.pdf', plz: ['4000-4099', 4125, 4126] },
+          { orte: 'Binningen', datei: 'assets/iwb-flyer-binningen.pdf', plz: [4102] }
+        ],
         formular: ''
       },
 
       pflicht: {
         titel: 'Worum es geht',
-        text: 'Gemäss IWB braucht jede Liegenschaft nach dem Wasserzähler einen Rückflussverhinderer, eingebaut auf Kosten der Eigentümerschaft (§ 28 Ausführungsbestimmungen IWB, SG 772.800). Er verhindert, dass Wasser aus dem Haus zurück ins Trinkwassernetz fliesst.',
+        text: 'Gemäss IWB braucht jede Liegenschaft nach dem Wasserzähler einen Rückflussverhinderer, eingebaut auf Kosten der Eigentümerschaft (Basel-Stadt: § 28 Ausführungsbestimmungen IWB, SG 772.800; Binningen: § 24 Wasserreglement Binningen). Er verhindert, dass Wasser aus dem Haus zurück ins Trinkwassernetz fliesst.',
         fristDatum: '1.1.2027', // falls IWB die Frist neu setzt: hier und im Satz darunter anpassen
         frist: 'IWB hat Liegenschaften ohne Rückflussverhinderer angeschrieben und um Nachrüstung bis zum 1. Januar 2027 gebeten.',
         gebiet: 'Versorgungsgebiet IWB: ganzer Kanton Basel-Stadt (Basel, Riehen, Bettingen) und Gemeinde Binningen',
-        quelle: 'Quelle: IWB, Broschüre «Rückflussverhinderung in Trinkwasserinstallationen» und Schreiben an Hauseigentümer. Jäggi Vollmer ist ein unabhängiges Sanitärunternehmen und nicht Teil von IWB.'
+        quelle: 'Quelle: IWB, Flyer «Rückflussverhinderung in Trinkwasserinstallationen» und Schreiben an Hauseigentümer. Jäggi Vollmer ist ein unabhängiges Sanitärunternehmen und nicht Teil von IWB.'
       },
 
       anleitung: {

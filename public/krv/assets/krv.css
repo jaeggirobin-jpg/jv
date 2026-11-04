@@ -18,6 +18,11 @@
 .krv-iwb-links { display: grid; gap: 6px; margin: 0 0 12px; }
 .krv-iwb-links[hidden] { display: none; }
 .krv-iwb-links a { color: #94621F; font-weight: 600; }
+.krv-flyer { display: grid; gap: 8px; }
+.krv-flyer__knoepfe { display: flex; flex-wrap: wrap; gap: 8px; }
+.krv-iwb-links .krv-flyer__knopf { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1.5px solid #BD843A; border-radius: 999px; background: #fff; color: #94621F; text-decoration: none; }
+.krv-iwb-links .krv-flyer__knopf::before { content: 'PDF'; font-size: .7rem; font-weight: 700; letter-spacing: .04em; color: #fff; background: #BD843A; border-radius: 4px; padding: 2px 5px; }
+.krv-iwb-links .krv-flyer__knopf:hover, .krv-iwb-links .krv-flyer__knopf:focus-visible { background: #F4EADD; }
 .krv-frist strong { font-family: 'Oswald', sans-serif; font-size: 1.8rem; color: #94621F; line-height: 1.1; }
 
 /* ── Anleitung ────────────────────────────────────────────────────────── */
