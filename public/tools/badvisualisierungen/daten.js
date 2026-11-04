@@ -85,7 +85,12 @@
     '.top .jv-kopf a:hover{border-color:var(--accent)}' +
     '.top .jv-kopf a[hidden]{display:none}' +
     '.mock:has(img[src^="data:"]){display:none}.mock img[src^="data:"]{display:none}' +
-    '@media print{.top .jv-kopf{display:none}}';
+    '@media print{.top .jv-kopf{display:none}}' +
+    // Übersicht (Feedback 4.11.2026 «Darstellung schlecht»): Hochformat-Fotos sprengten die 220 px hohe
+    // Bildfläche der Karte und lagen über dem Namen. Zeile fest auf die Höhe, Bilder darin zugeschnitten.
+    '.grid .card .pair{grid-template-rows:minmax(0,1fr);overflow:hidden;flex:0 0 auto}' +
+    '.grid .card .pair img{min-width:0;min-height:0}' +
+    '.grid .card .meta{position:relative}';
 
   function kopf() {
     var top = document.querySelector('header.top');
