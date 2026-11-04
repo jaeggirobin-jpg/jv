@@ -113,7 +113,12 @@
     var r = inhalt(a, cfg);
     var fi = cfg.firma || {};
     var w = werbung(cfg);
-    var logo = opts.logoUrl || BASIS + 'assets/logo-mail.png';
+    // Bilder: angehängt (cid) im .eml, sonst von assetBasis bzw. der KRV-Seite
+    function bild(name) {
+      if (opts.cid && opts.cid[name]) return 'cid:' + name;
+      return (opts.assetBasis || BASIS + 'assets/') + name + '.png';
+    }
+    var logo = opts.logoUrl || bild('logo-mail');
     var symbol = { gut: '&#10003;', achtung: '!', offen: '?' }[r.ton];
     var randFarbe = r.ton === 'gut' ? F.gruen : F.kupfer;
     var feldFarbe = r.ton === 'gut' ? F.gruenHell : F.kupferHell;
@@ -125,7 +130,7 @@
       var zellen = w.kacheln.map(function (k, i) {
         return '<td class="kachel" valign="top" width="' + Math.floor(100 / w.kacheln.length) + '%" style="padding:12px 16px' + (i ? ';border-left:1px solid ' + F.linie : '') + '">' +
           '<a href="' + esc(k.url) + '" target="_blank" style="text-decoration:none;display:block">' +
-          '<span style="display:block;font-family:' + SCHRIFT + ';font-size:11px;letter-spacing:1px;text-transform:uppercase;color:' + F.kupferDunkel + ';font-weight:bold">' + (k.symbol ? '<span style="font-size:14px;letter-spacing:0;margin-right:5px;font-family:\'Segoe UI Symbol\',\'Apple Symbols\',' + SCHRIFT + '">' + esc(k.symbol) + '</span>' : '') + esc(k.bereich) + '</span>' +
+          '<span style="display:block;font-family:' + SCHRIFT + ';font-size:11px;letter-spacing:1px;text-transform:uppercase;color:' + F.kupferDunkel + ';font-weight:bold">' + (k.symbol ? '<img src="' + esc(bild('symbol-' + k.symbol)) + '" width="13" height="13" alt="" style="display:inline-block;width:13px;height:13px;border:0;margin:0 6px 0 0;vertical-align:-1px">' : '') + esc(k.bereich) + '</span>' +
           '<span style="display:block;font-family:' + SCHRIFT + ';font-size:15px;line-height:20px;font-weight:bold;color:' + F.text + '">' + esc(k.titel) + ' <span style="color:' + F.kupfer + '">&rarr;</span></span>' +
           '</a></td>';
       }).join('');
@@ -185,7 +190,7 @@
   }
 
   // ── Entwurf als .eml-Datei (Outlook öffnet sie dank «X-Unsent: 1» als neue, bearbeitbare Mail) ──
-  // logoBase64: PNG des Logos ohne «data:»-Vorspann; dann hängt es als Inline-Bild an (cid), sonst Link
+  // bilder: { 'logo-mail': Base64, 'symbol-dach': Base64, … } ohne «data:»-Vorspann; hängen als Inline-Bilder an (cid), fehlende als Link
   function b64(t) {
     if (typeof Buffer !== 'undefined') return Buffer.from(t, 'utf8').toString('base64');
     return btoa(unescape(encodeURIComponent(t)));
@@ -199,7 +204,11 @@
   function eml(a, cfg, opts) {
     opts = opts || {};
     var t = text(a, cfg);
-    var h = html(a, cfg, { logoUrl: opts.logoBase64 ? 'cid:logo-jv' : undefined });
+    var bilder = opts.bilder || {};
+    if (opts.logoBase64) bilder['logo-mail'] = opts.logoBase64;
+    var namen = Object.keys(bilder).filter(function (n) { return bilder[n] && /^[a-z0-9-]+$/.test(n); });
+    var cid = {}; namen.forEach(function (n) { cid[n] = true; });
+    var h = html(a, cfg, { cid: cid });
     var g = 'krv' + Date.now().toString(36);
     var alt = '----=_alt_' + g, rel = '----=_rel_' + g;
     var teilAlt =
@@ -212,12 +221,14 @@
       'To: ' + String(a.email || '').replace(/[\r\n<>,;"]/g, '') + '\r\n' +
       'Subject: ' + kopfWort(t.betreff) + '\r\n' +
       'MIME-Version: 1.0\r\n';
-    if (!opts.logoBase64) return kopf + teilAlt;
+    if (!namen.length) return kopf + teilAlt;
     return kopf +
       'Content-Type: multipart/related; boundary="' + rel + '"; type="multipart/alternative"\r\n\r\n' +
       '--' + rel + '\r\n' + teilAlt +
-      '--' + rel + '\r\nContent-Type: image/png; name="logo.png"\r\nContent-Transfer-Encoding: base64\r\n' +
-      'Content-ID: <logo-jv>\r\nContent-Disposition: inline; filename="logo.png"\r\n\r\n' + zeilen76(opts.logoBase64) +
+      namen.map(function (n) {
+        return '--' + rel + '\r\nContent-Type: image/png; name="' + n + '.png"\r\nContent-Transfer-Encoding: base64\r\n' +
+          'Content-ID: <' + n + '>\r\nContent-Disposition: inline; filename="' + n + '.png"\r\n\r\n' + zeilen76(bilder[n]);
+      }).join('') +
       '--' + rel + '--\r\n';
   }
 

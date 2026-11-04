@@ -104,9 +104,10 @@
     return location.hostname.indexOf('krv.') === 0 ? '/assets/' : '/krv/assets/';
   }
   // Entwurf als .eml laden: Doppelklick öffnet ihn in Outlook als neue Mail (Logo als Inline-Bild angehängt)
-  function emlLaden(a) {
-    return fetch(mailAssets() + 'logo-mail.png').then(function (r) {
-      if (!r.ok) throw new Error('Logo ' + r.status);
+  var MAIL_BILDER = ['logo-mail', 'symbol-dach', 'symbol-tropfen'];
+  function bildBase64(name) {
+    return fetch(mailAssets() + name + '.png').then(function (r) {
+      if (!r.ok) throw new Error(name + ' ' + r.status);
       return r.blob();
     }).then(function (b) {
       return new Promise(function (ok, nein) {
@@ -115,8 +116,14 @@
         fr.onerror = nein;
         fr.readAsDataURL(b);
       });
-    }).catch(function () { return null; }).then(function (logo) {
-      var inhalt = window.KRV_ANTWORT.eml(a, CFG, { logoBase64: logo });
+    }).catch(function () { return null; });
+  }
+  function emlLaden(a) {
+    return Promise.all(MAIL_BILDER.map(bildBase64)).then(function (liste) {
+      var bilder = {};
+      MAIL_BILDER.forEach(function (n, i) { if (liste[i]) bilder[n] = liste[i]; });
+      var logo = !!bilder['logo-mail'];
+      var inhalt = window.KRV_ANTWORT.eml(a, CFG, { bilder: bilder });
       var url = URL.createObjectURL(new Blob([inhalt], { type: 'message/rfc822' }));
       var link = document.createElement('a');
       link.href = url;
@@ -761,7 +768,7 @@
             var fr = document.createElement('iframe');
             fr.title = 'Vorschau der Antwort-Mail';
             fr.setAttribute('sandbox', '');
-            fr.srcdoc = window.KRV_ANTWORT.html(daten, CFG, { logoUrl: mailAssets() + 'logo-mail.png' });
+            fr.srcdoc = window.KRV_ANTWORT.html(daten, CFG, { assetBasis: mailAssets() });
             box.innerHTML = '<p class="dc-hinweis">An: ' + esc(daten.email) + ' · Betreff: ' + esc(window.KRV_ANTWORT.text(daten, CFG).betreff) + '</p>';
             box.appendChild(fr);
             box.hidden = false;

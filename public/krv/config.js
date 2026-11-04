@@ -90,8 +90,8 @@
         titel: 'Auch sonst für Sie da',
         text: 'Jäggi Vollmer ist Ihr Fachbetrieb für Sanitär und Spenglerei in Basel.',
         kacheln: [
-          { symbol: '\u2668\uFE0E', bereich: 'Sanitär', titel: 'Neues Bad, Boiler, Reparaturen', text: 'Vom tropfenden Hahn bis zum ganzen Badumbau. Ihr neues Bad zeigen wir Ihnen vorab als Visualisierung.', link: 'Mehr erfahren', url: 'https://www.jaeggivollmer.ch/?utm_source=krv-mail&utm_medium=email&utm_campaign=krv-antwort&utm_content=sanitaer' },
-          { symbol: '\u2302\uFE0E', bereich: 'Spenglerei', titel: 'Dachrinnen, Bleche, Anschlüsse', text: 'Wir reparieren Dachrinnen und Ablaufrohre, ersetzen Bleche und dichten Anschlüsse an Kamin und Dach ab.', link: 'Mehr erfahren', url: 'https://www.jaeggivollmer.ch/?utm_source=krv-mail&utm_medium=email&utm_campaign=krv-antwort&utm_content=spenglerei' },
+          { symbol: 'tropfen', bereich: 'Sanitär', titel: 'Neues Bad, Boiler, Reparaturen', text: 'Vom tropfenden Hahn bis zum ganzen Badumbau. Ihr neues Bad zeigen wir Ihnen vorab als Visualisierung.', link: 'Mehr erfahren', url: 'https://www.jaeggivollmer.ch/?utm_source=krv-mail&utm_medium=email&utm_campaign=krv-antwort&utm_content=sanitaer' },
+          { symbol: 'dach', bereich: 'Spenglerei', titel: 'Dachrinnen, Bleche, Anschlüsse', text: 'Wir reparieren Dachrinnen und Ablaufrohre, ersetzen Bleche und dichten Anschlüsse an Kamin und Dach ab.', link: 'Mehr erfahren', url: 'https://www.jaeggivollmer.ch/?utm_source=krv-mail&utm_medium=email&utm_campaign=krv-antwort&utm_content=spenglerei' },
         ]
       },
 
