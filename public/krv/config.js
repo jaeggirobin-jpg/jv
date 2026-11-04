@@ -27,7 +27,7 @@
       plz: ['4000-4099', 4102, 4125, 4126]
     },
 
-    // ── IWB Installationskontrolle: Empfänger der Rückantwortkarte (Mail-Entwurf im Admin) ──
+    // ── IWB Installationskontrolle: Empfänger der Meldung «KRV vorhanden / eingebaut» (Mail-Entwurf im Admin) ──
     iwbInstallationskontrolle: 'installationskontrolle@iwb.ch',
 
     // ── Fotos ──────────────────────────────────────────────────────────────
@@ -125,7 +125,7 @@
           { f: 'Muss ich einen einbauen?', a: 'Gemäss IWB braucht jede Liegenschaft im Versorgungsgebiet einen kontrollierbaren Rückflussverhinderer nach dem Wasserzähler, eingebaut auf Kosten der Eigentümerschaft. Wurden Sie von IWB angeschrieben, hat IWB bei Ihrer Liegenschaft keinen festgestellt und bittet um Nachrüstung bis zum 1. Januar 2027.' },
           { f: 'Kostet der Check etwas?', a: 'Nein. Die Beurteilung Ihrer Fotos ist kostenlos und unverbindlich. Eine Offerte erhalten Sie nur, wenn ein Rückflussverhinderer fehlt und Sie das möchten.' },
           { f: 'Wie sicher ist eine Beurteilung per Foto?', a: 'Auf guten Fotos erkennen wir meist, ob ein Rückflussverhinderer vorhanden ist. Es bleibt eine Einschätzung und ersetzt keine Kontrolle vor Ort. Sind die Fotos nicht eindeutig, fragen wir nach.' },
-          { f: 'Ich habe schon einen. Was nun?', a: 'Dann müssen Sie nichts einbauen. Wurden Sie von IWB angeschrieben, melden Sie IWB, dass bereits ein Rückflussverhinderer vorhanden ist, mit der Rückantwortkarte aus dem Schreiben oder über das Online-Formular von IWB (Link oben bei der Frist).' },
+          { f: 'Ich habe schon einen. Was nun?', a: 'Dann müssen Sie nichts einbauen. Machen Sie einfach den Gratis-Check: Sehen wir den Rückflussverhinderer auf Ihren Fotos, melden wir das IWB für Sie per E-Mail. Sie können es IWB auch selbst melden, über das Online-Formular von IWB (Link oben bei der Frist).' },
           { f: 'Wer darf den Rückflussverhinderer einbauen?', a: 'Gemäss IWB ein Sanitärunternehmen mit Installationsbewilligung von IWB. Jäggi Vollmer hat diese Bewilligung und meldet den Einbau direkt an IWB.' },
         ]
       },

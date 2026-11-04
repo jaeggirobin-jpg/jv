@@ -15,7 +15,23 @@
 .krv-admin .krv-fotoliste .dc-bild img { aspect-ratio: 3 / 4; }
 .krv-anrufen { background: #FBF0DD; color: #7A4D00; border-radius: 8px; padding: 10px 12px; font-size: .92rem; margin: 0; }
 
-/* IWB-Rückantwortkarte */
+/* Meldung an IWB */
 .krv-karte__felder { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
 .krv-karte__felder [hidden] { display: none; }
 .krv-karte input[type="text"], .krv-karte input[type="date"] { max-width: 100%; box-sizing: border-box; font-size: 16px; }
+
+/* Bearbeitung: mehr Platz für das Detail, grössere Fotos und Textfelder */
+.krv-admin .krv-fotoliste .dc-bilder { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.krv-admin .dc-verwaltung textarea { min-height: 160px; line-height: 1.5; }
+@media (min-width: 900px) {
+  .krv-admin .dc-layout { grid-template-columns: minmax(240px, 300px) minmax(0, 1fr); }
+}
+
+/* Status als Knöpfe (speichert sofort) */
+.krv-feldtitel { display: block; font-weight: 600; font-size: .88rem; margin-bottom: 6px; }
+.krv-status { display: flex; flex-wrap: wrap; gap: 6px; }
+.krv-status__knopf { min-height: 40px; padding: 0 14px; border: 1.5px solid #CFC9C1; border-radius: 999px; background: #fff; color: #25292E; font: inherit; font-size: .9rem; font-weight: 600; cursor: pointer; }
+.krv-status__knopf:hover { border-color: #BD843A; }
+.krv-status__knopf[aria-pressed="true"] { background: #94621F; border-color: #94621F; color: #fff; }
+.krv-status__knopf:focus-visible { outline: 2px solid #BD843A; outline-offset: 2px; }
+.krv-autosave { margin: 0; }

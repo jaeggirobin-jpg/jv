@@ -47,12 +47,31 @@
   function adresseVon(a) {
     return [a.strasse, a.hausnummer].filter(Boolean).join(' ') + ', ' + a.plz + ' ' + a.ort;
   }
-  function waNummer(tel) {
+  // Schweizer Nummer ohne Ländervorwahl und führende 0, z. B. «793288180» aus «079 328 81 80» oder «+41 79 …»
+  // (Kunden tippen die Nummer unterschiedlich ein). Ausländische Nummern: null.
+  function telNational(tel) {
     var n = String(tel || '').replace(/[^\d+]/g, '');
-    if (n.indexOf('+') === 0) n = n.slice(1);
-    else if (n.indexOf('00') === 0) n = n.slice(2);
-    else if (n.indexOf('0') === 0) n = '41' + n.slice(1);
-    return n;
+    if (n.indexOf('+41') === 0) n = n.slice(3);
+    else if (n.indexOf('0041') === 0) n = n.slice(4);
+    else if (n.indexOf('+') === 0 || n.indexOf('00') === 0) return null;
+    else if (n.length === 11 && n.indexOf('41') === 0) n = n.slice(2);
+    if (n.indexOf('0') === 0) n = n.slice(1);
+    return /^[1-9]\d{8}$/.test(n) ? n : null;
+  }
+  // Anzeige «079 328 81 80»; unbekanntes Format bleibt wie eingegeben
+  function telAnzeige(tel) {
+    var n = telNational(tel);
+    return n ? '0' + n.slice(0, 2) + ' ' + n.slice(2, 5) + ' ' + n.slice(5, 7) + ' ' + n.slice(7) : String(tel || '').trim();
+  }
+  function telLink(tel) {
+    var n = telNational(tel);
+    return n ? '+41' + n : String(tel || '').replace(/[^\d+]/g, '');
+  }
+  function waNummer(tel) {
+    var n = telNational(tel);
+    if (n) return '41' + n;
+    n = String(tel || '').replace(/[^\d+]/g, '');
+    return n.indexOf('+') === 0 ? n.slice(1) : n.indexOf('00') === 0 ? n.slice(2) : n;
   }
   function mb(bytes) {
     return (bytes / 1024 / 1024).toFixed(bytes < 10 * 1024 * 1024 ? 1 : 0).replace('.', ',') + ' MB';
@@ -75,7 +94,7 @@
       betreff = 'Ihr KRV-Check ' + a.referenz + ': Rückflussverhinderer vorhanden';
       body = anrede +
         'Gute Nachricht: Auf Ihren Fotos ist nach dem Wasserzähler ein Rückflussverhinderer zu erkennen. Sie müssen nichts einbauen.\n\n' + zusatz +
-        'Falls Sie von IWB angeschrieben wurden: Melden Sie IWB mit der beigelegten Rückantwortkarte, dass bereits ein Rückflussverhinderer vorhanden ist.\n\n' +
+        'Wir melden IWB per E-Mail, dass bei Ihnen bereits ein Rückflussverhinderer vorhanden ist. Sie müssen dafür nichts weiter tun.\n\n' +
         vorbehalt + gruss;
     } else if (beurteilung === 'fehlt') {
       betreff = 'Ihr KRV-Check ' + a.referenz + ': Rückflussverhinderer fehlt';
@@ -146,7 +165,22 @@
       root.addEventListener('click', klick);
       // Rückantwortkarte: Einbaudatum nur bei «eingebaut»
       root.addEventListener('change', function (e) {
-        if (e.target.dataset.a === 'karte-art') el('karte-datum-feld').hidden = e.target.value !== 'eingebaut';
+        var art = e.target.dataset.a;
+        if (art === 'karte-art') el('karte-datum-feld').hidden = e.target.value !== 'eingebaut';
+        if (art === 'beurteilung') vormerken({ beurteilung: e.target.value }, true);
+      });
+      // Textfelder automatisch speichern
+      root.addEventListener('input', function (e) {
+        var art = e.target.dataset.a;
+        if (art === 'text') vormerken({ beurteilung_text: e.target.value });
+        if (art === 'notiz') vormerken({ notiz_intern: e.target.value });
+      });
+      root.addEventListener('focusout', function (e) {
+        if (['text', 'notiz'].indexOf(e.target.dataset.a) >= 0 && ausstehend) jetztSpeichern();
+      });
+      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden' && ausstehend) jetztSpeichern(); });
+      window.addEventListener('beforeunload', function (e) {
+        if (ausstehend || speichertGerade) { jetztSpeichern(); e.preventDefault(); e.returnValue = ''; }
       });
       root.querySelector('[data-a="video-datei"]').addEventListener('change', function (e) {
         var datei = e.target.files && e.target.files[0];
@@ -263,6 +297,7 @@
     }
 
     function zeige(ref) {
+      if (ausstehend && ausstehend.referenz !== ref) jetztSpeichern();
       var a = zustand.anfragen.filter(function (x) { return x.referenz === ref; })[0];
       var d = el('detail');
       if (!a) { d.hidden = true; root.querySelector('.dc-layout').classList.remove('detail-offen'); return; }
@@ -272,9 +307,6 @@
       var adresse = adresseVon(a);
       var maps = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(adresse + ', Schweiz');
       var extra = a.utm_extra || {};
-      var loeschText = a.status === 'auftrag'
-        ? 'Status Auftrag: wird nicht automatisch gelöscht.'
-        : 'Wird ohne Auftrag am ' + datum(new Date(new Date(a.created_at).getTime() + LOESCHFRIST * 864e5)) + ' automatisch gelöscht (mit Fotos).';
 
       d.innerHTML =
         '<button type="button" class="dc-btn dc-zurueck" data-a="zurueck">← Zur Liste</button>' +
@@ -283,9 +315,9 @@
           (a.rolle === 'mieter' ? ' · <span class="dc-badge mieter">Mieter/in</span>' : '') +
           (a.iwb_brief ? ' · <span class="dc-badge krv-iwb">IWB-Brief erhalten</span>' : '') +
           (a.offerte_gewuenscht === false ? ' · <span class="dc-badge krv-keine-offerte">Keine Offerte gewünscht</span>' : '') + '</div>' +
-        '<p class="dc-loeschung">' + esc(loeschText) + '</p>' +
+        '<p class="dc-loeschung">' + esc(loeschText(a)) + '</p>' +
         '<div class="dc-knoepfe">' +
-          '<a class="dc-btn" href="tel:' + esc(String(a.telefon).replace(/[^\d+]/g, '')) + '">Anrufen</a>' +
+          '<a class="dc-btn" href="tel:' + esc(telLink(a.telefon)) + '">Anrufen</a>' +
           '<a class="dc-btn" href="https://wa.me/' + esc(waNummer(a.telefon)) + '" target="_blank" rel="noopener">WhatsApp</a>' +
           '<a class="dc-btn" href="mailto:' + esc(a.email) + '?subject=' + encodeURIComponent('Ihr KRV-Check ' + a.referenz) + '">E-Mail</a>' +
           '<a class="dc-btn" href="' + esc(maps) + '" target="_blank" rel="noopener">Karte</a>' +
@@ -310,16 +342,14 @@
             '</div>' +
             '<p class="dc-gespeichert" data-a="ki-status" aria-live="polite"></p>' +
             '<p class="dc-hinweis dc-ki-hinweis">KI-Knöpfe: Nur der Text dieses Feldes geht zur Überarbeitung an Anthropic (USA), keine Fotos und keine Angaben aus der Anfrage. Bitte keine Namen, Adressen oder Telefonnummern hineinschreiben.</p></div>' +
-          '<div><label for="krv-status">Status</label><select id="krv-status" data-a="status">' +
-            STATUS.map(function (s) { return '<option value="' + s.wert + '"' + (s.wert === a.status ? ' selected' : '') + '>' + esc(s.label) + '</option>'; }).join('') +
-          '</select></div>' +
+          '<div><span class="krv-feldtitel" id="krv-status-titel">Status</span><div class="krv-status" role="group" aria-labelledby="krv-status-titel" data-a="status">' + statusKnoepfe(a.status) + '</div></div>' +
           '<div><label for="krv-notiz">Interne Notiz</label><textarea id="krv-notiz" data-a="notiz" autocomplete="off">' + esc(a.notiz_intern || '') + '</textarea></div>' +
-          '<div><button type="button" class="dc-btn dc-btn--primaer" data-a="speichern">Speichern</button> <span class="dc-gespeichert" data-a="gespeichert" aria-live="polite"></span></div>' +
+          '<p class="dc-gespeichert krv-autosave" data-a="gespeichert" aria-live="polite">Änderungen werden automatisch gespeichert.</p>' +
         '</div>' +
         '<div class="dc-knoepfe" data-a="antwort">' + antwortKnopf(a) + '</div>' +
 
-        '<h4>IWB-Rückantwortkarte</h4><div class="dc-verwaltung krv-karte">' +
-          '<p class="dc-hinweis">Karte mit den Angaben aus der Anfrage als PDF. Ort, Datum und Unterschrift ergänzt die Eigentümerschaft von Hand.</p>' +
+        '<h4>Meldung an IWB</h4><div class="dc-verwaltung krv-karte">' +
+          '<p class="dc-hinweis">Die Meldung geht als E-Mail an die IWB-Installationskontrolle, eine Rückantwortkarte braucht es nicht.</p>' +
           '<fieldset class="dc-ampelwahl"><legend>Rückflussverhinderer</legend>' +
             '<label class="dc-ampel"><input type="radio" name="krv-karte-' + esc(a.referenz) + '" data-a="karte-art" value="vorhanden"' + (a.beurteilung !== 'fehlt' ? ' checked' : '') + '><span>ist bereits vorhanden</span></label>' +
             '<label class="dc-ampel"><input type="radio" name="krv-karte-' + esc(a.referenz) + '" data-a="karte-art" value="eingebaut"' + (a.beurteilung === 'fehlt' ? ' checked' : '') + '><span>ist eingebaut worden (durch uns)</span></label>' +
@@ -328,14 +358,12 @@
             '<div><label for="krv-zaehler">Wasserzählernummer <span class="dc-optional">(falls bekannt)</span></label><input type="text" id="krv-zaehler" data-a="karte-zaehler" autocomplete="off"></div>' +
             '<div data-a="karte-datum-feld"' + (a.beurteilung === 'fehlt' ? '' : ' hidden') + '><label for="krv-einbau">Einbaudatum</label><input type="date" id="krv-einbau" data-a="karte-datum" autocomplete="off" value="' + new Date().toISOString().slice(0, 10) + '"></div>' +
           '</div>' +
-          '<div class="dc-knoepfe"><button type="button" class="dc-btn dc-btn--primaer" data-a="karte-mail">Mail an IWB mit Karte</button>' +
-            '<button type="button" class="dc-btn" data-a="karte">Nur Karte herunterladen (PDF)</button></div>' +
-          '<p class="dc-hinweis">«Mail an IWB» lädt die Karte herunter und öffnet einen Entwurf an ' + esc(CFG.iwbInstallationskontrolle || 'IWB') + ' mit allen Angaben. Die heruntergeladene Karte im Mail anhängen.</p>' +
-          '<p class="dc-gespeichert" data-a="karte-status" aria-live="polite"></p>' +
+          '<div class="dc-knoepfe"><button type="button" class="dc-btn dc-btn--primaer" data-a="karte-mail">Mail an IWB</button></div>' +
+          '<p class="dc-hinweis">Öffnet einen fertigen Entwurf an ' + esc(CFG.iwbInstallationskontrolle || 'IWB') + ' im eigenen Mailprogramm.</p>' +
         '</div>' +
 
         '<h4>Kontakt und Liegenschaft</h4><dl>' +
-          zeile('Adresse', adresse) + zeile('E-Mail', a.email) + zeile('Telefon', a.telefon) +
+          zeile('Adresse', adresse) + zeile('E-Mail', a.email) + zeile('Telefon', telAnzeige(a.telefon)) +
           zeile('Rolle', ROLLEN[a.rolle] || a.rolle) + zeile('IWB-Brief', a.iwb_brief ? 'ja, erhalten' : 'nein / nicht angegeben') +
           zeile('Offerte, falls KRV fehlt', a.offerte_gewuenscht === false ? 'nein, nur prüfen' : 'ja, gewünscht') +
           zeileWenn('Bemerkung', a.bemerkung) +
@@ -355,25 +383,6 @@
       if (!a.keine_fotos || (a.fotos || []).length) fotosLaden(a);
     }
 
-    // ── IWB-Rückantwortkarte: leere IWB-Karte (assets/iwb-rueckantwortkarte.pdf) mit pdf-lib ausfüllen ──
-    var pdfLib = null;
-    function pdfLibLaden() {
-      if (window.PDFLib) return Promise.resolve(window.PDFLib);
-      if (!pdfLib) pdfLib = new Promise(function (ok, nein) {
-        var sk = document.createElement('script');
-        sk.src = ASSETS + 'vendor/pdf-lib.min.js';
-        sk.onload = function () { ok(window.PDFLib); };
-        sk.onerror = function () { pdfLib = null; nein(new Error('PDF-Bibliothek konnte nicht geladen werden')); };
-        document.head.appendChild(sk);
-      });
-      return pdfLib;
-    }
-    // Standardschrift Helvetica kennt nur westeuropäische Zeichen: Rest ohne Akzent bzw. weglassen
-    function latin1(t) {
-      return String(t == null ? '' : t).replace(/[^\u0000-\u00FF]/g, function (c) {
-        return c.normalize('NFD').replace(/[^\u0000-\u00FF]/g, '');
-      }).trim();
-    }
     function karteAngaben() {
       return {
         art: (root.querySelector('[data-a="karte-art"]:checked') || {}).value || 'vorhanden',
@@ -382,89 +391,39 @@
       };
     }
 
-    // Mail-Entwurf an die IWB-Installationskontrolle mit den Angaben der Karte als Text
+    // Meldung an die IWB-Installationskontrolle als Mail-Entwurf (ersetzt die Rückantwortkarte, mit IWB abgesprochen)
     function iwbMail(a, k) {
-      var liegenschaft = (a.strasse || '') + ' ' + (a.hausnummer || '') + ', ' + (a.plz || '') + ' ' + (a.ort || '');
+      var liegenschaft = ((a.strasse || '') + ' ' + (a.hausnummer || '')).trim() + ', ' + ((a.plz || '') + ' ' + (a.ort || '')).trim();
       var eingebaut = k.art === 'eingebaut';
       var F = CFG.firma || {};
+      var firma = F.name || 'Jäggi Vollmer GmbH';
       var zeilen = [
-        'Liegenschaft: ' + liegenschaft.trim(),
+        'Liegenschaft: ' + liegenschaft,
         'Wasserzählernummer: ' + (k.zaehler || 'nicht bekannt'),
         'Rückflussverhinderer: ' + (eingebaut ? 'ist eingebaut worden' : 'ist bereits vorhanden')
       ];
       if (eingebaut) {
-        zeilen.push('Installationsfirma: ' + (F.name || 'Jäggi Vollmer GmbH'));
+        zeilen.push('Installationsfirma: ' + firma);
         if (k.einbau) zeilen.push('Einbaudatum: ' + k.einbau.split('-').reverse().join('.'));
       }
-      zeilen.push('Name, Vorname: ' + (a.nachname || '') + ' ' + (a.vorname || '') + (ROLLEN[a.rolle] ? ' (' + ROLLEN[a.rolle] + ')' : ''));
-      zeilen.push('Telefon: ' + (a.telefon || ''));
+      zeilen.push((ROLLEN[a.rolle] || 'Kontakt') + ': ' + ((a.vorname || '') + ' ' + (a.nachname || '')).trim());
+      zeilen.push('Telefon: ' + telAnzeige(a.telefon));
       zeilen.push('Unsere Referenz: ' + a.referenz);
-      var betreff = 'Rückantwortkarte Rückflussverhinderer: ' + liegenschaft.trim();
+      var betreff = 'Rückflussverhinderer ' + (eingebaut ? 'eingebaut' : 'vorhanden') + ': ' + liegenschaft;
       var body = 'Guten Tag\n\n' +
-        'Im Anhang erhalten Sie die Rückantwortkarte Rückflussverhinderer für folgende Liegenschaft:\n\n' +
+        (eingebaut
+          ? 'Wir melden Ihnen, dass wir in folgender Liegenschaft einen Rückflussverhinderer nach dem Wasserzähler eingebaut haben:\n\n'
+          : 'Wir melden Ihnen, dass in folgender Liegenschaft nach dem Wasserzähler bereits ein Rückflussverhinderer vorhanden ist:\n\n') +
         zeilen.join('\n') + '\n\n' +
-        'Freundliche Grüsse\n' + (F.name || 'Jäggi Vollmer GmbH') + '\n' +
+        (eingebaut ? '' : 'Unsere Beurteilung stützt sich auf Fotos der Installation, die uns die Kundschaft geschickt hat.\n\n') +
+        'Bei Fragen erreichen Sie uns gerne unter ' + (F.telefon || '') + '.\n\n' +
+        'Freundliche Grüsse\n' + firma + '\n' +
         [F.strasse, F.ort].filter(Boolean).join(', ') + '\n' + [F.telefon, F.email].filter(Boolean).join(' · ');
       return 'mailto:' + (CFG.iwbInstallationskontrolle || '') + '?subject=' + encodeURIComponent(betreff) + '&body=' + encodeURIComponent(body);
     }
 
-    function karte(mitMail) {
-      var a = aktuelleAnfrage();
-      if (!a) return;
-      var k = karteAngaben();
-      var art = k.art, zaehler = k.zaehler, einbau = k.einbau;
-      var status = el('karte-status');
-      status.textContent = 'PDF wird erstellt …';
-      Promise.all([pdfLibLaden(), fetch(ASSETS + 'iwb-rueckantwortkarte.pdf').then(function (r) {
-        if (!r.ok) throw new Error('Vorlage nicht gefunden');
-        return r.arrayBuffer();
-      })]).then(function (x) {
-        var L = x[0];
-        return L.PDFDocument.load(x[1]).then(function (doc) {
-          return Promise.all([doc.embedFont(L.StandardFonts.Helvetica), doc.embedFont(L.StandardFonts.HelveticaBold)]).then(function (f) {
-            var seite = doc.getPage(0);
-            var farbe = L.rgb(0.1, 0.1, 0.12);
-            // Text auf eine Linie der Karte (Koordinaten in Punkt, Ursprung unten links), bei Bedarf kleiner
-            var schreibe = function (text, x, linieY, breite) {
-              text = latin1(text);
-              if (!text) return;
-              var gr = 11;
-              while (gr > 7 && f[0].widthOfTextAtSize(text, gr) > breite) gr -= 0.5;
-              seite.drawText(text, { x: x + 2, y: linieY + 4, size: gr, font: f[0], color: farbe });
-            };
-            schreibe((a.plz || '') + ' ' + (a.ort || ''), 28.35, 323.24, 316);
-            schreibe(zaehler, 373.8, 323.24, 190);
-            schreibe(((a.strasse || '') + ' ' + (a.hausnummer || '')), 28.35, 292.85, 316);
-            // Kreuz im passenden Kästchen
-            var kx = art === 'eingebaut' ? 165 : 34, ky = 243.3;
-            seite.drawLine({ start: { x: kx - 4, y: ky - 4 }, end: { x: kx + 4, y: ky + 4 }, thickness: 1.4, color: farbe });
-            seite.drawLine({ start: { x: kx - 4, y: ky + 4 }, end: { x: kx + 4, y: ky - 4 }, thickness: 1.4, color: farbe });
-            if (art === 'eingebaut') {
-              schreibe((CFG.firma && CFG.firma.name) || 'Jäggi Vollmer GmbH', 28.35, 211.92, 316);
-              if (einbau) schreibe(einbau.split('-').reverse().join('.'), 373.8, 211.92, 190);
-            }
-            schreibe(a.vorname, 28.35, 143.1, 252);
-            schreibe(a.nachname, 28.35, 112.75, 252);
-            schreibe(a.telefon, 28.35, 82.7, 252);
-            return doc.save();
-          });
-        });
-      }).then(function (bytes) {
-        var blob = new Blob([bytes], { type: 'application/pdf' });
-        var link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'IWB-Rueckantwortkarte-' + a.referenz + '.pdf';
-        document.body.appendChild(link); link.click(); link.remove();
-        setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
-        if (mitMail) {
-          window.location.href = iwbMail(a, k);
-          status.textContent = 'Karte heruntergeladen und Mail-Entwurf geöffnet: bitte die Karte (' + link.download + ') anhängen.';
-        } else status.textContent = 'Heruntergeladen.';
-      }).catch(function (e) { status.textContent = 'Fehler: ' + e.message; });
-    }
-
     function antwortKnopf(a) {
-      if (!a.beurteilung) return '<p class="dc-hinweis">Nach dem Speichern der Beurteilung erscheint hier der passende E-Mail-Entwurf an den Kunden.</p>';
+      if (!a.beurteilung) return '<p class="dc-hinweis">Sobald eine Beurteilung gewählt ist, erscheint hier der passende E-Mail-Entwurf an den Kunden.</p>';
       return '<a class="dc-btn dc-btn--primaer" href="' + esc(antwortMail(a, a.beurteilung, a.beurteilung_text)) + '">Antwort per E-Mail (' + esc(label(BEURTEILUNG, a.beurteilung)) + ')</a>';
     }
 
@@ -491,28 +450,74 @@
       });
     }
 
-    function speichern() {
+    // ── Automatisch speichern ────────────────────────────────────────
+    // Status und Beurteilung sofort, Textfelder kurz nach dem Tippen und beim Verlassen des Feldes.
+    // Gesendet werden nur die geänderten Felder; die Aufrufe laufen nacheinander.
+    var ausstehend = null;   // { referenz, felder }
+    var speicherUhr = null;
+    var speicherKette = Promise.resolve();
+    var speichertGerade = 0;
+
+    function statusKnoepfe(aktuell) {
+      return STATUS.map(function (x) {
+        return '<button type="button" class="krv-status__knopf s-' + x.wert + '" data-status="' + x.wert + '" aria-pressed="' + (x.wert === aktuell) + '">' + esc(x.label) + '</button>';
+      }).join('');
+    }
+    function speicherStatus(text, istFehler) {
+      var s = el('gespeichert');
+      if (!s) return;
+      s.textContent = text;
+      s.classList.toggle('dc-meldung-fehler', !!istFehler);
+    }
+    function vormerken(felder, sofort) {
       var a = aktuelleAnfrage();
       if (!a) return;
-      var gewaehlt = root.querySelector('[data-a="beurteilung"]:checked');
-      var body = {
-        action: 'speichern',
-        referenz: a.referenz,
-        status: el('status').value,
-        beurteilung: gewaehlt ? gewaehlt.value : null,
-        beurteilung_text: el('text').value,
-        notiz_intern: el('notiz').value
-      };
-      var knopf = el('speichern');
-      knopf.disabled = true;
-      post('/krv-admin-anfrage', body).then(function (r) {
-        Object.keys(r).forEach(function (k) { a[k] = r[k]; });
-        chips(); zeige(a.referenz);
-        el('gespeichert').textContent = 'Gespeichert.';
-      }).catch(function (e) {
-        knopf.disabled = false;
-        fehler('Speichern fehlgeschlagen: ' + e.message);
+      if (ausstehend && ausstehend.referenz !== a.referenz) jetztSpeichern();
+      ausstehend = ausstehend || { referenz: a.referenz, felder: {} };
+      Object.keys(felder).forEach(function (k) { ausstehend.felder[k] = felder[k]; });
+      speicherStatus('Wird gespeichert …');
+      clearTimeout(speicherUhr);
+      speicherUhr = setTimeout(jetztSpeichern, sofort ? 0 : 800);
+    }
+    function jetztSpeichern() {
+      clearTimeout(speicherUhr);
+      if (!ausstehend) return speicherKette;
+      var auftrag = ausstehend;
+      ausstehend = null;
+      speichertGerade++;
+      speicherKette = speicherKette.then(function () {
+        return post('/krv-admin-anfrage', Object.assign({ action: 'speichern', referenz: auftrag.referenz }, auftrag.felder)).then(function (r) {
+          var a = zustand.anfragen.filter(function (x) { return x.referenz === auftrag.referenz; })[0];
+          if (a) Object.keys(r).forEach(function (k) { a[k] = r[k]; });
+          chips(); liste();
+          if (a && zustand.aktiv === a.referenz) {
+            detailAktualisieren(a);
+            if (!ausstehend) speicherStatus('Gespeichert um ' + new Date().toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' }) + '.');
+          }
+        }).catch(function (e) {
+          // Felder behalten: Die nächste Änderung (oder ein Klick auf einen Status) versucht es erneut
+          if (!ausstehend) ausstehend = auftrag;
+          else if (ausstehend.referenz === auftrag.referenz) ausstehend.felder = Object.assign({}, auftrag.felder, ausstehend.felder);
+          if (zustand.aktiv === auftrag.referenz) speicherStatus('Nicht gespeichert: ' + e.message + '. Wird bei der nächsten Änderung erneut versucht.', true);
+          else fehler('Speichern fehlgeschlagen (' + auftrag.referenz + '): ' + e.message);
+        }).then(function () { speichertGerade--; });
       });
+      return speicherKette;
+    }
+    // Nach dem Speichern nur Anzeigen nachführen, Textfelder bleiben unberührt (sonst springt der Cursor)
+    function detailAktualisieren(a) {
+      var d = el('detail');
+      var badge = d.querySelector('.dc-zeile1 .dc-badge');
+      if (badge) { badge.className = 'dc-badge s-' + a.status; badge.textContent = label(STATUS, a.status); }
+      d.querySelectorAll('[data-status]').forEach(function (k) { k.setAttribute('aria-pressed', String(k.dataset.status === a.status)); });
+      var loesch = d.querySelector('.dc-loeschung');
+      if (loesch) loesch.textContent = loeschText(a);
+      el('antwort').innerHTML = antwortKnopf(a);
+    }
+    function loeschText(a) {
+      return a.status === 'auftrag'
+        ? 'Status Auftrag: wird nicht automatisch gelöscht.'
+        : 'Wird ohne Auftrag am ' + datum(new Date(new Date(a.created_at).getTime() + LOESCHFRIST * 864e5)) + ' automatisch gelöscht (mit Fotos).';
     }
 
     // ── KI für die Begründung (gemeinsamer KI-Zugang auf dem Server, netlify/functions/_lib/ki.js) ──
@@ -541,8 +546,9 @@
         if (zustand.aktiv !== ref || !aktuell) return;
         zustand.kiVorher = { ref: ref, text: aktuell.value };
         aktuell.value = r.text;
+        vormerken({ beurteilung_text: r.text }, true);
         el('ki-zurueck').hidden = false;
-        kiStatus(r.gekuerzt ? 'Die KI-Antwort war zu lang und wurde abgeschnitten. Bitte prüfen.' : 'Text von der KI überarbeitet. Bitte prüfen und dann speichern.', !!r.gekuerzt);
+        kiStatus(r.gekuerzt ? 'Die KI-Antwort war zu lang und wurde abgeschnitten. Bitte prüfen.' : 'Text von der KI überarbeitet und gespeichert. Bitte prüfen.', !!r.gekuerzt);
       }).catch(function (e) {
         if (zustand.aktiv === ref) kiStatus('KI: ' + e.message, true);
       }).then(function () {
@@ -555,9 +561,10 @@
       var ta = el('text');
       if (!v || v.ref !== zustand.aktiv || !ta) return;
       ta.value = v.text;
+      vormerken({ beurteilung_text: v.text }, true);
       zustand.kiVorher = null;
       el('ki-zurueck').hidden = true;
-      kiStatus('Text von vor der KI wiederhergestellt. Bitte speichern, falls er so bleiben soll.');
+      kiStatus('Text von vor der KI wiederhergestellt.');
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -692,6 +699,11 @@
     function klick(e) {
       var t = e.target.closest('button, a');
       if (!t || !root.contains(t)) return;
+      if (t.dataset.status) {
+        root.querySelectorAll('[data-status]').forEach(function (k) { k.setAttribute('aria-pressed', String(k === t)); });
+        vormerken({ status: t.dataset.status }, true);
+        return;
+      }
       if (t.dataset.ref) { zeige(t.dataset.ref); if (window.innerWidth < 900) root.scrollIntoView({ block: 'start' }); return; }
       if (t.dataset.filter) { zustand.filter = t.dataset.filter; chips(); liste(); return; }
       if (t.dataset.tab) {
@@ -702,18 +714,20 @@
         return;
       }
       switch (t.dataset.a) {
-        case 'laden': zustand.fotos = {}; laden(); break;
+        case 'laden': zustand.fotos = {}; jetztSpeichern().then(laden); break;
         case 'csv': csv(); break;
-        case 'speichern': speichern(); break;
         case 'ki-korrigieren': kiText('korrigieren', t); break;
         case 'ki-umschreiben': kiText('umschreiben', t); break;
         case 'ki-zurueck': kiZurueck(); break;
-        case 'karte': karte(false); break;
-        case 'karte-mail': karte(true); break;
+        case 'karte-mail':
+          var aktuell = aktuelleAnfrage();
+          if (aktuell) window.location.href = iwbMail(aktuell, karteAngaben());
+          break;
         case 'video-los': videoLos(); break;
         case 'video-entfernen': videoEntfernen(); break;
         case 'video-hier': el('video-start').value = Math.floor(el('video-quelle').currentTime || 0); break;
         case 'zurueck':
+          jetztSpeichern();
           zustand.aktiv = null;
           el('detail').hidden = true;
           root.querySelector('.dc-layout').classList.remove('detail-offen');
