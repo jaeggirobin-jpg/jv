@@ -12,6 +12,10 @@
 //    &vorlage=1 bietet bei einem leeren Projekt gleich «Vorlage einfügen» an.
 // 4. Projekte suchen: Der Knopf «Projekte» öffnet eine Suche, der Cursor steht im Suchfeld
 //    (die Auswahlliste im Kopf entfällt, siehe werkzeuge/tools_einbinden.py).
+// 5. Feedback 4.11.2026: Logo führt zur Übersicht der Plattform, «Heute» und «Projektdaten
+//    ausblenden» wieder an ihrem Platz, Wochenkopf nur «KW nn» (mittig), Text eines Balkens mit
+//    Wochenende (oder der im Balken keinen Platz hat) steht nach dem letzten Balken, Spalten der
+//    Tabelle: Breite am Rand im Kopf ziehen, Rechtsklick auf den Kopf = Spalten ein- und ausblenden.
 (function () {
   'use strict';
   if (typeof S === 'undefined' || typeof cur !== 'function' || !window.JVGeo) return;
@@ -339,7 +343,9 @@
       '.pjs-feld{position:relative;display:block}' +
       '.pjs-feld .ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:18px;height:18px;opacity:.6;pointer-events:none}' +
       '#pjs-q{padding:10px 12px 10px 38px;font-size:16px;border-radius:10px}' +
-      '.pjs-z{cursor:pointer;border-radius:8px;padding-left:8px;padding-right:8px;margin:0 -8px}' +
+      // .ph-list .ph-li.pjs-z: die Stile des Tools stehen im <body> und gewännen sonst (padding:10px 0),
+      // der Text klebte am Kupferbalken der gewählten Zeile (Feedback 4.11.2026 «Anzeige komisch»)
+      '.ph-list .ph-li.pjs-z{cursor:pointer;border-radius:8px;padding:10px 12px 10px 14px;margin:0 -12px}' +
       '.pjs-z:hover{background:var(--slate-soft,rgba(0,0,0,.04))}' +
       '.pjs-z.pjs-aktiv{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}' +
       '.pjs-z mark{background:var(--accent-soft);color:inherit;border-radius:2px;padding:0 1px;box-shadow:0 1px 0 var(--accent)}' +
@@ -628,4 +634,287 @@
     ACT.projects = function (el) { projektSuche(!!(el && el.closest && el.closest('#projpick'))); };
     window.projectsModal = function () { projektSuche(false); };
   }
+  // ── 5. Feedback 4.11.2026 ─────────────────────────────────────────────
+  (function () {
+    var stil5 = document.createElement('style');
+    stil5.textContent =
+      // «Heute» und «Projektdaten ausblenden» tragen die Klasse .ghost, die das Tool auch für den
+      // gestrichelten Basisplan-Balken braucht (position:absolute; top:6px): beide Knöpfe landeten oben
+      // links unter dem Kopf. Hier wieder normale Knöpfe im Fluss.
+      '.btn.ghost{position:relative;top:auto;height:auto;opacity:1;pointer-events:auto;border-style:solid}' +
+      // Logo = Weg zur Übersicht der Plattform
+      'a.jv-brand{display:block;color:inherit;text-decoration:none;border-radius:10px}' +
+      'a.jv-brand:focus-visible{outline:2px solid var(--accent,#BD843A);outline-offset:3px}' +
+      // Wochenkopf: nur «KW nn», mittig (die Tage stehen in der Zeile darunter, das Datum im Tooltip)
+      '#gscroll .kw-row div{text-align:center}' +
+      '#gscroll .kw-row div span{display:none}' +
+      // Spalten: Griff am rechten Rand jeder Kopfzelle
+      '#gscroll .g-head .g-l>span{position:relative;min-width:0;overflow:visible}' +
+      '#gscroll .jv-sp-griff{position:absolute;top:-8px;bottom:-6px;right:-5px;width:9px;cursor:col-resize;z-index:2;touch-action:none}' +
+      '#gscroll .jv-sp-griff::after{content:"";position:absolute;top:4px;bottom:2px;left:4px;width:1px;background:var(--line,#ddd);opacity:0;transition:opacity .15s}' +
+      '#gscroll .g-head .g-l:hover .jv-sp-griff::after{opacity:1}' +
+      '#gscroll .jv-sp-griff:hover::after,#gscroll .jv-sp-griff.jv-zieht::after{opacity:1;background:var(--accent,#BD843A);width:2px;left:3.5px}' +
+      'body.jv-sp-ziehen,body.jv-sp-ziehen *{cursor:col-resize!important;user-select:none!important}' +
+      // Menü «Spalten»
+      '.jv-sp-menue{position:fixed;z-index:2147480000;min-width:230px;max-width:calc(100vw - 16px);padding:6px;border-radius:10px;' +
+        'background:var(--surface,#fff);color:var(--fg,#222);border:1px solid var(--line,#ddd);box-shadow:0 10px 30px rgba(0,0,0,.18);font-size:13px}' +
+      '.jv-sp-menue h3{margin:4px 8px 6px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted,#777)}' +
+      '.jv-sp-menue label,.jv-sp-menue button{display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;padding:7px 8px;' +
+        'border:0;background:none;border-radius:6px;font:inherit;color:inherit;text-align:left;cursor:pointer}' +
+      '.jv-sp-menue label:hover,.jv-sp-menue button:hover,.jv-sp-menue button:focus-visible{background:var(--surface-2,#f3f3f3);outline:none}' +
+      '.jv-sp-menue input{margin:0;accent-color:var(--accent,#BD843A)}' +
+      '.jv-sp-menue hr{border:0;border-top:1px solid var(--line,#ddd);margin:5px 4px}' +
+      '.jv-sp-menue .jv-sp-hinweis{padding:4px 8px 6px;color:var(--muted,#777);font-size:12px}';
+    document.head.appendChild(stil5);
+
+    // ── Logo: zur Übersicht der Plattform (gleicher Tab, wie die Lasche «Zurück») ──
+    var brand = document.querySelector('header.top .brand');
+    if (brand && !brand.closest('a')) {
+      var a = document.createElement('a');
+      a.className = 'jv-brand';
+      a.href = '/';
+      a.title = 'Zur Übersicht der JV-Plattform';
+      a.setAttribute('aria-label', 'Zur Übersicht der JV-Plattform');
+      brand.parentNode.insertBefore(a, brand);
+      a.appendChild(brand);
+    }
+
+    // ── Spalten der Tabelle: Breite und Sichtbarkeit (je Gerät, je Bildschirmbreite des Tools) ──
+    var SP_KEY = 'jv-tp-spalten-v1';
+    var SPALTEN = {
+      5: { lay: 'n', keys: ['ord', 'name', 'firm', 'dur', 'del'] },
+      7: { lay: 'm', keys: ['ord', 'name', 'firm', 'dur', 'end', 'edit', 'del'] },
+      9: { lay: 'w', keys: ['ord', 'name', 'firm', 'start', 'dur', 'end', 'prog', 'edit', 'del'] }
+    };
+    var NAMEN = {
+      ord: 'Reihenfolge (▲▼)', name: 'Gewerk / Arbeit', firm: 'Ausführende Firma', start: 'Start',
+      dur: 'AT (Arbeitstage)', end: 'Ende', prog: '% (Fortschritt)', edit: 'Bearbeiten', del: 'Löschen'
+    };
+    var MIN = { name: 90, firm: 70, start: 70 };
+    var GRIFF = { name: 1, firm: 1, start: 1, dur: 1, end: 1, prog: 1 };
+
+    var spLesen = function () {
+      try { var o = JSON.parse(localStorage.getItem(SP_KEY) || '{}'); return o && typeof o === 'object' ? o : {}; }
+      catch (e) { return {}; }
+    };
+    var SP = spLesen();
+    var spSchreiben = function () {
+      try { localStorage.setItem(SP_KEY, JSON.stringify(SP)); } catch (e) { /* ohne localStorage gilt es nur bis zum Neuladen */ }
+    };
+    var spStand = function (lay) {
+      var s = SP[lay];
+      if (!s || typeof s !== 'object') s = SP[lay] = {};
+      if (!s.w || typeof s.w !== 'object') s.w = {};
+      if (!Array.isArray(s.aus)) s.aus = [];
+      return s;
+    };
+
+    // Grundwerte der frisch gezeichneten Tabelle merken (vor jeder eigenen Änderung)
+    var grundwerte = function (sc) {
+      if (sc._jvSp) return sc._jvSp;
+      var cols = (sc.style.getPropertyValue('--cols') || '').trim().split(/\s+/);
+      var info = SPALTEN[cols.length];
+      var head = sc.querySelector('.g-head .g-l');
+      var inner = sc.querySelector('.g-inner');
+      var lw = parseFloat(sc.style.getPropertyValue('--lw'));
+      if (!info || !head || !inner || !(lw > 0) || head.children.length !== cols.length) return null;
+      var gap = parseFloat(getComputedStyle(head).columnGap) || 0;
+      var def = cols.map(function (c, i) {
+        return i === 1 ? head.children[1].getBoundingClientRect().width : (parseFloat(c) || 0);
+      });
+      var summe = def.reduce(function (a, b) { return a + b; }, 0);
+      sc._jvSp = {
+        lay: info.lay, keys: info.keys, cols: cols, def: def, gap: gap,
+        rest: lw - summe - gap * (cols.length - 1),        // Innenabstand und Rand der linken Spalte
+        W: (parseFloat(inner.style.width) || 0) - lw        // Breite der Zeitachse
+      };
+      return sc._jvSp;
+    };
+
+    var spAnwenden = function (sc) {
+      var g = grundwerte(sc);
+      if (!g) return;
+      var st = spStand(g.lay);
+      var tpl = [], lw = g.rest, sichtbar = 0, versteckt = [];
+      g.keys.forEach(function (k, i) {
+        if (k !== 'name' && st.aus.indexOf(k) >= 0) { versteckt.push(i + 1); return; }
+        var w = +st.w[k] > 0 ? Math.max(MIN[k] || 20, Math.min(900, +st.w[k])) : g.def[i];
+        tpl.push(k === 'name' ? 'minmax(0,1fr)' : Math.round(w) + 'px');
+        lw += w;
+        sichtbar++;
+      });
+      lw = Math.round(lw + g.gap * (sichtbar - 1));
+      sc.style.setProperty('--cols', tpl.join(' '));
+      sc.style.setProperty('--lw', lw + 'px');
+      var inner = sc.querySelector('.g-inner');
+      if (inner) inner.style.width = (lw + g.W) + 'px';
+      var ov = sc.querySelector('.g-ov');
+      if (ov) ov.style.left = lw + 'px';
+      // ausgeblendete Spalten: im Kopf und in den Zeilen der Arbeiten (Phasen haben ein eigenes Raster)
+      var css = versteckt.map(function (n) {
+        return '#gscroll .g-row.task>.g-l>:nth-child(' + n + '),#gscroll .g-head>.g-l>:nth-child(' + n + ')';
+      }).join(',');
+      var el = document.getElementById('jv-sp-aus');
+      if (!el) { el = document.createElement('style'); el.id = 'jv-sp-aus'; document.head.appendChild(el); }
+      el.textContent = css ? css + '{display:none!important}' : '';
+    };
+
+    var spGriffe = function (sc) {
+      var g = grundwerte(sc);
+      var head = sc.querySelector('.g-head .g-l');
+      if (!g || !head || head._jvGriffe) return;
+      head._jvGriffe = true;
+      head.title = 'Rand ziehen: Spaltenbreite ändern · Doppelklick auf den Rand: zurücksetzen · Rechtsklick: Spalten ein- und ausblenden';
+      g.keys.forEach(function (k, i) {
+        var zelle = head.children[i];
+        if (!GRIFF[k] || !zelle) return;
+        var griff = document.createElement('i');
+        griff.className = 'jv-sp-griff';
+        griff.setAttribute('aria-hidden', 'true');
+        griff.dataset.k = k;
+        zelle.appendChild(griff);
+      });
+      head.addEventListener('pointerdown', function (e) {
+        var griff = e.target.closest && e.target.closest('.jv-sp-griff');
+        if (!griff || e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var k = griff.dataset.k, i = g.keys.indexOf(k);
+        var st = spStand(g.lay);
+        var start = griff.parentNode.getBoundingClientRect().width, x0 = e.clientX;
+        griff.classList.add('jv-zieht');
+        document.body.classList.add('jv-sp-ziehen');
+        try { griff.setPointerCapture(e.pointerId); } catch (er) { /* ohne Capture */ }
+        var bewegen = function (ev) {
+          st.w[k] = Math.round(Math.max(MIN[k] || 20, Math.min(900, start + ev.clientX - x0)));
+          spAnwenden(sc);
+        };
+        var fertig = function () {
+          griff.classList.remove('jv-zieht');
+          document.body.classList.remove('jv-sp-ziehen');
+          griff.removeEventListener('pointermove', bewegen);
+          griff.removeEventListener('pointerup', fertig);
+          griff.removeEventListener('pointercancel', fertig);
+          if (Math.abs((st.w[k] || 0) - g.def[i]) < 1) delete st.w[k];
+          spSchreiben();
+        };
+        griff.addEventListener('pointermove', bewegen);
+        griff.addEventListener('pointerup', fertig);
+        griff.addEventListener('pointercancel', fertig);
+      });
+      head.addEventListener('dblclick', function (e) {
+        var griff = e.target.closest && e.target.closest('.jv-sp-griff');
+        if (!griff) return;
+        delete spStand(g.lay).w[griff.dataset.k];
+        spSchreiben();
+        spAnwenden(sc);
+      });
+      head.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+        menueZeigen(sc, e.clientX, e.clientY);
+      });
+    };
+
+    var menue = null;
+    var menueZu = function () {
+      if (!menue) return;
+      menue.remove();
+      menue = null;
+      document.removeEventListener('pointerdown', ausserhalb, true);
+      document.removeEventListener('keydown', taste5, true);
+      window.removeEventListener('resize', menueZu);
+      window.removeEventListener('scroll', menueZu, true);
+    };
+    var ausserhalb = function (e) { if (menue && !menue.contains(e.target)) menueZu(); };
+    var taste5 = function (e) { if (e.key === 'Escape') { e.stopPropagation(); menueZu(); } };
+
+    var menueZeigen = function (sc, x, y) {
+      menueZu();
+      var g = grundwerte(sc);
+      if (!g) return;
+      var st = spStand(g.lay);
+      menue = document.createElement('div');
+      menue.className = 'jv-sp-menue';
+      menue.setAttribute('role', 'menu');
+      var html = '<h3>Spalten anzeigen</h3>';
+      g.keys.forEach(function (k) {
+        if (k === 'name') return;
+        html += '<label role="menuitemcheckbox"><input type="checkbox" data-k="' + k + '"' +
+          (st.aus.indexOf(k) < 0 ? ' checked' : '') + '>' + esc(NAMEN[k]) + '</label>';
+      });
+      html += '<hr><button type="button" data-a="alle">Alle Spalten zeigen</button>' +
+        '<button type="button" data-a="breite">Spaltenbreiten zurücksetzen</button>' +
+        '<div class="jv-sp-hinweis">Breite: Rand im Kopf ziehen. Gilt auf diesem Gerät.</div>';
+      menue.innerHTML = html;
+      document.body.appendChild(menue);
+      var r = menue.getBoundingClientRect();
+      menue.style.left = Math.max(8, Math.min(x, innerWidth - r.width - 8)) + 'px';
+      menue.style.top = Math.max(8, Math.min(y, innerHeight - r.height - 8)) + 'px';
+      menue.addEventListener('change', function (e) {
+        var k = e.target.dataset && e.target.dataset.k;
+        if (!k) return;
+        st.aus = st.aus.filter(function (x) { return x !== k; });
+        if (!e.target.checked) st.aus.push(k);
+        spSchreiben();
+        spAnwenden(document.getElementById('gscroll') || sc);
+      });
+      menue.addEventListener('click', function (e) {
+        var b = e.target.closest && e.target.closest('button[data-a]');
+        if (!b) return;
+        if (b.dataset.a === 'alle') st.aus = [];
+        else st.w = {};
+        spSchreiben();
+        spAnwenden(document.getElementById('gscroll') || sc);
+        menueZu();
+      });
+      setTimeout(function () {
+        document.addEventListener('pointerdown', ausserhalb, true);
+        document.addEventListener('keydown', taste5, true);
+        window.addEventListener('resize', menueZu);
+        window.addEventListener('scroll', menueZu, true);
+      }, 0);
+      var erstes = menue.querySelector('input');
+      if (erstes) try { erstes.focus({ preventScroll: true }); } catch (e) { /* Fokus egal */ }
+    };
+
+    // ── Text der Balken: mit Wochenende (mehrere Stücke) oder zu lang für den Balken → danach ──
+    var balkenText = function (sc) {
+      sc.querySelectorAll('.g-row.task .g-tl').forEach(function (tl) {
+        var stuecke = tl.querySelectorAll('.bar[data-bar]');
+        if (!stuecke.length || tl.querySelector('.bar-out')) return;
+        var mitText = null;
+        stuecke.forEach(function (b) { var s = b.querySelector('span'); if (s && s.innerHTML) mitText = s; });
+        if (!mitText) return;
+        var abgeschnitten = mitText.scrollWidth > mitText.clientWidth + 1;
+        if (stuecke.length < 2 && !abgeschnitten) return;
+        var letztes = stuecke[stuecke.length - 1];
+        var rechts = (parseFloat(letztes.style.left) || 0) + (parseFloat(letztes.style.width) || 0);
+        var out = document.createElement('div');
+        out.className = 'bar-out';
+        out.dataset.barl = letztes.dataset.bar;
+        out.style.left = (rechts + 6) + 'px';
+        out.innerHTML = mitText.innerHTML;
+        mitText.innerHTML = '';
+        tl.appendChild(out);
+      });
+    };
+
+    var nachRender = function () {
+      var sc = document.getElementById('gscroll');
+      if (!sc) { menueZu(); return; }
+      spAnwenden(sc);
+      spGriffe(sc);
+      balkenText(sc);
+    };
+
+    if (typeof render === 'function') {
+      var altRender = render;
+      render = function () {
+        var r = altRender.apply(this, arguments);
+        try { nachRender(); } catch (e) { console.error('plattform.js: Nachbearbeitung der Tabelle', e); }
+        return r;
+      };
+      try { nachRender(); } catch (e) { /* noch nichts gezeichnet */ }
+    }
+  })();
 })();
