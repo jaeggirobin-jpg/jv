@@ -65,12 +65,11 @@
       var fl = flyerUrl(cfg, a.plz);
       if (fl) r.knopf = { text: 'IWB-Flyer zum Rückflussverhinderer (PDF)', url: fl };
     } else {
-      r.betreff = 'Ihr KRV-Check ' + a.referenz + ': noch ein Foto, bitte';
+      r.betreff = 'Ihr KRV-Check ' + a.referenz + ': nicht sicher erkennbar';
       r.ergebnis = 'Noch nicht sicher erkennbar';
       r.ton = 'offen';
       r.absaetze.push('Auf Ihren Fotos können wir leider nicht sicher erkennen, ob ein Rückflussverhinderer eingebaut ist.');
       if (begruendung) r.absaetze.push(begruendung);
-      r.absaetze.push('Können Sie uns noch ein Foto senden? Antworten Sie einfach auf diese E-Mail und hängen Sie das Foto an. Am besten von etwa einem Meter Abstand, mit dem Wasserzähler und allen Ventilen rechts und links davon. Alternativ kommen wir gerne kurz vorbei.');
     }
     return r;
   }
