@@ -954,6 +954,7 @@
     sitzungSicherstellen: sitzungSicherstellen,
     sitzungLaden: sitzungLaden,
     passwortAendern: passwortAendern,
+    kiZustimmung: kiZustimmung,          // Freigabe-Fenster der KI (einmal je Browser), z. B. für assets/ki-chat.js
     benutzer: function () { return benutzer; }
   };
 })();

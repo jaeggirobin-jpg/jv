@@ -3,7 +3,7 @@
 // Genutzt von:
 //   dachcheck-texte.js     → Befund und Empfehlung im Drohnen-Check-Bericht
 //   krv-admin-anfrage.js   → Begründung in der Antwort an den Kunden (KRV-Check)
-//   ki.js                  → Texthilfe im Katalog und «sample» für Michis Tools (jv-bridge.js)
+//   ki.js                  → Texthilfe im Katalog, «sample» für Michis Tools (jv-bridge.js), Chat in Reel und Story (werkzeug-chat.js)
 //
 // Einstellungen in Netlify (Environment variables):
 //   ANTHROPIC_API_KEY  geheim, nur hier auf dem Server

@@ -38,6 +38,7 @@ docs.jaeggivollmer.ch/
 │   │   └── assets/jv-bridge.js → Speicher der Tools (statt claude.ai), KI für die Tools (`use('sample')`) + Anmeldefenster der Plattform
 │   ├── assets/plattform.js|css → Plattform (Router, Projekte, Rechte im Menü, Daten übernehmen)
 │   ├── assets/badvis-editor.js → Badvisualisierungen erstellen, bearbeiten, löschen (Route `#/visualisierung/…`)
+│   ├── assets/ki-chat.js   → Chat mit Claude in Reel-Generator und Story (Fragen + Änderungen, Rückgängig)
 │   ├── assets/feedback.js  → Feedback-Knopf mit Bildausschnitt (Plattform und Tools)
 │   ├── assets/zurueck.js   → Lasche «Zurück» in Tools und Seiten (alles öffnet im selben Tab)
 │   ├── assets/feedback-board.js, zugaenge.js → Verwaltung: Feedback-Board, Logins
@@ -149,6 +150,7 @@ JV_KI_MODELL=...              ← optional, anderes Claude-Modell (früher DC_KI
 
 - Jede KI-Anfrage läuft über `_lib/ki.js` (offizielles SDK, Streaming, Frist 8.5 s wegen des 10-s-Limits der Functions; danach Teilantwort mit `gekuerzt`). Nie direkt `fetch` an die API, nie Texte loggen (nur Status, Fehlertyp, request-id; bei 400/404 die Meldung der API).
 - Heute: Drohnen-Check und KRV-Begründung (Bereich `anfragen`), Katalog (`ki.js` Aktion `text`, Bereich `katalog`), Michis Tools (`ki.js` Aktion `sample`, Bereich `projekte`). Die Knöpfe schicken nur den Text des Feldes (dazu Titel, Beurteilung bzw. Ampel), nie Namen, Adressen, Fotos; bei `sample` bestimmt das Tool den Inhalt.
+- Chat in Reel und Story (Robin 4.11.2026): `assets/ki-chat.js` (eingebunden über `tools_einbinden.py`) schickt nur den Stand (Texte, Einstellungen, Reihenfolge, nie Fotos) an `ki.js` Aktion `chat` (Bereich `projekte`); `_lib/werkzeug-chat.js` prüft jede Änderung gegen eine feste Liste je Werkzeug, die Seite wendet sie über die Bedienelemente des Tools an. Story-Änderungen im Browser (`jvstory.ki`).
 - `jv-bridge.js` bildet `window.claude.use('sample')` nach (Fehler als `{ code, message }`, 5 Min Zwischenspeicher, 2 gleichzeitig, Freigabe-Fenster einmal je Browser `jv-ki-ok`); Tools nie von Hand auf KI umbauen.
 
 ### Authentifizierung (Plattform und Admin-Functions)

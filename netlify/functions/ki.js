@@ -9,10 +9,15 @@
 //        Allgemeine Anfrage für Michis Tools über window.claude.use('sample') in jv-bridge.js (Bereich «projekte»)
 //        → { text, gekuerzt, stufe }
 //
+//   { action: 'chat', werkzeug: 'reel'|'story', zustand, nachrichten: [{ role, content }] }
+//        Chat im Reel-Generator und in der Story (Bereich «projekte», _lib/werkzeug-chat.js)
+//        → { antwort, aenderungen, verworfen, gekuerzt }
+//
 // Fehler: { error, code } mit den Codes des sample-Vertrags (not_granted, invalid_request, prompt_too_large,
 // rate_limited, sampling_disabled, refused, empty_completion, upstream_error).
 // Texte gehen an Anthropic (USA). Die Oberflächen weisen darauf hin, keine Personendaten mitzuschicken.
 const ki = require('./_lib/ki');
+const werkzeugChat = require('./_lib/werkzeug-chat');
 const { anmeldung } = require('./_lib/auth');
 const { json, body } = require('./_lib/tools');
 
@@ -105,11 +110,15 @@ exports.handler = async (event) => {
   const b = body(event);
   if (!b || typeof b !== 'object' || Array.isArray(b)) return json(400, { error: 'Ungültige Anfrage', code: 'invalid_request' });
 
-  const bereich = b.action === 'text' ? 'katalog' : b.action === 'sample' ? 'projekte' : '';
+  const bereich = b.action === 'text' ? 'katalog' : (b.action === 'sample' || b.action === 'chat') ? 'projekte' : '';
   if (!bereich) return json(400, { error: 'Unbekannte Aktion', code: 'invalid_request' });
   if (!(await anmeldung(event, bereich))) return json(401, { error: 'Nicht angemeldet', code: 'not_granted' });
 
   try {
+    if (b.action === 'chat') {
+      const r = await werkzeugChat.chat(b);
+      return json(r.status, r.body);
+    }
     return b.action === 'text' ? await katalogText(b) : await sample(b);
   } catch (e) {
     if (e instanceof ki.KiFehler) return json(e.status, { error: e.message, code: e.code });
