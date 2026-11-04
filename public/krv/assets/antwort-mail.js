@@ -6,12 +6,12 @@
 // keine Hintergrundbilder, alles lesbar auch ohne Bilder.
 //
 // Werbung (cfg.texte.antwortWerbung): nur eigene, ähnliche Leistungen an Kundschaft, die selbst angefragt hat,
-// mit einfacher Abmeldung in jeder Mail (Art. 3 Abs. 1 lit. o UWG).
+// ohne Abmeldehinweis (Robin 4.11.2026: einzelne Antwort, keine Massenwerbung).
 
 (function (root) {
   var F = {
     text: '#25292E', grau: '#5E676C', hell: '#929A9D', anthrazit: '#4B575D',
-    kupfer: '#BD843A', kupferDunkel: '#94621F', kupferHell: '#F4EADD', grund: '#F7F5F2', linie: '#E6E1DA'
+    kupfer: '#BD843A', kupferDunkel: '#94621F', kupferHell: '#F4EADD', gruen: '#3D7A4A', gruenHell: '#E6F0E8', grund: '#F7F5F2', linie: '#E6E1DA'
   };
   var SCHRIFT = "Arial,Helvetica,sans-serif";
   var BASIS = 'https://krv.jaeggivollmer.ch/';
@@ -44,8 +44,7 @@
     var mieter = a.rolle === 'mieter'
       ? 'Den Einbau muss die Eigentümerschaft oder die Verwaltung in Auftrag geben. Leiten Sie diese E-Mail gerne weiter.'
       : '';
-    var vorbehalt = 'Unsere Einschätzung beruht auf Ihren Fotos und ersetzt keine Kontrolle vor Ort.';
-    var r = { absaetze: [], vorbehalt: vorbehalt };
+    var r = { absaetze: [] };
     if (a.beurteilung === 'vorhanden') {
       r.betreff = 'Ihr KRV-Check ' + a.referenz + ': Rückflussverhinderer vorhanden';
       r.ergebnis = 'Rückflussverhinderer vorhanden';
@@ -72,7 +71,6 @@
       r.absaetze.push('Auf Ihren Fotos können wir leider nicht sicher erkennen, ob ein Rückflussverhinderer eingebaut ist.');
       if (begruendung) r.absaetze.push(begruendung);
       r.absaetze.push('Können Sie uns noch ein Foto senden? Antworten Sie einfach auf diese E-Mail und hängen Sie das Foto an. Am besten von etwa einem Meter Abstand, mit dem Wasserzähler und allen Ventilen rechts und links davon. Alternativ kommen wir gerne kurz vorbei.');
-      r.vorbehalt = '';
     }
     return r;
   }
@@ -89,13 +87,12 @@
       'Vielen Dank für Ihre Anfrage zum Gratis KRV-Check (' + a.referenz + ', ' + adresse(a) + ').\n\n' +
       r.absaetze.join('\n\n') + '\n\n' +
       (r.knopf ? r.knopf.text + ': ' + r.knopf.url + '\n\n' : '') +
-      (r.vorbehalt ? 'Bitte beachten Sie: ' + r.vorbehalt + '\n\n' : '') +
       'Freundliche Grüsse\nJäggi Vollmer\n' + (fi.telefon || '');
     var w = werbung(cfg);
     if (w) {
       t += '\n\n— ' + w.titel + ' —\n' + w.kacheln.map(function (k) {
         return k.titel + ': ' + k.text + ' ' + k.url;
-      }).join('\n') + '\n\n' + w.abmelden;
+      }).join('\n');
     }
     t += '\n\n' + [fi.name, fi.strasse, fi.ort].filter(Boolean).join(', ');
     return { betreff: r.betreff, text: t };
@@ -119,7 +116,8 @@
     var w = werbung(cfg);
     var logo = opts.logoUrl || BASIS + 'assets/logo-mail.png';
     var symbol = { gut: '&#10003;', achtung: '!', offen: '?' }[r.ton];
-    var randFarbe = r.ton === 'gut' ? F.anthrazit : F.kupfer;
+    var randFarbe = r.ton === 'gut' ? F.gruen : F.kupfer;
+    var feldFarbe = r.ton === 'gut' ? F.gruenHell : F.kupferHell;
     var vorschau = r.ergebnis + ' – ' + adresse(a);
 
     var kacheln = '';
@@ -164,7 +162,7 @@
           '<p style="margin:0 0 20px;font-family:' + SCHRIFT + ';font-size:14px;color:' + F.hell + '">' + esc(adresse(a)) + '</p>' +
           // Ergebnis
           '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px"><tr>' +
-            '<td bgcolor="' + F.kupferHell + '" style="background:' + F.kupferHell + ';border-left:5px solid ' + randFarbe + ';border-radius:6px;padding:14px 16px">' +
+            '<td bgcolor="' + feldFarbe + '" style="background:' + feldFarbe + ';border-left:5px solid ' + randFarbe + ';border-radius:6px;padding:14px 16px">' +
               '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>' +
                 '<td width="34" valign="middle"><div style="width:30px;height:30px;line-height:30px;border-radius:15px;background:' + randFarbe + ';color:#ffffff;text-align:center;font-family:' + SCHRIFT + ';font-size:17px;font-weight:bold">' + symbol + '</div></td>' +
                 '<td valign="middle" style="padding-left:10px;font-family:' + SCHRIFT + ';font-size:18px;line-height:24px;font-weight:bold;color:' + F.text + '">' + esc(r.ergebnis) + '</td>' +
@@ -174,7 +172,6 @@
           absatz('Vielen Dank für Ihre Anfrage zum Gratis KRV-Check.') +
           r.absaetze.map(function (t) { return absatz(t); }).join('') +
           (r.knopf ? '<div style="margin:4px 0 20px">' + knopf(r.knopf.text, r.knopf.url, F.kupferDunkel) + '</div>' : '') +
-          (r.vorbehalt ? absatz(r.vorbehalt, ';font-size:14px;line-height:21px;color:' + F.grau) : '') +
           absatz('Freundliche Grüsse') +
           '<p style="margin:0 0 24px;font-family:' + SCHRIFT + ';font-size:16px;line-height:24px;color:' + F.text + '"><strong>Jäggi Vollmer</strong><br>' +
             '<a href="tel:' + esc(fi.telefonLink || '') + '" style="color:' + F.kupferDunkel + ';text-decoration:none">' + esc(fi.telefon || '') + '</a>' +
@@ -189,7 +186,6 @@
       '<tr><td style="padding:14px 26px 8px;border-top:1px solid ' + F.linie + '">' +
         '<p style="margin:0 0 8px;font-family:' + SCHRIFT + ';font-size:13px;line-height:19px;color:' + F.anthrazit + '"><strong>' + esc(fi.name || 'Jäggi Vollmer GmbH') + '</strong> · Spenglerei · Sanitär · Planung<br>' +
           esc([fi.strasse, fi.ort].filter(Boolean).join(', ')) + ' · <a href="' + esc(fi.website || '') + '" target="_blank" style="color:' + F.anthrazit + '">' + esc(String(fi.website || '').replace(/^https?:\/\//, '')) + '</a></p>' +
-        (w ? '<p style="margin:0;font-family:' + SCHRIFT + ';font-size:12px;line-height:18px;color:' + F.hell + '">' + esc(w.abmelden) + '</p>' : '') +
       '</td></tr>' +
 
       '</table></td></tr></table></body></html>';

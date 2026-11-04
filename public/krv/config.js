@@ -85,15 +85,14 @@
       },
 
       // Werbeteil der Antwort-Mail an den Kunden (assets/antwort-mail.js). null = ohne Werbung.
-      // Nur eigene Leistungen; die Abmeldung muss in jeder Mail stehen (Art. 3 Abs. 1 lit. o UWG).
+      // Nur eigene Leistungen.
       antwortWerbung: {
         titel: 'Auch sonst für Sie da',
         text: 'Jäggi Vollmer ist Ihr Fachbetrieb für Sanitär und Spenglerei in Basel.',
         kacheln: [
           { bereich: 'Sanitär', titel: 'Neues Bad, Boiler, Reparaturen', text: 'Vom tropfenden Hahn bis zum ganzen Badumbau. Ihr neues Bad zeigen wir Ihnen vorab als Visualisierung.', link: 'Mehr erfahren', url: 'https://www.jaeggivollmer.ch/?utm_source=krv-mail&utm_medium=email&utm_campaign=krv-antwort&utm_content=sanitaer' },
           { bereich: 'Spenglerei', titel: 'Dachrinnen, Bleche, Anschlüsse', text: 'Wir reparieren Dachrinnen und Ablaufrohre, ersetzen Bleche und dichten Anschlüsse an Kamin und Dach ab.', link: 'Mehr erfahren', url: 'https://www.jaeggivollmer.ch/?utm_source=krv-mail&utm_medium=email&utm_campaign=krv-antwort&utm_content=spenglerei' },
-        ],
-        abmelden: 'Sie erhalten diese E-Mail, weil Sie den Gratis KRV-Check angefragt haben. Keine Hinweise auf weitere Angebote mehr? Antworten Sie kurz mit «Keine Werbung».'
+        ]
       },
 
       pflicht: {
