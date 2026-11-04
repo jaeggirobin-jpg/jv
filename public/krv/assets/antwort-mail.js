@@ -119,32 +119,25 @@
     var feldFarbe = r.ton === 'gut' ? F.gruenHell : F.kupferHell;
     var vorschau = r.ergebnis + ' – ' + adresse(a);
 
-    var kacheln = '';
-    if (w) {
-      var zellen = w.kacheln.map(function (k) {
-        return '<td class="kachel" valign="top" width="50%" style="padding:0 6px 12px">' +
-          '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;border:1px solid ' + F.linie + ';border-radius:8px"><tr>' +
-          '<td style="border-top:4px solid ' + F.kupfer + ';border-radius:8px 8px 0 0;padding:16px 16px 18px">' +
-          '<p style="margin:0 0 4px;font-family:' + SCHRIFT + ';font-size:12px;letter-spacing:1px;text-transform:uppercase;color:' + F.kupferDunkel + ';font-weight:bold">' + esc(k.bereich) + '</p>' +
-          '<p style="margin:0 0 8px;font-family:' + SCHRIFT + ';font-size:17px;line-height:22px;font-weight:bold;color:' + F.text + '">' + esc(k.titel) + '</p>' +
-          '<p style="margin:0 0 14px;font-family:' + SCHRIFT + ';font-size:14px;line-height:21px;color:' + F.grau + '">' + esc(k.text) + '</p>' +
-          '<a href="' + esc(k.url) + '" target="_blank" style="font-family:' + SCHRIFT + ';font-size:14px;font-weight:bold;color:' + F.kupferDunkel + ';text-decoration:none">' + esc(k.link) + ' &rarr;</a>' +
-          '</td></tr></table></td>';
-      });
-      var reihen = '';
-      for (var i = 0; i < zellen.length; i += 2) reihen += '<tr>' + zellen[i] + (zellen[i + 1] || '<td class="kachel" width="50%"></td>') + '</tr>';
-      kacheln =
-        '<tr><td style="padding:8px 26px 0">' +
-          '<p style="margin:0 0 4px;font-family:' + SCHRIFT + ';font-size:20px;line-height:26px;font-weight:bold;color:' + F.anthrazit + '">' + esc(w.titel) + '</p>' +
-          '<p style="margin:0 0 16px;font-family:' + SCHRIFT + ';font-size:15px;line-height:22px;color:' + F.grau + '">' + esc(w.text) + '</p>' +
-        '</td></tr>' +
-        '<tr><td style="padding:0 20px 8px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + reihen + '</table></td></tr>';
+    // Werbung als schmales Band direkt unter dem Logo (Robin 4.11.2026: «unten liest das keiner»)
+    var band = '';
+    if (w && w.kacheln && w.kacheln.length) {
+      var zellen = w.kacheln.map(function (k, i) {
+        return '<td class="kachel" valign="top" width="' + Math.floor(100 / w.kacheln.length) + '%" style="padding:12px 16px' + (i ? ';border-left:1px solid ' + F.linie : '') + '">' +
+          '<a href="' + esc(k.url) + '" target="_blank" style="text-decoration:none;display:block">' +
+          '<span style="display:block;font-family:' + SCHRIFT + ';font-size:11px;letter-spacing:1px;text-transform:uppercase;color:' + F.kupferDunkel + ';font-weight:bold">' + esc(k.bereich) + '</span>' +
+          '<span style="display:block;font-family:' + SCHRIFT + ';font-size:15px;line-height:20px;font-weight:bold;color:' + F.text + '">' + esc(k.titel) + ' <span style="color:' + F.kupfer + '">&rarr;</span></span>' +
+          '</a></td>';
+      }).join('');
+      band = '<tr><td style="padding:0 0 14px">' +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="' + F.kupferHell + '" style="background:' + F.kupferHell + ';border-radius:8px"><tr>' + zellen + '</tr></table>' +
+        '</td></tr>';
     }
 
     return '<!DOCTYPE html><html lang="de-CH"><head><meta charset="utf-8">' +
       '<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light">' +
       '<title>' + esc(r.betreff) + '</title>' +
-      '<style>@media (max-width:620px){.huelle{width:100%!important}.kachel{display:block!important;width:100%!important;box-sizing:border-box}.innen{padding-left:18px!important;padding-right:18px!important}}</style>' +
+      '<style>@media (max-width:620px){.huelle{width:100%!important}.kachel{display:block!important;width:100%!important;box-sizing:border-box;border-left:0!important}.innen{padding-left:18px!important;padding-right:18px!important}}</style>' +
       '</head><body style="margin:0;padding:0;background:' + F.grund + '">' +
       '<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:' + F.grund + '">' + esc(vorschau) + '</div>' +
       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="' + F.grund + '" style="background:' + F.grund + '"><tr><td align="center" style="padding:24px 10px">' +
@@ -152,6 +145,8 @@
 
       // Kopf: Logo direkt auf dem Hintergrund (kein Kasten)
       '<tr><td style="padding:4px 26px 18px"><a href="' + esc(fi.website || 'https://www.jaeggivollmer.ch') + '" target="_blank"><img src="' + esc(logo) + '" width="200" alt="Jäggi Vollmer" style="display:block;width:200px;max-width:60%;height:auto;border:0;font-family:' + SCHRIFT + ';font-size:20px;font-weight:bold;color:' + F.anthrazit + '"></a></td></tr>' +
+
+      band +
 
       // Hauptkarte
       '<tr><td bgcolor="#ffffff" style="background:#ffffff;border-radius:10px;border-top:5px solid ' + F.kupfer + '">' +
@@ -178,8 +173,7 @@
         '</td></tr>' +
       '</table></td></tr>' +
 
-      '<tr><td style="height:26px;line-height:26px;font-size:0">&nbsp;</td></tr>' +
-      kacheln +
+      '<tr><td style="height:18px;line-height:18px;font-size:0">&nbsp;</td></tr>' +
 
       // Fuss
       '<tr><td style="padding:14px 26px 8px;border-top:1px solid ' + F.linie + '">' +
