@@ -18,7 +18,7 @@ Mitarbeiterinnen und Mitarbeiter und ein gemeinsamer KI-Zugang (Claude) für all
 | Badvisualisierungen erstellen und bearbeiten | `public/assets/badvis-editor.js`; Knöpfe und Aufbereitung im Tool `public/tools/badvisualisierungen/daten.js` |
 | Kundenlink für Badvisualisierungen | `visualisierung-links.js`, `get-visualisierung.js`, `public/visualisierung.html`; Tabelle `visualisierung_links` |
 | Feedback | `public/assets/feedback.js` (Knopf, Bildausschnitt), `feedback-board.js` (Board, Export), Function `feedback.js`; Tabelle `plattform_feedback`, Bucket `feedback` (`migration_016`) |
-| KI (Claude) | `netlify/functions/_lib/ki.js` (gemeinsamer Zugang), `ki.js` (Katalog, Tools); KI für die Tools in `jv-bridge.js` |
+| KI (Claude) | `netlify/functions/_lib/ki.js` (gemeinsamer Zugang), `ki.js` (Katalog, Tools, Chat), `_lib/werkzeug-chat.js`; KI für die Tools in `jv-bridge.js`, Chat in Reel/Story `assets/ki-chat.js` |
 | Neue Tool-Version von Michi übernehmen | `werkzeuge/tools_einbinden.py` |
 | App (PWA): installierbar, Offline-Hinweis | `public/manifest.webmanifest`, `public/sw.js`, `public/offline.html`, `public/assets/app.js`; Symbole `public/assets/app/` aus `werkzeuge/app_symbole.py` |
 
@@ -143,6 +143,13 @@ in einem eigenen Fenster ohne Adressleiste, mit dem JV-Symbol.
 - **Michis Tools:** Baut Michi in eine neue Version KI ein (`window.claude.use('sample')` wie bei claude.ai), läuft sie
   nach dem Einbinden ohne Umbau. Beim ersten Mal fragt der Browser einmal «KI verwenden?». Nur für Logins mit dem
   Bereich «Projekte».
+- **Chat mit Claude in Reel-Generator und Story** (Robin, 4.11.2026): Knopf «Claude» unten rechts. Man stellt Fragen
+  («Welcher Spruch passt zu einem Gäste-WC?») oder verlangt Änderungen («Mach das Rätsel lustiger», «Verschieb Foto 4
+  nach vorne», «Akzentfarbe auf JV-Kupfer»); Claude ändert direkt, jede Antwort mit Änderungen hat «Rückgängig».
+  Reel: Startseite, Rätsel-/Split-Text, Spruch, eigener Spruch, Zusatz, Etappen-Texte, Reihenfolge der Fotos (Fotos
+  hinzufügen/entfernen und die Schlussseite bleiben von Hand). Story: Titel, Text, Knopf, Telefon, Fusszeile,
+  Akzentfarbe; die Änderungen merkt sich der Browser, «Original» stellt alles zurück. Mit geht nur der Stand (Texte,
+  Einstellungen, Reihenfolge), nie Fotos. Bereich «Projekte».
 - **Netlify:** `ANTHROPIC_API_KEY` (Site configuration → Environment variables). Optional `JV_KI_MODELL` für ein
   anderes Claude-Modell (das frühere `DC_KI_MODELL` gilt weiter). Vorgabe ist ein schnelles Modell, weil Netlify jede
   Function nach 10 Sekunden abbricht. Ohne Schlüssel läuft alles andere normal, nur die KI-Knöpfe melden es.

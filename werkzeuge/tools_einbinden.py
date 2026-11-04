@@ -93,6 +93,14 @@ def zurueck_einbinden(text, name):
     return text[:i] + '<script src="/assets/zurueck.js" defer></script>\n' + text[i:]
 
 
+# Chat mit Claude (Robin, 4.11.2026): Knopf «Claude» unten rechts, Fragen und Änderungen am Inhalt
+def ki_chat_einbinden(text, werkzeug, name):
+    i = text.rfind('</body>')
+    if i < 0:
+        raise Fehler(name + ': </body> fehlt')
+    return text[:i] + f'<script src="/assets/ki-chat.js" data-werkzeug="{werkzeug}" defer></script>\n' + text[i:]
+
+
 # ── 1. Bau-Terminplaner ──────────────────────────────────────────────────
 def terminplaner(t):
     n = 'Terminplaner'
@@ -180,12 +188,13 @@ def gaeste_wc(t):
 
 # ── 4. Story Badumbau (keine Daten, keine Speicherfunktionen) ────────────
 def story(t):
-    return kopf(t, ROBOTS, 'Story')
+    # Bridge für Anmeldung und KI-Freigabe des Chats
+    return ki_chat_einbinden(kopf(t, ROBOTS + bridge('story'), 'Story'), 'story', 'Story')
 
 
 # ── 5. Reel-Generator (nutzt nur «downloads») ────────────────────────────
 def reel(t):
-    return kopf(t, ROBOTS + bridge('reel'), 'Reel')
+    return ki_chat_einbinden(kopf(t, ROBOTS + bridge('reel'), 'Reel'), 'reel', 'Reel')
 
 
 # (Datei, Ordner, Anpassung, erwartete Änderung der Anzahl <script>-Tags)
@@ -194,8 +203,8 @@ TOOLS = [
     ('1_Bau-Terminplaner_JV.html', 'terminplaner', terminplaner, +5),           # Bridge, geo-admin, plattform.js, Feedback, Zurück
     ('2_JV_Badvisualisierungen.html', 'badvisualisierungen', badvisualisierungen, +4),   # Bridge, daten.js, Feedback, Zurück
     ('3_Gaeste-WC_Umbauvorschau.html', 'gaeste-wc', gaeste_wc, +2),             # Bridge, Feedback, Zurück, 3D-Scan entfernt
-    ('4_JV_Story_Badumbau.html', 'story', story, +2),                           # Feedback, Zurück
-    ('5_JV_Reel-Generator.html', 'reel', reel, +3),                             # Bridge, Feedback, Zurück
+    ('4_JV_Story_Badumbau.html', 'story', story, +4),                           # Bridge, Claude-Chat, Feedback, Zurück
+    ('5_JV_Reel-Generator.html', 'reel', reel, +4),                             # Bridge, Claude-Chat, Feedback, Zurück
 ]
 
 
