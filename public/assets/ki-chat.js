@@ -3,7 +3,9 @@
 //   <script src="/assets/ki-chat.js" data-werkzeug="reel" defer></script>   (bzw. "story")
 //
 // Knopf «Claude» unten rechts öffnet ein Seitenfenster: Fragen stellen oder Änderungen verlangen
-// («Mach den Rätsel-Text lustiger», «Verschieb Foto 3 nach vorne»). Die Anfrage geht über
+// («Mach den Rätsel-Text lustiger», «Verschieb Foto 3 nach vorne», «Logo ohne Karte unten rechts»).
+// Freie Gestaltung: im Reel Logo, Farben und Ebenen (Text, Formen, Logo) über window.JVReelGestaltung
+// (eingefügt von tools_einbinden.py), in der Story CSS je Element und zusätzliche Textfelder. Die Anfrage geht über
 // /api/ki (Aktion «chat», netlify/functions/_lib/werkzeug-chat.js) an Claude. Mit geht nur der Stand
 // des Tools (Texte, Einstellungen, Reihenfolge), nie Fotos. Die Antwort enthält geprüfte Änderungen;
 // dieses Skript wendet sie über die Bedienelemente des Tools an (wie ein Klick oder eine Eingabe),
@@ -72,9 +74,95 @@
     return pos === nach;
   }
 
+  // ── Freie Gestaltung (Robin, 4.11.2026: «freie Anpassungen via Chat») ─────
+  // Gestaltung = { farben, logo, ebenen } (Reel) bzw. { stile, ebenen } (Story). Der Server prüft jede
+  // Änderung (netlify/functions/_lib/gestaltung.js); hier werden sie nur noch eingesetzt.
+  function kopie(o) { return JSON.parse(JSON.stringify(o || {})); }
+  function felderSetzen(ziel, werte) {
+    Object.keys(werte || {}).forEach(function (k) { if (werte[k] === null) delete ziel[k]; else ziel[k] = werte[k]; });
+  }
+  function neueId(liste) {
+    var n = 1;
+    while (liste.some(function (e) { return e.id === 'e' + n; })) n++;
+    return 'e' + n;
+  }
+  // {art:'ebene', aktion, id, ebene} auf die Liste anwenden; gibt Text oder Fehler zurück
+  function ebeneAnwenden(liste, a, wort) {
+    if (a.aktion === 'neu') {
+      var e = kopie(a.ebene);
+      Object.keys(e).forEach(function (k) { if (e[k] === null) delete e[k]; });
+      e.id = neueId(liste);
+      liste.push(e);
+      return { text: wort + ' «' + e.id + '» hinzugefügt' };
+    }
+    var i = liste.map(function (x) { return x.id; }).indexOf(a.id);
+    if (i < 0) return { fehler: wort + ' «' + a.id + '» gibt es nicht' };
+    if (a.aktion === 'entfernen') { liste.splice(i, 1); return { text: wort + ' «' + a.id + '» entfernt' }; }
+    var alt = liste[i];
+    Object.keys(a.ebene || {}).forEach(function (k) {
+      if (k === 'stil' && a.ebene.stil) { alt.stil = alt.stil || {}; felderSetzen(alt.stil, a.ebene.stil); }
+      else if (a.ebene[k] === null) delete alt[k]; else alt[k] = a.ebene[k];
+    });
+    return { text: wort + ' «' + a.id + '» geändert' };
+  }
+
+  var REEL_GESTALTUNG = 'jvreel.ki_gestaltung';
+  var LOGO_FELDER = { sichtbar: 'sichtbar', freigestellt: 'Datei ohne Hintergrund', x: 'Lage', y: 'Lage', breite: 'Grösse', karte: 'Karte', kartenfarbe: 'Kartenfarbe', radius: 'Ecken',
+    deckkraft: 'Deckkraft', schatten: 'Schatten', von: 'Zeit', bis: 'Zeit', einblenden: 'Einblenden', ausblenden: 'Ausblenden' };
+  function reelG() { return window.JVReelGestaltung && window.JVReelGestaltung.setzen ? window.JVReelGestaltung : null; }
+  function gestaltungLeer(g) {
+    return !g || (!Object.keys(g.farben || {}).length && !Object.keys(g.logo || {}).length && !(g.ebenen || []).length);
+  }
+  function reelGSetzen(g) {
+    var G = reelG();
+    if (!G) return false;
+    G.setzen(g);
+    try {
+      if (gestaltungLeer(g)) localStorage.removeItem(REEL_GESTALTUNG);
+      else localStorage.setItem(REEL_GESTALTUNG, JSON.stringify(g));
+    } catch (e) { /* gilt dann nur bis zum Neuladen */ }
+    return true;
+  }
+  function reelStart() {
+    var G = reelG();
+    if (!G) return;
+    var g = null;
+    try { g = JSON.parse(localStorage.getItem(REEL_GESTALTUNG) || 'null'); } catch (e) { g = null; }
+    if (g && typeof g === 'object' && !Array.isArray(g)) {
+      G.setzen({
+        farben: g.farben && typeof g.farben === 'object' ? g.farben : {},
+        logo: g.logo && typeof g.logo === 'object' ? g.logo : {},
+        ebenen: Array.isArray(g.ebenen) ? g.ebenen.filter(function (e) { return e && typeof e === 'object'; }).slice(0, 20) : []
+      });
+    }
+  }
+  function reelGestaltung(a) {
+    var G = reelG();
+    if (!G) return { fehler: 'Die Gestaltung ist in diesem Tool nicht verfügbar' };
+    var g = G.stand();
+    g.farben = g.farben || {}; g.logo = g.logo || {}; g.ebenen = g.ebenen || [];
+    var e;
+    if (a.art === 'logo') {
+      felderSetzen(g.logo, a.werte);
+      var was = [];
+      Object.keys(a.werte).forEach(function (k) { var w = LOGO_FELDER[k]; if (w && was.indexOf(w) < 0) was.push(w); });
+      e = { text: 'Logo: ' + (was.join(', ') || 'angepasst') };
+    } else if (a.art === 'farbe') {
+      if (a.wert === null) delete g.farben[a.name]; else g.farben[a.name] = a.wert;
+      e = { text: 'Farbe ' + a.name + ': ' + (a.wert || 'Original') };
+    } else if (a.art === 'ebene') {
+      e = ebeneAnwenden(g.ebenen, a, 'Ebene');
+    } else if (a.art === 'gestaltung_zuruecksetzen') {
+      g = { farben: {}, logo: {}, ebenen: [] };
+      e = { text: 'Gestaltung aufs Original zurückgesetzt' };
+    } else return { fehler: 'Unbekannte Änderung' };
+    if (!e.fehler) reelGSetzen(g);
+    return e;
+  }
+
   var reel = {
     name: 'Reel-Generator',
-    vorschlaege: ['Schlag mir einen witzigeren Rätsel-Text vor', 'Welcher Spruch passt zu einem Gäste-WC?', 'Kürze die Etappen-Texte'],
+    vorschlaege: ['Schlag mir einen witzigeren Rätsel-Text vor', 'Zeig das Logo ohne weisse Karte, kleiner und unten rechts', 'Kürze die Etappen-Texte'],
     bereit: function () { return !!$('photoList') && !!$('quizText'); },
     zustand: function () {
       var z = { einleitung: gewaehlt('intro'), spruch: gewaehlt('say'), sprueche: {}, felder: {}, fotos: [] };
@@ -96,6 +184,8 @@
       z.beispielFotos = !!(bsp && !bsp.hidden && bsp.offsetParent !== null);
       var d = $('durLabel');
       if (d && d.textContent) z.dauer = d.textContent;
+      var G = reelG();
+      if (G) { z.gestaltung = G.stand(); z.gestaltungStandard = G.standard(); }
       return z;
     },
     anwenden: function (a) {
@@ -124,7 +214,7 @@
       if (a.art === 'verschieben') {
         return reelVerschieben(a.nr, a.nach) ? { text: 'Foto ' + a.nr + ' an Stelle ' + a.nach + ' verschoben' } : { fehler: 'Foto ' + a.nr + ' liess sich nicht verschieben' };
       }
-      return { fehler: 'Unbekannte Änderung' };
+      return reelGestaltung(a);
     },
     sichern: function () {
       var s = { intro: gewaehlt('intro'), say: gewaehlt('say'), felder: {}, reihe: [], texte: {} };
@@ -134,6 +224,8 @@
         s.reihe.push(k);
         if (inp) s.texte[k] = inp.value;
       });
+      var G = reelG();
+      if (G) s.gestaltung = G.stand();
       return s;
     },
     zuruecksetzen: function (s) {
@@ -150,6 +242,13 @@
         var k = fotoSchluessel(li), inp = li.querySelector('input[type=text]');
         if (inp && Object.prototype.hasOwnProperty.call(s.texte, k) && inp.value !== s.texte[k]) eingabe(inp, s.texte[k]);
       });
+      if (s.gestaltung) reelGSetzen(s.gestaltung);
+    },
+    original: {
+      text: 'Gestaltung zurück',
+      titel: 'Logo, Farben und Ebenen aufs Original zurücksetzen (Texte bleiben)',
+      geaendert: function () { var G = reelG(); return !!G && !gestaltungLeer(G.stand()); },
+      tun: function () { reelGSetzen({ farben: {}, logo: {}, ebenen: [] }); }
     }
   };
 
@@ -214,17 +313,105 @@
       else localStorage.removeItem(STORY_SPEICHER);
     } catch (e) { /* gilt dann nur bis zum Neuladen */ }
   }
+  // Elemente für die freie Gestaltung (CSS) und ihr ursprüngliches style-Attribut
+  var STIL_ELEMENTE = ['flaeche', 'hintergrund', 'verlauf', 'inhalt', 'logokarte', 'logo', 'titel', 'strich', 'text', 'knopf', 'kontakt', 'telefon', 'fusszeile'];
+  var CSS_EIGENSCHAFTEN = ['display', 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'max-width', 'min-width', 'max-height', 'min-height',
+    'margin', 'margin-top', 'margin-bottom', 'margin-left', 'margin-right', 'padding', 'padding-top', 'padding-bottom', 'padding-left', 'padding-right',
+    'background', 'background-color', 'color', 'font-size', 'font-weight', 'font-style', 'font-family', 'line-height', 'letter-spacing',
+    'text-align', 'text-transform', 'text-shadow', 'text-decoration', 'box-shadow', 'border', 'border-radius', 'opacity', 'transform', 'filter',
+    'align-self', 'align-items', 'justify-content', 'flex-direction', 'flex-grow', 'gap', 'order', 'z-index', 'object-fit', 'object-position',
+    'white-space', 'visibility'];
+  var stilEl = null, stilOriginal = {};
+  function storyStilElemente() {
+    if (stilEl) return stilEl;
+    var fit = $('fit'), e = storyElemente();
+    if (!fit || !e) return null;
+    var flaeche = fit.firstElementChild;
+    var kinder = flaeche ? Array.prototype.slice.call(flaeche.children) : [];
+    var logo = fit.querySelector('img[alt^="Jäggi"]');
+    var telZeile = e.telefon ? e.telefon.parentElement : null;
+    stilEl = {
+      flaeche: flaeche, hintergrund: kinder[0] && kinder[0].tagName === 'IMG' ? kinder[0] : null, verlauf: kinder[1] || null, inhalt: kinder[2] || null,
+      logokarte: logo ? logo.parentElement : null, logo: logo, titel: e.titel, strich: e.strich, text: e.text, knopf: e.knopfFlaeche,
+      kontakt: telZeile ? telZeile.parentElement : null, telefon: telZeile, fusszeile: e.fusszeile
+    };
+    STIL_ELEMENTE.forEach(function (k) { if (stilEl[k]) stilOriginal[k] = stilEl[k].getAttribute('style') || ''; });
+    return stilEl;
+  }
+  // zweite Prüfung im Browser (auch für Werte aus dem Speicher des Browsers)
+  function cssOk(eig, wert) {
+    return CSS_EIGENSCHAFTEN.indexOf(eig) >= 0 && typeof wert === 'string' && wert.length <= 200 &&
+      !/[;{}<>\\"`@!]|\/\*|url\s*\(|image-set|image\s*\(|element\s*\(|expression|javascript/i.test(wert);
+  }
+  function stilSetzen(el, stil) {
+    Object.keys(stil || {}).forEach(function (k) { if (stil[k] != null && cssOk(k, stil[k])) el.style.setProperty(k, stil[k]); });
+  }
+  var EBENE_GRUND = 'position:absolute;left:80px;top:860px;width:920px;z-index:5;font-family:"Roboto Condensed",Arial,sans-serif;' +
+    'font-size:60px;font-weight:700;line-height:1.2;color:#ffffff;text-align:center;text-shadow:0 2px 14px rgba(0,0,0,0.5)';
+  function storyGestaltungAnwenden(werte) {
+    var S = storyStilElemente();
+    if (!S) return;
+    STIL_ELEMENTE.forEach(function (k) { if (S[k]) S[k].setAttribute('style', stilOriginal[k]); });
+    if (werte.farbe) storySetzen('farbe', werte.farbe);
+    if (S.logo) {
+      if (!S.logo.dataset.jvOriginal) S.logo.dataset.jvOriginal = S.logo.getAttribute('src');
+      var src = werte.logoFrei ? '/logo.png' : S.logo.dataset.jvOriginal;
+      if (S.logo.getAttribute('src') !== src) S.logo.setAttribute('src', src);
+    }
+    var stile = werte.stile || {};
+    Object.keys(stile).forEach(function (k) { if (S[k]) stilSetzen(S[k], stile[k]); });
+    Array.prototype.forEach.call(S.flaeche.querySelectorAll('[data-jv-ebene]'), function (d) { d.remove(); });
+    (werte.ebenen || []).forEach(function (eb) {
+      if (!eb || typeof eb.text !== 'string') return;
+      var d = document.createElement('div');
+      d.setAttribute('data-jv-ebene', eb.id || '');
+      d.setAttribute('style', EBENE_GRUND);
+      storySchreiben(d, eb.text.slice(0, 300));
+      stilSetzen(d, eb.stil);
+      S.flaeche.appendChild(d);
+    });
+  }
   function storyAnwendenAlle(werte) {
     Object.keys(storyOriginal).forEach(function (k) {
       var w = Object.prototype.hasOwnProperty.call(werte, k) ? werte[k] : storyOriginal[k];
       storySetzen(k, w);
     });
     storyWerte = JSON.parse(JSON.stringify(werte));
+    storyGestaltungAnwenden(storyWerte);
     storySpeichern();
+  }
+  function storyGestaltung(a) {
+    var stile = kopie(storyWerte.stile), ebenen = kopie({ l: storyWerte.ebenen || [] }).l, e;
+    if (a.art === 'stil') {
+      var S = storyStilElemente();
+      if (!S || !S[a.element]) return { fehler: 'Element «' + a.element + '» nicht gefunden' };
+      stile[a.element] = stile[a.element] || {};
+      felderSetzen(stile[a.element], a.stil);
+      if (!Object.keys(stile[a.element]).length) delete stile[a.element];
+      e = { text: 'Gestaltung von «' + a.element + '» geändert' };
+    } else if (a.art === 'logo_bild') {
+      var n = kopie(storyWerte);
+      if (a.wert === 'freigestellt') n.logoFrei = true; else delete n.logoFrei;
+      storyAnwendenAlle(n);
+      return { text: a.wert === 'freigestellt' ? 'Logo ohne weissen Hintergrund' : 'Logo-Datei wie im Original' };
+    } else if (a.art === 'ebene') {
+      e = ebeneAnwenden(ebenen, a, 'Textfeld');
+    } else if (a.art === 'gestaltung_zuruecksetzen') {
+      if (a.element) { delete stile[a.element]; e = { text: '«' + a.element + '» aufs Original zurückgesetzt' }; }
+      else { stile = {}; ebenen = []; e = { text: 'Gestaltung aufs Original zurückgesetzt' }; }
+    } else return { fehler: 'Unbekannte Änderung' };
+    if (e.fehler) return e;
+    var neu = kopie(storyWerte);
+    if (a.art === 'gestaltung_zuruecksetzen' && !a.element) delete neu.logoFrei;
+    if (Object.keys(stile).length) neu.stile = stile; else delete neu.stile;
+    if (ebenen.length) neu.ebenen = ebenen; else delete neu.ebenen;
+    storyAnwendenAlle(neu);
+    return e;
   }
   function storyStart() {
     var e = storyElemente();
     if (!e) return;
+    storyStilElemente();   // ursprüngliche Stile merken, bevor etwas gesetzt wird
     storyOriginal = {};
     Object.keys(STORY_FELDER).forEach(function (k) { if (e[k]) storyOriginal[k] = storyLesen(e[k]); });
     storyOriginal.farbe = storyFarbe();
@@ -235,18 +422,34 @@
       if (Object.prototype.hasOwnProperty.call(storyOriginal, k) && typeof gemerkt[k] === 'string' && gemerkt[k].length <= 300) sauber[k] = gemerkt[k];
     });
     if (sauber.farbe && !/^#[0-9A-Fa-f]{6}$/.test(sauber.farbe)) delete sauber.farbe;
+    if (gemerkt.stile && typeof gemerkt.stile === 'object' && !Array.isArray(gemerkt.stile)) {
+      var st = {};
+      Object.keys(gemerkt.stile).forEach(function (k) {
+        if (STIL_ELEMENTE.indexOf(k) >= 0 && gemerkt.stile[k] && typeof gemerkt.stile[k] === 'object') st[k] = gemerkt.stile[k];
+      });
+      if (Object.keys(st).length) sauber.stile = st;
+    }
+    if (gemerkt.logoFrei === true) sauber.logoFrei = true;
+    if (Array.isArray(gemerkt.ebenen)) {
+      var eb = gemerkt.ebenen.filter(function (x) { return x && typeof x.text === 'string' && typeof x.id === 'string'; }).slice(0, 20);
+      if (eb.length) sauber.ebenen = eb;
+    }
     storyAnwendenAlle(sauber);
   }
 
   var story = {
     name: 'Story Badumbau',
-    vorschlaege: ['Mach den Titel persönlicher', 'Setz die Akzentfarbe auf JV-Kupfer', 'Schreib den Text für ein Gäste-WC um'],
+    vorschlaege: ['Mach den Titel persönlicher', 'Zeig das Logo ohne weisse Karte und etwas kleiner', 'Setz die Akzentfarbe auf JV-Kupfer'],
     bereit: function () { return !!storyOriginal; },
     zustand: function () {
       var e = storyElemente(), z = { felder: {}, original: {} };
       Object.keys(STORY_FELDER).forEach(function (k) { if (e[k]) z.felder[k] = storyLesen(e[k]); });
       z.farbe = storyFarbe();
-      Object.keys(storyWerte).forEach(function (k) { z.original[k] = storyOriginal[k]; });
+      Object.keys(storyWerte).forEach(function (k) { if (Object.prototype.hasOwnProperty.call(storyOriginal, k)) z.original[k] = storyOriginal[k]; });
+      storyStilElemente();
+      z.gestaltung = { stile: kopie(storyWerte.stile), ebenen: kopie({ l: storyWerte.ebenen || [] }).l, logoBild: storyWerte.logoFrei ? 'freigestellt' : 'original' };
+      z.aufbau = {};
+      STIL_ELEMENTE.forEach(function (k) { if (Object.prototype.hasOwnProperty.call(stilOriginal, k)) z.aufbau[k] = stilOriginal[k].slice(0, 400); });
       return z;
     },
     anwenden: function (a) {
@@ -262,7 +465,7 @@
         storySpeichern();
         return { text: 'Akzentfarbe ' + a.wert };
       }
-      return { fehler: 'Unbekannte Änderung' };
+      return storyGestaltung(a);
     },
     sichern: function () { return JSON.parse(JSON.stringify(storyWerte)); },
     zuruecksetzen: function (s) { storyAnwendenAlle(s); },
@@ -361,11 +564,11 @@
     if (ADAPTER.original) {
       origKnopf = el('button', null, ADAPTER.original.text);
       origKnopf.type = 'button';
-      origKnopf.title = 'Alle Änderungen zurücknehmen und das Original zeigen';
+      origKnopf.title = ADAPTER.original.titel || 'Alle Änderungen zurücknehmen und das Original zeigen';
       origKnopf.addEventListener('click', function () {
         var vorher = ADAPTER.sichern();
         ADAPTER.original.tun();
-        zeigeKi({ antwort: 'Das Original ist wiederhergestellt.', erledigt: [], fehler: [], vorher: vorher });
+        zeigeKi({ antwort: WZ === 'reel' ? 'Logo, Farben und Ebenen sind wieder wie im Original.' : 'Das Original ist wiederhergestellt.', erledigt: [], fehler: [], vorher: vorher });
         origAktualisieren();
       });
       kopf.appendChild(origKnopf);
@@ -548,6 +751,7 @@
 
   function start() {
     if (WZ === 'story') storyStart();
+    if (WZ === 'reel') reelStart();
     bauen();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);

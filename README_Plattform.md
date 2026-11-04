@@ -150,6 +150,11 @@ in einem eigenen Fenster ohne Adressleiste, mit dem JV-Symbol.
   hinzufügen/entfernen und die Schlussseite bleiben von Hand). Story: Titel, Text, Knopf, Telefon, Fusszeile,
   Akzentfarbe; die Änderungen merkt sich der Browser, «Original» stellt alles zurück. Mit geht nur der Stand (Texte,
   Einstellungen, Reihenfolge), nie Fotos. Bereich «Projekte».
+  **Freie Gestaltung** (Robin, 4.11.2026): Reel: Logo (Lage, Grösse, mit/ohne Karte, Datei ohne weissen Hintergrund,
+  Deckkraft, Zeitfenster), Grundfarben und zusätzliche Ebenen (Text, Rechteck, Kreis, Linie, Logo, je mit Zeitfenster
+  und Ein-/Ausblenden), Knopf «Gestaltung zurück». Story: CSS je Element (Logo, Logokarte, Titel, Knopf …), Logo ohne
+  Hintergrund, zusätzliche Textfelder. Der Server lässt nur bekannte Felder und CSS ohne Bilder von aussen zu
+  (`netlify/functions/_lib/gestaltung.js`). Die Gestaltung merkt sich der Browser.
 - **Netlify:** `ANTHROPIC_API_KEY` (Site configuration → Environment variables). Optional `JV_KI_MODELL` für ein
   anderes Claude-Modell (das frühere `DC_KI_MODELL` gilt weiter). Vorgabe ist ein schnelles Modell, weil Netlify jede
   Function nach 10 Sekunden abbricht. Ohne Schlüssel läuft alles andere normal, nur die KI-Knöpfe melden es.

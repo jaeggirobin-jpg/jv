@@ -193,8 +193,96 @@ def story(t):
 
 
 # ── 5. Reel-Generator (nutzt nur «downloads») ────────────────────────────
+# Freie Gestaltung des Reels über den Claude-Chat (Robin, 4.11.2026: «freie Anpassungen via Chat»).
+# Das Tool zeichnet alles in einer geschlossenen Funktion; diese Stellen machen Farben und Logo einstellbar
+# und zeichnen zusätzliche Ebenen (Text, Formen, Logo). Ohne Gestaltung sieht das Reel aus wie bei Michi.
+# Gesteuert wird über window.JVReelGestaltung.setzen({ farben, logo, ebenen }) aus public/assets/ki-chat.js.
+REEL_GESTALTUNG = r"""
+// ── JV: freie Gestaltung über den Claude-Chat (eingefügt von werkzeuge/tools_einbinden.py) ──
+const JVG_STD = { gold: GOLD, weiss: WHITE, dunkel: DARK };
+let JVG = { farben: {}, logo: {}, ebenen: [] };
+let jvgFrei = null, jvgFreiLaedt = false;   // Logo ohne weissen Hintergrund (/logo.png), erst bei Bedarf geladen
+function jvgLogo(o) {
+  if (!o.freigestellt) return logoImg;
+  if (!jvgFrei && !jvgFreiLaedt) { jvgFreiLaedt = true; loadImg('/logo.png').then((i) => { jvgFrei = i; try { refresh(false); } catch (e) {} }).catch(() => {}); }
+  return jvgFrei || logoImg;
+}
+function jvgZeit(o, t) { return t == null || (t >= (o.von || 0) && (o.bis == null || t < o.bis)); }
+function jvgBlende(o, t) {
+  if (t == null) return 1; let a = 1;
+  if (o.einblenden > 0) a = Math.min(a, clamp((t - (o.von || 0)) / o.einblenden));
+  if (o.ausblenden > 0 && o.bis != null) a = Math.min(a, clamp((o.bis - t) / o.ausblenden));
+  return a;
+}
+function jvgEbenen(c, t) {
+  for (const e of JVG.ebenen) {
+    if (!jvgZeit(e, t)) continue;
+    const a = (e.deckkraft != null ? e.deckkraft : 1) * jvgBlende(e, t); if (a <= 0) continue;
+    c.save(); c.globalAlpha = a;
+    const x = e.x != null ? e.x : W / 2, y = e.y != null ? e.y : H / 2;
+    if (e.drehung) { c.translate(x, y); c.rotate(e.drehung * Math.PI / 180); c.translate(-x, -y); }
+    const zeichnen = (fn) => (e.schatten ? shadowed(c, fn, 18, 0.6) : fn());
+    if (e.typ === 'text') {
+      const schreib = e.schrift === 'schreib', gr = e.groesse || 80;
+      c.font = `${schreib ? 400 : (e.gewicht || 700)} ${gr}px ${schreib ? SCRIPT : COND}`;
+      c.fillStyle = e.farbe || WHITE; c.textAlign = { links: 'left', rechts: 'right' }[e.ausrichtung] || 'center'; c.textBaseline = 'middle';
+      const z = String(e.text || '').split('\n'), zh = gr * 1.15, y0 = y - (z.length - 1) * zh / 2;
+      zeichnen(() => z.forEach((l, i) => c.fillText(l, x, y0 + i * zh)));
+    } else if (e.typ === 'rechteck') {
+      const b = e.b || 400, h = e.h || 200; c.fillStyle = e.farbe || WHITE;
+      zeichnen(() => { rr(c, x - b / 2, y - h / 2, b, h, Math.min(e.radius || 0, b / 2, h / 2)); c.fill(); });
+    } else if (e.typ === 'kreis') {
+      c.fillStyle = e.farbe || GOLD; zeichnen(() => { c.beginPath(); c.arc(x, y, e.r || 100, 0, Math.PI * 2); c.fill(); });
+    } else if (e.typ === 'linie') {
+      c.strokeStyle = e.farbe || GOLD; c.lineWidth = e.dicke || 10; c.lineCap = 'round';
+      zeichnen(() => { c.beginPath(); c.moveTo(x, y); c.lineTo(e.x2 != null ? e.x2 : x + 300, e.y2 != null ? e.y2 : y); c.stroke(); });
+    } else if (e.typ === 'logo' && logoImg) {
+      const bild = jvgLogo(e), lw = e.breite || 400, lh = bild.naturalHeight * lw / bild.naturalWidth;
+      zeichnen(() => c.drawImage(bild, x - lw / 2, y - lh / 2, lw, lh));
+    }
+    c.restore();
+  }
+}
+window.JVReelGestaltung = {
+  setzen(g) {
+    g = g && typeof g === 'object' ? g : {};
+    JVG = { farben: g.farben || {}, logo: g.logo || {}, ebenen: Array.isArray(g.ebenen) ? g.ebenen : [] };
+    GOLD = JVG.farben.gold || JVG_STD.gold; WHITE = JVG.farben.weiss || JVG_STD.weiss; DARK = JVG.farben.dunkel || JVG_STD.dunkel;
+    try { refresh(false); } catch (e) { /* Tool startet noch */ }
+  },
+  stand() { return JSON.parse(JSON.stringify(JVG)); },
+  standard() { return Object.assign({}, JVG_STD); },
+  masse: { breite: W, hoehe: H },
+};
+"""
+
+REEL_LOGO = r"""function logoCard(c, t) {
+  const L = JVG.logo;
+  if (!logoImg || L.sichtbar === false || !jvgZeit(L, t)) return;
+  const bild = jvgLogo(L), lw = L.breite || 600, f = lw / 600, lh = bild.naturalHeight * lw / bild.naturalWidth;
+  const karte = L.karte !== false, px = karte ? 35 * f : 0, py = karte ? 28 * f : 0, cw = lw + 2 * px, ch = lh + 2 * py;
+  const x = L.x != null ? L.x - cw / 2 : (W - cw) / 2, y = L.y != null ? L.y - ch / 2 : 120;
+  c.save(); c.globalAlpha = (L.deckkraft != null ? L.deckkraft : 1) * jvgBlende(L, t);
+  if (karte) shadowed(c, () => { c.fillStyle = L.kartenfarbe || WHITE; rr(c, x, y, cw, ch, L.radius != null ? L.radius : 26 * f); c.fill(); }, L.schatten === false ? 0 : 30, L.schatten === false ? 0 : 0.35);
+  if (!karte && L.schatten) shadowed(c, () => c.drawImage(bild, x, y, lw, lh), 24, 0.5);
+  else c.drawImage(bild, x + px, y + py, lw, lh);
+  c.restore();
+}
+"""
+
+
+def reel_gestaltung(t):
+    t = regex_ersetzen(t, r"const GOLD = ('[^']*'), WHITE = ('[^']*'), DARK = ('[^']*');",
+                       lambda m: f'let GOLD = {m.group(1)}, WHITE = {m.group(2)}, DARK = {m.group(3)};', 'Reel Farben')
+    t = regex_ersetzen(t, r"function logoCard\(c\) \{\n.*?\n\}\n", lambda m: REEL_LOGO, 'Reel Logo', flags=re.S)
+    t = ersetzen(t, '  logoCard(ctx);\n}\nfunction buildEndBg', '  logoCard(ctx, t);\n  jvgEbenen(ctx, t);\n}\nfunction buildEndBg', 'Reel Ebenen')
+    # Gestaltung direkt nach der Zeile mit dem Logo-Bild (dort sind clamp, rr, shadowed und das Canvas bekannt)
+    return ersetzen(t, "let logoImg = null, photos = [], endBg = null, isExample = true;\n",
+                    "let logoImg = null, photos = [], endBg = null, isExample = true;\n" + REEL_GESTALTUNG.lstrip('\n'), 'Reel Gestaltung')
+
+
 def reel(t):
-    return ki_chat_einbinden(kopf(t, ROBOTS + bridge('reel'), 'Reel'), 'reel', 'Reel')
+    return ki_chat_einbinden(kopf(reel_gestaltung(t), ROBOTS + bridge('reel'), 'Reel'), 'reel', 'Reel')
 
 
 # (Datei, Ordner, Anpassung, erwartete Änderung der Anzahl <script>-Tags)
