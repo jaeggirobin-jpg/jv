@@ -1705,24 +1705,27 @@ function planPdf(p,opt={}){
  return doc;
 }
 function contactsPdf(p){
- const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});pdfBg(doc,true,p);const PW=297,M=12;
- try{doc.addImage(LOGO,'PNG',M,M,40,10.45);}catch(e){}
- doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(...RGB.fg);doc.text('Kontaktliste '+(p.name||''),M+48,M+6);
- doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...RGB.muted);doc.text([p.address,'Stand '+fmt(todayIso())].filter(Boolean).join('   ·   '),M+48,M+11.5);
+ const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});pdfBg(doc,true,p);const PW=297,M=12;const halb=(a,f)=>{doc.setGState(new doc.GState({opacity:a}));f();doc.setGState(new doc.GState({opacity:1}));};
+ doc.setFillColor(255,255,255);halb(.88,()=>doc.roundedRect(M,M-3.5,PW-2*M,20,3,3,'F'));doc.setFillColor(175,118,49);doc.roundedRect(M,M-3.5,2.2,20,1.1,1.1,'F');
+ try{doc.addImage(LOGO,'PNG',M+5,M,40,10.45);}catch(e){}
+ doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(...RGB.fg);doc.text('Kontaktliste '+(p.name||''),M+53,M+6);
+ doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...RGB.muted);doc.text([p.address,'Stand '+fmt(todayIso())].filter(Boolean).join('   ·   '),M+53,M+11.5);
  const C=[['Firma / Rolle',58],['Kontaktperson',40],['Tätigkeit',50],['Adresse',48],['Telefon',38],['E-Mail',39]];
- let y=M+20;
- const head=()=>{doc.setFillColor(...RGB.ph);doc.rect(M,y,PW-2*M,7,'F');doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(...RGB.muted);let x=M+1.5;C.forEach(([l,w])=>{doc.text(l.toUpperCase(),x,y+4.7);x+=w;});y+=7;};
+ let y=M+20,top=y,zi=0;const rahmen=()=>{doc.setDrawColor(...RGB.line);doc.setLineWidth(.3);doc.roundedRect(M,top,PW-2*M,y-top,2,2,'S');doc.setLineWidth(.2);};
+ const head=()=>{top=y;zi=0;doc.setFillColor(...RGB.ph);halb(.95,()=>{doc.roundedRect(M,y,PW-2*M,7,2,2,'F');doc.rect(M,y+2,PW-2*M,5,'F');});doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(...RGB.muted);let x=M+1.5;C.forEach(([l,w])=>{doc.text(l.toUpperCase(),x,y+4.7);x+=w;});y+=7;};
  head();
  const PL=leaderOf(p);const rows=[...(PL.name?[Object.assign(['Projektleitung\n'+(S.cfg.sender.company||''),PL.name,PL.title||'Projektleitung',[S.cfg.sender.street,S.cfg.sender.city].filter(Boolean).join('\n'),[PL.phone||S.cfg.sender.phone,PL.mobile].filter(Boolean).join('\n'),PL.email],{logo:(ownFirm()||{}).logo||''})]:[]),...(p.contacts||[]).map(c=>[c.role+(c.company?'\n'+c.company:''),c.name,c.role,[c.street,c.city].filter(Boolean).join('\n'),[c.phone,c.mobile].filter(Boolean).join('\n'),c.email]),
   ...projectFirms(p,!!S.withBidders).map(e=>Object.assign([e.f.name,e.f.contact,[...new Set(e.tasks)].join(', '),[e.f.street,e.f.city].filter(Boolean).join('\n'),[e.f.phone,e.f.mobile].filter(Boolean).join('\n'),e.f.email],{logo:e.f.logo||''}))];
  doc.setFontSize(8.5);
  for(const r of rows){
   const cells=r.map((v,k)=>doc.splitTextToSize(String(v||''),C[k][1]-3));let h=Math.max(...cells.map(c=>c.length))*3.8+3;let lg=null;const rl=logoSrc(r.logo);if(rl){try{const pr=doc.getImageProperties(rl);const lh=6,lw=Math.min(30,lh*pr.width/pr.height);lg={lw,lh:lw*pr.height/pr.width,ty:cells[0].length*3.8+2};h=Math.max(h,lg.ty+lg.lh+3);}catch(e){}}
-  if(y+h>210-M){doc.addPage();y=M;head();}
+  if(y+h>210-M){rahmen();doc.addPage();y=M;head();}
+  doc.setFillColor(...(zi++%2?[246,247,248]:[255,255,255]));halb(.86,()=>doc.rect(M,y,PW-2*M,h,'F'));
   let x=M+1.5;cells.forEach((c,k)=>{doc.setFont('helvetica',k===0?'bold':'normal');doc.setTextColor(...RGB.fg);doc.text(c,x,y+4.4);x+=C[k][1];});
   if(lg){try{doc.addImage(rl,'PNG',M+1.5,y+lg.ty,lg.lw,lg.lh);}catch(e){}}
   y+=h;doc.setDrawColor(...RGB.line);doc.line(M,y,PW-M,y);
  }
+ rahmen();
  return doc;
 }
 async function exportXlsx(){
