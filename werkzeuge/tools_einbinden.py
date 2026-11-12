@@ -85,12 +85,23 @@ def feedback_einbinden(text, ordner, name):
     return text[:i] + tag + text[i:]
 
 
-# Zurück zur Plattform (Robin, 2.11.2026: Tools öffnen im selben Tab): Lasche am linken Rand
-def zurueck_einbinden(text, name):
+# Zurück zur Plattform (Robin, 2.11.2026: Tools öffnen im selben Tab). Robin, 12.11.2026: Knopf «Zurück»
+# oben links direkt vor dem Logo, Klick aufs Logo = Übersicht der Plattform. Selektor des Logos je Tool;
+# Tools ohne Logo im Kopf (Gäste-WC, Story) behalten die Lasche am linken Rand.
+ZURUECK_LOGO = {
+    'badvisualisierungen': '.top > img',
+    'terminplaner': '.top .brand',
+    'reel': 'header > .logo',
+}
+
+
+def zurueck_einbinden(text, ordner, name):
     i = text.rfind('</body>')
     if i < 0:
         raise Fehler(name + ': </body> fehlt')
-    return text[:i] + '<script src="/assets/zurueck.js" defer></script>\n' + text[i:]
+    logo = ZURUECK_LOGO.get(ordner)
+    attr = f' data-logo="{logo}"' if logo else ''
+    return text[:i] + f'<script src="/assets/zurueck.js"{attr} defer></script>\n' + text[i:]
 
 
 # Chat mit Claude (Robin, 4.11.2026): Knopf «Claude» unten rechts, Fragen und Änderungen am Inhalt
@@ -346,7 +357,7 @@ def main():
             continue
         ergebnis = fn(dateien[datei])
         ergebnis = feedback_einbinden(ergebnis, ordner, datei)
-        ergebnis = zurueck_einbinden(ergebnis, datei)
+        ergebnis = zurueck_einbinden(ergebnis, ordner, datei)
         vorher, nachher = dateien[datei].count('<script'), ergebnis.count('<script')
         if nachher - vorher != differenz:
             raise Fehler(f'{datei}: {vorher} Skripte vorher, {nachher} nachher (erwartet {differenz:+d}); '

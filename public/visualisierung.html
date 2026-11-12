@@ -11,8 +11,10 @@
   <link rel="apple-touch-icon" href="/dachcheck/assets/icon/apple-touch-icon.png">
   <style>
     /* Kundenansicht einer Badvisualisierung: Aufbau und Farben wie im Tool «JV Badvisualisierungen»
-       (Vorher/Nachher-Regler, Farbwahl, Beschrieb). Bilder nur als Canvas mit Wasserzeichen,
-       geladen über kurzlebige signierte Adressen (siehe netlify/functions/get-visualisierung.js). */
+       (Vorher/Nachher-Regler, Farbwahl, Beschrieb). Bilder nur als Canvas, ohne Wasserzeichen (Robin,
+       12.11.2026), geladen über kurzlebige signierte Adressen (siehe netlify/functions/get-visualisierung.js).
+       Robin, 12.11.2026: Visualisierung gross und mittig, darunter Farbwahl und Beschrieb; beim Laden
+       das JV-Logo animiert. */
     @font-face { font-family: "Fraunces"; font-weight: 400; font-display: swap; src: url("/assets/fonts/fraunces-latin-400-normal.woff2") format("woff2"); }
     @font-face { font-family: "Fraunces"; font-weight: 600; font-display: swap; src: url("/assets/fonts/fraunces-latin-600-normal.woff2") format("woff2"); }
     @font-face { font-family: "Instrument Sans"; font-weight: 400; font-display: swap; src: url("/assets/fonts/instrument-sans-latin-400-normal.woff2") format("woff2"); }
@@ -37,9 +39,25 @@
     .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
     h1 { font-family: var(--display); font-weight: 600; font-size: clamp(28px, 4vw, 40px); line-height: 1.1; margin: 6px 0 12px; text-wrap: balance; }
     .lead { color: var(--muted); max-width: 56ch; margin: 0 0 24px; }
-    .wrap { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 40px; align-items: start; }
-    .wrap.portrait { grid-template-columns: minmax(0, 600px) minmax(0, 1fr); }
-    @media (max-width: 860px) { .wrap, .wrap.portrait { grid-template-columns: 1fr; gap: 24px; } }
+    /* Aufbau von oben nach unten, alles mittig: Titel · Visualisierung (so gross, wie Breite und
+       Bildschirmhöhe erlauben) · Farbwahl · Beschrieb · Mockup */
+    .wrap { --ar: 1.3333; }
+    .kopf { text-align: center; max-width: 760px; margin: 0 auto 22px; }
+    .kopf .lead { margin: 0 auto; }
+    .buehne { width: min(100%, calc(76vh * var(--ar))); margin: 0 auto; }
+    @supports (height: 1svh) { .buehne { width: min(100%, calc(76svh * var(--ar))); } }
+    .unten { max-width: 760px; margin: 26px auto 0; }
+    .unten .picker { text-align: center; }
+    .unten .picker-label, .unten .swatches { justify-content: center; }
+    @media (max-width: 600px) {
+      .shell { padding-block: 14px 28px; }
+      .top { padding-bottom: 12px; margin-bottom: 18px; }
+      .top img { height: 32px; }
+      .top .hinweis { display: none; }
+      .kopf { margin-bottom: 16px; }
+      .buehne { width: 100%; }
+      .unten { margin-top: 20px; }
+    }
     .stage { position: relative; max-width: 100%; border-radius: 6px; overflow: hidden; touch-action: none; cursor: ew-resize; background: var(--chip); }
     .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
     .stage .before { clip-path: inset(0 calc(100% - var(--pos, 50%)) 0 0); }
@@ -64,14 +82,34 @@
     .swatches button[aria-pressed="true"] { outline: 2px solid var(--fg); outline-offset: 3px; }
     .swatches button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
     .swatches button.gloss::after { content: ""; position: absolute; top: 6px; left: 8px; width: 10px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, .9); transform: rotate(-30deg); }
-    .mock { grid-column: 1 / -1; margin-top: 8px; position: relative; border-radius: 6px; overflow: hidden; background: var(--chip); aspect-ratio: 4 / 3; }
+    .mock { width: min(100%, 900px); margin: 28px auto 0; position: relative; border-radius: 6px; overflow: hidden; background: var(--chip); aspect-ratio: 4 / 3; }
     .mock canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-    .note { grid-column: 1 / -1; margin-top: 6px; font-size: 13px; color: var(--muted); max-width: 70ch; }
+    .note { margin: 14px auto 0; font-size: 13px; color: var(--muted); max-width: 70ch; text-align: center; }
     .laedt::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, .35) 50%, transparent 70%); background-size: 200% 100%; animation: glanz 1.2s linear infinite; }
     @keyframes glanz { from { background-position: 200% 0; } to { background-position: -200% 0; } }
     @media (prefers-reduced-motion: reduce) { .laedt::after { animation: none; } .swatches button { transition: none; } }
     @media (prefers-reduced-motion: no-preference) { .stage.anim .before, .stage.anim .handle { transition: clip-path .6s ease, left .6s ease; } }
     #status { max-width: 620px; margin: 48px auto; text-align: center; color: var(--muted); }
+    /* Laden: JV-Logo füllt sich von links nach rechts in Farbe, darunter ein Kupferbalken */
+    body.laden .top { visibility: hidden; }
+    .lader { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 6vh 0 20px; }
+    .lader-logo { position: relative; width: min(320px, 72vw); aspect-ratio: 1300 / 415.4; }
+    .lader-logo img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+    .lader-logo .grau { opacity: .2; filter: grayscale(1); }
+    .lader-logo .farbe { clip-path: inset(0 100% 0 0); animation: fuellen 2.2s cubic-bezier(.65, 0, .35, 1) infinite; }
+    @keyframes fuellen {
+      0% { clip-path: inset(0 100% 0 0); opacity: 1; }
+      55%, 82% { clip-path: inset(0 0 0 0); opacity: 1; }
+      100% { clip-path: inset(0 0 0 0); opacity: 0; }
+    }
+    .lader-balken { position: relative; width: min(200px, 50vw); height: 3px; border-radius: 3px; background: var(--line); overflow: hidden; }
+    .lader-balken::after { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 40%; border-radius: 3px; background: #BD843A; animation: balken 1.3s ease-in-out infinite; }
+    @keyframes balken { to { left: 100%; } }
+    .lader-text { font-size: 14px; color: var(--muted); }
+    @media (prefers-reduced-motion: reduce) {
+      .lader-logo .farbe { animation: none; clip-path: none; }
+      .lader-balken::after { animation: none; left: 30%; }
+    }
     #status.fehler { text-align: left; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 22px 24px; color: var(--fg); }
     #status h2 { font-family: var(--display); font-weight: 600; margin: 0 0 8px; font-size: 22px; }
     #status p { margin: 0; color: var(--muted); }
@@ -80,16 +118,21 @@
     @media print { html, body { display: none !important; } }
   </style>
 </head>
-<body>
+<body class="laden">
   <div class="shell">
     <header class="top">
       <img src="/dachcheck/assets/logo-jaeggi-vollmer.svg" alt="Jäggi Vollmer – Spenglerei, Sanitär, Planung" draggable="false" />
       <span class="hinweis">Badplanung · vertraulich</span>
     </header>
     <main>
-      <div id="status" role="status">Visualisierung wird geladen …</div>
+      <div id="status" role="status"><div class="lader"><div class="lader-logo"><img class="grau" src="/dachcheck/assets/logo-jaeggi-vollmer.svg" alt="" draggable="false" /><img class="farbe" src="/dachcheck/assets/logo-jaeggi-vollmer.svg" alt="Jäggi Vollmer" draggable="false" /></div><div class="lader-balken"></div><div class="lader-text">Ihre Visualisierung wird geladen …</div></div></div>
       <div class="wrap" id="inhalt" hidden>
-        <div>
+        <div class="kopf">
+          <div class="eyebrow" id="eyebrow"></div>
+          <h1 id="titel"></h1>
+          <p class="lead" id="lead"></p>
+        </div>
+        <div class="buehne">
           <div class="stage anim" id="stage" style="--pos:50%">
             <canvas id="c-nachher" aria-label="Nachher"></canvas>
             <canvas class="before" id="c-vorher" aria-label="Vorher"></canvas>
@@ -98,10 +141,7 @@
           </div>
           <input class="range" id="range" type="range" min="0" max="100" value="50" aria-label="Vorher/Nachher-Regler" />
         </div>
-        <div>
-          <div class="eyebrow" id="eyebrow"></div>
-          <h1 id="titel"></h1>
-          <p class="lead" id="lead"></p>
+        <div class="unten">
           <div class="picker" id="picker" hidden>
             <div class="picker-label">Keramikfarbe <strong id="cname"></strong> <span id="cfin"></span></div>
             <div class="swatches" id="sw" role="group" aria-label="Keramikfarbe wählen"></div>
@@ -132,29 +172,21 @@
     var token = new URLSearchParams(location.search).get('t') || '';
     var MAX_PX = 1800;          // Canvas-Breite höchstens (Schärfe vs. Speicher)
     var objekt = null;
-    var wasserzeichen = '';
-    var logo = null;
     var bitmaps = {};           // Schlüssel (vorher, room-x, mock-x) → ImageBitmap/Bild
     var gewaehlt = null;
     var lauf = 0;
+
+    var LADER = $('status').innerHTML;   // animiertes Logo aus dem Markup
 
     function status(html, fehler) {
       var el = $('status');
       el.innerHTML = html;
       el.className = fehler ? 'fehler' : '';
       el.hidden = false;
+      document.body.classList.remove('laden');
     }
     function esc(s) {
       return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
-    }
-
-    function logoLaden() {
-      return new Promise(function (fertig) {
-        var img = new Image();
-        img.onload = function () { logo = img; fertig(); };
-        img.onerror = function () { fertig(); };
-        img.src = '/logo.png';
-      });
     }
 
     // Bild über die signierte Adresse holen und dekodieren. Die Adresse erscheint nie im DOM.
@@ -193,7 +225,7 @@
         });
     }
 
-    // Bild «cover» in die Leinwand zeichnen, danach Wasserzeichen darüber
+    // Bild «cover» in die Leinwand zeichnen
     function zeichnen(canvas, bild, verhaeltnis) {
       var box = canvas.parentNode.getBoundingClientRect();
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -209,41 +241,6 @@
         var bw = bild.width * s, bh = bild.height * s;
         ctx.drawImage(bild, (w - bw) / 2, (h - bh) / 2, bw, bh);
       }
-      wasserzeichenZeichnen(ctx, w, h);
-    }
-
-    // Wasserzeichen: Logo und «Vertraulich – Name · Datum», diagonal, halbtransparent, gekachelt
-    function wasserzeichenZeichnen(ctx, w, h) {
-      var text = (wasserzeichen ? '«Vertraulich – ' + wasserzeichen + '»' : '«Vertraulich»') + ' · ' + new Date().toLocaleDateString('de-CH');
-      var logoW = w / 4.2;
-      var logoH = logo ? logoW * (logo.height / logo.width) : logoW / 3.3;
-      var stepX = logoW * 1.6, stepY = logoH * 2.9;
-      var diag = Math.sqrt(w * w + h * h);
-      var cols = Math.ceil(diag / stepX) + 2, rows = Math.ceil(diag / stepY) + 2;
-      ctx.save();
-      ctx.translate(w / 2, h / 2);
-      ctx.rotate(-Math.PI / 6);
-      if (logo) {
-        ctx.globalAlpha = 0.16;
-        for (var r = -rows; r <= rows; r++) {
-          for (var c = -cols; c <= cols; c++) ctx.drawImage(logo, c * stepX - logoW / 2, r * stepY - logoH / 2, logoW, logoH);
-        }
-      }
-      ctx.globalAlpha = 0.5;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.font = '600 ' + Math.max(12, Math.round(w / 48)) + 'px "Instrument Sans", sans-serif';
-      ctx.lineWidth = Math.max(2, w / 700);
-      ctx.strokeStyle = 'rgba(30, 26, 22, .45)';
-      ctx.fillStyle = 'rgba(255, 255, 255, .85)';
-      for (var r2 = -rows; r2 <= rows; r2++) {
-        for (var c2 = -cols; c2 <= cols; c2++) {
-          var x = c2 * stepX + stepX / 2, y = r2 * stepY + stepY / 2;
-          ctx.strokeText(text, x, y);
-          ctx.fillText(text, x, y);
-        }
-      }
-      ctx.restore();
     }
 
     function verhaeltnis() {
@@ -287,6 +284,7 @@
       document.title = (o.raum ? o.raum + ' · ' : '') + 'Badvisualisierung · Jäggi Vollmer';
       $('inhalt').classList.toggle('portrait', o.aspect === '3/4');
       $('stage').style.aspectRatio = o.aspect;
+      $('inhalt').style.setProperty('--ar', String(verhaeltnis()));
       $('eyebrow').textContent = [o.raum, o.datum].filter(Boolean).join(' · ');
       $('titel').textContent = o.titel;
       $('lead').textContent = o.lead;
@@ -345,10 +343,10 @@
         status('<h2>Kein gültiger Link</h2><p>Dieser Link scheint unvollständig zu sein. Bitte kontaktieren Sie Jäggi Vollmer.</p>', true);
         return;
       }
-      status('Visualisierung wird geladen …');
+      status(LADER);
+      document.body.classList.add('laden');
       bitmaps = {};
       Promise.all([
-        logoLaden(),
         document.fonts && document.fonts.load ? document.fonts.load('600 20px "Instrument Sans"').catch(function () {}) : null,
         fetch('/.netlify/functions/get-visualisierung?t=' + encodeURIComponent(token), { cache: 'no-store' }).then(function (r) {
           return r.json().catch(function () { return {}; }).then(function (j) {
@@ -357,9 +355,8 @@
           });
         })
       ]).then(function (erg) {
-        var j = erg[2];
+        var j = erg[1];
         objekt = j.objekt;
-        wasserzeichen = j.watermark || '';
         if (!objekt || !objekt.varianten || !objekt.varianten.length) throw new Error('Visualisierung unvollständig');
         return bilderLaden(j.bilder);
       }).then(function () {
@@ -371,6 +368,7 @@
           if (gemerkt && objekt.varianten.some(function (v) { return v.id === gemerkt; })) id = gemerkt;
         } catch (e) { /* egal */ }
         $('status').hidden = true;
+        document.body.classList.remove('laden');
         $('inhalt').hidden = false;
         // Startfarbe ist schon geladen; eine gemerkte andere Farbe lädt farbeWaehlen nach
         gewaehlt = v0.id;

@@ -14,7 +14,7 @@ Mitarbeiterinnen und Mitarbeiter und ein gemeinsamer KI-Zugang (Claude) für all
 | Logins verwalten | `netlify/functions/zugaenge.js`, `public/assets/zugaenge.js`; Tabellen `mitarbeiter`, `anmelde_fehler` (`migration_017`) |
 | Michis Tools | `public/tools/<tool>/index.html`; Speicher `tool-db.js`, `tool-asset.js`, `tool-blob.js`; Tabelle `tool_docs`, Bucket `tools` (`migration_015`) |
 | Karte und Adressvorschläge (swisstopo) | `public/tools/assets/geo-admin.js`, `public/tools/terminplaner/plattform.js` |
-| Lasche «Zurück» (alles öffnet im selben Tab) | `public/assets/zurueck.js`, Merker in `public/assets/plattform.js` |
+| «Zurück» vor dem Logo bzw. Lasche am Rand (alles öffnet im selben Tab) | `public/assets/zurueck.js`, Merker in `public/assets/plattform.js` |
 | Badvisualisierungen erstellen und bearbeiten | `public/assets/badvis-editor.js`; Knöpfe und Aufbereitung im Tool `public/tools/badvisualisierungen/daten.js` |
 | Kundenlink für Badvisualisierungen | `visualisierung-links.js`, `get-visualisierung.js`, `public/visualisierung.html`; Tabelle `visualisierung_links` |
 | Feedback | `public/assets/feedback.js` (Knopf, Bildausschnitt), `feedback-board.js` (Board, Export), Function `feedback.js`; Tabelle `plattform_feedback`, Bucket `feedback` (`migration_016`) |
@@ -49,7 +49,7 @@ Das Repo ist öffentlich. Kundendaten, Kundenfotos, 3D-Scans und Personendaten k
 6. **Live testen** (in der Cloud-Sitzung waren geo.admin.ch und Supabase nur mit Attrappen prüfbar):
    - Terminplaner: Knopf «Projekte» → Suchfeld (Name, Adresse, Bauherrschaft), Adressvorschläge beim Tippen,
      PDF «Terminplan» mit schwarz-weisser Karte und farbigem Kreis um die Adresse.
-   - Aus der Plattform ein Tool öffnen: öffnet im selben Tab, die Lasche «Zurück» am linken Rand führt zurück.
+   - Aus der Plattform ein Tool öffnen: öffnet im selben Tab, «Zurück» oben links vor dem Logo (bzw. die Lasche am linken Rand) führt zurück, das Logo zur Übersicht.
    - Badvisualisierung: im Projekt Kundenlink erstellen, in einem privaten Fenster öffnen, Link deaktivieren → gesperrt.
    - Gäste-WC: 3D-Ansicht lädt den Scan.
    - Feedback: Knopf «Feedback» → Bereich aufziehen → markieren → senden → erscheint im Feedback-Board.
@@ -59,9 +59,9 @@ Das Repo ist öffentlich. Kundendaten, Kundenfotos, 3D-Scans und Personendaten k
 
 ## Navigation
 
-- Tools, Kundenseiten und Berichtsvorschauen öffnen im selben Tab. Am linken Rand erscheint die Lasche «Zurück»: sie
-  führt dorthin zurück, wo man in der Plattform war (Übersicht, Projekt, Kunden, Anfrage). Direkt aufgerufen führt sie
-  zur Übersicht. Kunden sehen die Lasche nicht (nur wenn die Seite aus der Plattform geöffnet wurde).
+- Tools, Kundenseiten und Berichtsvorschauen öffnen im selben Tab. Oben links vor dem Logo (Badvisualisierungen,
+  Terminplaner, Reel) bzw. als Lasche am linken Rand erscheint «Zurück»: es führt dorthin zurück, wo man in der Plattform war (Übersicht, Projekt, Kunden, Anfrage). Direkt aufgerufen führt es
+  zur Übersicht, ein Klick aufs Logo ebenso. Kunden sehen «Zurück» nicht (nur wenn die Seite aus der Plattform geöffnet wurde).
 - Externe Ziele bleiben in einem neuen Tab: WhatsApp, Karte, E-Mail, Telefon, Webseiten von Firmen und der IWB.
 
 ## Als App installieren (PWA)

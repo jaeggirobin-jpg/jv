@@ -11,12 +11,6 @@ const URL_SEK = 60;
 const SCHLUESSEL_RE = /^(vorher|(room|mock)-[A-Za-z0-9_-]{1,60})$/;
 const ID_RE = /^[A-Za-z0-9_-]{1,60}$/;
 
-function kundenName(k) {
-  const anrede = { frau: 'Frau', herr: 'Herr', familie: 'Familie' }[k.anrede_typ] || '';
-  const vorname = k.anrede_typ !== 'familie' && k.vorname ? k.vorname : '';
-  return [anrede, vorname, k.nachname].filter(Boolean).join(' ');
-}
-
 // Text aus den Spezifikationen: nur Klartext, Farbmuster als eigener Wert (kein HTML an den Kunden)
 function entitaeten(s) {
   return s.replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
@@ -58,18 +52,18 @@ exports.handler = async (event) => {
   if (!/^[a-f0-9]{32}$/.test(token)) return t.json(400, { error: 'Ungültiger Link' });
 
   try {
-    const links = await t.rest('visualisierung_links?select=id,objekt_id,kunde_name,kunde_id,is_active,view_count&token=eq.' + token);
+    const links = await t.rest('visualisierung_links?select=id,objekt_id,kunde_id,is_active,view_count&token=eq.' + token);
     const link = links && links[0];
     if (!link) return t.json(404, { error: 'Link nicht gefunden' });
 
     const deaktiviert = { error: 'Dieser Link wurde deaktiviert. Bitte kontaktieren Sie Jäggi Vollmer.' };
     if (!link.is_active) return t.json(403, deaktiviert);
 
-    let name = link.kunde_name;
+    // Kundenzugang deaktiviert → Link gesperrt. Seit 12.11.2026 ohne Wasserzeichen (Robin): der Name
+    // geht nicht mehr an die Seite.
     if (link.kunde_id) {
-      const k = await t.rest('kunden?select=anrede_typ,vorname,nachname,status&id=eq.' + link.kunde_id);
+      const k = await t.rest('kunden?select=status&id=eq.' + link.kunde_id);
       if (!k || !k[0] || k[0].status !== 'aktiv') return t.json(403, deaktiviert);
-      name = kundenName(k[0]) || name;
     }
 
     const doc = await t.docLesen('badvis', 'objekte/' + link.objekt_id);
@@ -101,7 +95,7 @@ exports.handler = async (event) => {
       });
     } catch (e) { console.error('Zähler', e); }
 
-    return t.json(200, { ok: true, watermark: name, objekt, bilder });
+    return t.json(200, { ok: true, objekt, bilder });
   } catch (err) {
     console.error('get-visualisierung', err);
     return t.json(500, { error: 'Die Visualisierung konnte nicht geladen werden.' });
