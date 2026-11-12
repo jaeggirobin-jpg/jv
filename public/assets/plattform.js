@@ -621,7 +621,7 @@
     var frei = objekteListe().filter(function (o) { return !o.projektId || !D.projekte[o.projektId]; });
     var kunden = kundenVon(p.id);
     var html = '<section class="card" aria-labelledby="pkVisTitel"><h2 id="pkVisTitel">Badvisualisierungen</h2>' +
-      '<p class="muted">Vorher/Nachher mit Farbwahl. Für Kunden über einen geschützten Link mit Wasserzeichen, jederzeit deaktivierbar.</p>';
+      '<p class="muted">Vorher/Nachher mit Farbwahl. Für Kunden über einen geschützten Link (ohne Download), jederzeit deaktivierbar.</p>';
     if (eigene.length) {
       html += '<ul class="jvp-liste">' + eigene.map(function (o) {
         var bild = o.bilder && o.bilder.vorher ? '<img class="bild" src="/_blob/' + esc(o.bilder.vorher) + '" alt="" loading="lazy">' : '';
@@ -650,7 +650,7 @@
             '<div class="form-row"><div><label for="pvl-kunde">Kundenzugang</label><select id="pvl-kunde">' +
               kunden.map(function (k, i) { return '<option value="' + esc(k.id) + '"' + (i === 0 ? ' selected' : '') + '>' + esc(kundeName(k)) + '</option>'; }).join('') +
               '<option value="">– ohne Kundenzugang –</option></select></div>' +
-            '<div><label for="pvl-name">Name im Wasserzeichen *</label><input type="text" id="pvl-name" value="' + esc(vorschlag) + '" required autocomplete="off"></div></div>' +
+            '<div><label for="pvl-name">Name des Links *</label><input type="text" id="pvl-name" value="' + esc(vorschlag) + '" required autocomplete="off"></div></div>' +
             '<p class="muted" style="margin:6px 0 0">Mit Kundenzugang gilt: Wird der Kunde deaktiviert, ist auch dieser Link gesperrt.</p>' +
             '<div class="jvp-knopfreihe" style="margin-top:10px"><button type="submit" class="jvp-knopf jvp-knopf--primaer jvp-knopf--klein">Link erstellen und kopieren</button>' +
             '<button type="button" class="jvp-knopf jvp-knopf--klein" data-a="link-neu" data-objekt="' + esc(o.id) + '">Abbrechen</button></div></form>';
@@ -799,7 +799,7 @@
   });
 
   $('projektInhalt').addEventListener('change', function (ev) {
-    // Kundenzugang gewählt: Name im Wasserzeichen vorschlagen
+    // Kundenzugang gewählt: Name des Links vorschlagen
     if (ev.target.id === 'pvl-kunde') {
       var k = D.kunden.filter(function (x) { return x.id === ev.target.value; })[0];
       if (k) $('pvl-name').value = kundeName(k);

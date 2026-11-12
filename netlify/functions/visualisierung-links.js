@@ -39,7 +39,7 @@ exports.handler = async (event) => {
       const objektId = String(b.objekt_id || '');
       const name = String(b.kunde_name || '').trim().slice(0, 120);
       if (!ID_RE.test(objektId)) return t.json(400, { error: 'Objekt fehlt' });
-      if (!name) return t.json(400, { error: 'Name für das Wasserzeichen fehlt' });
+      if (!name) return t.json(400, { error: 'Name des Links fehlt' });
       if (b.kunde_id && !UUID_RE.test(b.kunde_id)) return t.json(400, { error: 'Ungültige Kunden-ID' });
       if (b.projekt_id && !ID_RE.test(b.projekt_id)) return t.json(400, { error: 'Ungültige Projekt-ID' });
       // Objekt muss existieren
