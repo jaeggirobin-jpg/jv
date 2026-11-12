@@ -113,6 +113,29 @@ def ki_chat_einbinden(text, werkzeug, name):
 
 
 # ── 1. Bau-Terminplaner ──────────────────────────────────────────────────
+def kontaktliste_hintergrund(t):
+    n = 'Terminplaner'
+    # PDF Kontaktliste (Unternehmer & Handwerker): Kopf, Tabellenkopf und Zeilen mit halbtransparentem
+    # Hintergrund wie im Terminplan, damit die Schrift über der Karte lesbar bleibt (Robin, 11.11.2026)
+    t = ersetzen(t, "pdfBg(doc,true,p);const PW=297,M=12;\n try{doc.addImage(LOGO,'PNG',M,M,40,10.45);}catch(e){}",
+                 "pdfBg(doc,true,p);const PW=297,M=12;const halb=(a,f)=>{doc.setGState(new doc.GState({opacity:a}));f();doc.setGState(new doc.GState({opacity:1}));};\n"
+                 " doc.setFillColor(255,255,255);halb(.88,()=>doc.roundedRect(M,M-3.5,PW-2*M,20,3,3,'F'));doc.setFillColor(175,118,49);doc.roundedRect(M,M-3.5,2.2,20,1.1,1.1,'F');\n"
+                 " try{doc.addImage(LOGO,'PNG',M+5,M,40,10.45);}catch(e){}", n)
+    t = ersetzen(t, "doc.text('Kontaktliste '+(p.name||''),M+48,M+6);", "doc.text('Kontaktliste '+(p.name||''),M+53,M+6);", n)
+    t = ersetzen(t, ".filter(Boolean).join('   ·   '),M+48,M+11.5);\n const C=[['Firma / Rolle',58]",
+                 ".filter(Boolean).join('   ·   '),M+53,M+11.5);\n const C=[['Firma / Rolle',58]", n)
+    t = ersetzen(t, " let y=M+20;\n const head=()=>{doc.setFillColor(...RGB.ph);doc.rect(M,y,PW-2*M,7,'F');",
+                 " let y=M+20,top=y,zi=0;const rahmen=()=>{doc.setDrawColor(...RGB.line);doc.setLineWidth(.3);doc.roundedRect(M,top,PW-2*M,y-top,2,2,'S');doc.setLineWidth(.2);};\n"
+                 " const head=()=>{top=y;zi=0;doc.setFillColor(...RGB.ph);halb(.95,()=>{doc.roundedRect(M,y,PW-2*M,7,2,2,'F');doc.rect(M,y+2,PW-2*M,5,'F');});", n)
+    t = ersetzen(t, "  if(y+h>210-M){doc.addPage();y=M;head();}\n  let x=M+1.5;cells.forEach",
+                 "  if(y+h>210-M){rahmen();doc.addPage();y=M;head();}\n"
+                 "  doc.setFillColor(...(zi++%2?[246,247,248]:[255,255,255]));halb(.86,()=>doc.rect(M,y,PW-2*M,h,'F'));\n"
+                 "  let x=M+1.5;cells.forEach", n)
+    t = ersetzen(t, "  y+=h;doc.setDrawColor(...RGB.line);doc.line(M,y,PW-M,y);\n }\n return doc;",
+                 "  y+=h;doc.setDrawColor(...RGB.line);doc.line(M,y,PW-M,y);\n }\n rahmen();\n return doc;", n)
+    return t
+
+
 def terminplaner(t):
     n = 'Terminplaner'
     t = kopf(t, ROBOTS + bridge('terminplaner') + '<script src="/tools/assets/geo-admin.js"></script>', n)
@@ -142,6 +165,8 @@ def terminplaner(t):
                  'const frame=y1=>{(doc.jvUnten=doc.jvUnten||{})[doc.internal.getCurrentPageInfo().pageNumber]=y1;doc.setDrawColor(...C.line);', n)
     t = ersetzen(t, 'const fy=PH-M-6;doc.setFillColor(...C.soft);',
                  'const fy=PH-M-6;doc.jvLegende={x:M,y:fy-1.5,w:W};doc.setFillColor(...C.soft);', n)
+
+    t = kontaktliste_hintergrund(t)
 
     # Keine Personendaten im öffentlichen Repo: kommen aus der Datenbank
     t = regex_ersetzen(t, r'const BASE_FIRMS=\[.*?\];\n', 'const BASE_FIRMS=[];\n', n)
